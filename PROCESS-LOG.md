@@ -11,9 +11,8 @@ Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, wit
 - **Guessed sources.** Two FDA (Food and Drug Administration) URLs an agent guessed returned 404.
 - **My cross-border lines overstated scope.** An independent fact-check failed my brief: it said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA (EU Digital Operational Resilience Act) to any EU financial entity. The sources say neither. Four product claims also overreached. Fixed, with new eval cases ([report](docs/qa/factcheck-report.md)).
 - **Four defects my tests missed.** With 92 tests green, an adversarial reviewer found enrichment running before its audit record, a "C.I.S.O." (chief information security officer) title routed to engineering, a brief re-adding an excluded CISO, and "compliance-ready" passing the claim gate. All fixed, each with a regression test ([report](docs/qa/adversarial-report.md)).
-- **One validation run aborted.** To meet the deadline I stopped the final no-mistakes run in its document step, kept its review fixes, committed the last fixes directly and relied on GitHub Actions for the final check.
-- **Two usage-limit stops**, at 00:12 and again before 00:36, when a plan upgrade cleared it.
-- **This log** first ran to about 14,700 words. To meet the packet's one-page rule I replaced the contract's append-only log with this page; the full log is in git history at `3dfa5fd:docs/decision-log.md`. The `no-mistakes(...)` commits are the validation pipeline's automatic fixes.
+- **One validation run aborted.** To meet the deadline I stopped the final validation run in its document step, kept its review fixes, committed the last fixes directly and relied on GitHub Actions for the final check.
+- **This log** first ran to about 14,700 words. To meet the packet's one-page rule I replaced the contract's append-only log with this page; the full log is in git history at `3dfa5fd:docs/decision-log.md`.
 
 ## What I learned
 

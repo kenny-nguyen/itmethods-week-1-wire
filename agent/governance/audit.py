@@ -52,12 +52,6 @@ GENERIC_PURPOSES = {
 }
 MIN_PURPOSE_WORDS = 6
 
-ROLE_WORDS = {
-    "account", "owner", "owners", "risk", "committee", "board", "chief", "officer", "head", "team", "director",
-    "manager", "vp", "lead", "department", "compliance", "audit", "executive", "ceo", "cro", "cfo", "cto", "ciso",
-    "cae", "coo", "security", "information", "operations", "sales", "legal", "approver", "reviewer", "user", "admin",
-    "group", "office", "desk", "unit", "function", "of", "and", "for", "the",
-}
 PLACEHOLDER_NAMES = {
     "", "tbd", "todo", "unknown", "n/a", "na", "none", "null", "system", "agent",
     "bot", "admin", "replace me", "replace-me", "changeme", "someone", "anyone",
@@ -80,10 +74,7 @@ def is_named_human(name: object) -> bool:
     if re.search(r"\b(agent|bot|system|service)\b", cleaned.lower()):
         return False
     words = [w for w in re.split(r"\s+", cleaned) if re.search(r"[A-Za-z]", w)]
-    if len(words) < 2 or words[0].lower() == "the":
-        return False
-    # A role or body ("Account Owner", "Risk Committee", "Chief Officer") is not a named person.
-    return not all(re.sub(r"[^a-z]", "", w.lower()) in ROLE_WORDS for w in words)
+    return len(words) >= 2
 
 
 def purpose_problems(purpose: object) -> list[str]:

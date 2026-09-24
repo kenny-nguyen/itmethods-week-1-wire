@@ -19,7 +19,7 @@ class BriefTests(unittest.TestCase):
 
     def test_canadian_brief_carries_caveat_and_osfi_context(self):
         text, _, _ = golden_brief(caveat=True)
-        self.assertIn("so applicability requires confirmation", text)
+        self.assertIn("SR 26-2 applicability requires confirmation", text)
         self.assertIn("E-23", text)
         self.assertIn("Nothing has been sent and the bank has not been contacted.", text)
         order = [text.index(h) for h in ("## What changed", "## What is certain for this account",

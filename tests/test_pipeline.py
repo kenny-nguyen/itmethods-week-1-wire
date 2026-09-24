@@ -131,7 +131,7 @@ class PipelineTests(unittest.TestCase):
         with tempdir() as d:
             s = run(MOTION, Path(d), provider=TemplateProvider())
             text = Path(s["accounts"]["hs-1001"]["brief"]).read_text()
-            self.assertIn("so applicability requires confirmation", text)
+            self.assertIn("SR 26-2 applicability requires confirmation", text)
             self.assertIn("OSFI Guideline E-23", text)
             self.assertIn("## What depends on structure (confirm)", text)
             self.assertIn("DORA", text)
