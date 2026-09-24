@@ -12,7 +12,7 @@ WIRE_OUT_DIR=<empty scratch dir> claude -p 'Run the regulatory-trigger-brief ski
 ```
 
 - Claude Code 2.1.280, model `claude-opus-5-5`, run on 2026-09-24 (UTC). The MCP server ran from a local `.venv` built from `requirements.txt`.
-- The prompt is the whole user input. The agent had no Bash, Write or Edit tools, so the only way to write a brief was through `request_approval`.
+- The prompt is the whole user input. The agent was not permitted to use Bash, Write or Edit (`--allowedTools` with `--permission-mode dontAsk`), so the only way to write a brief was through `request_approval`.
 - This was the first and only attempt. It was not re-run.
 - Full event stream: [`transcript.jsonl`](transcript.jsonl) (Claude Code `stream-json`: every tool call and result, including the web-fetch sub-agent's).
 

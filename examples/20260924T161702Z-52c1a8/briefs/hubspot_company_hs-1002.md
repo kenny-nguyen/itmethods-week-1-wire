@@ -21,10 +21,9 @@ Prepared for Kenny Nguyen, the account owner, to decide whether to share it in t
 - Reign Gateway gives applications and agents a governed path to approved models and tools [P-GATEWAY].
 - Reign prepares the evidence; the people who own the risk decide [P-EVIDENCE].
 - Reign Assurance is in co-design development [P-ASSURANCE-STATUS].
-- iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance, so where any of those functions is required, we would work with a firm that holds that mandate [P-BANKING].
 
 ## Suggested next step
-- The account owner offers the audit and risk committee an Executive Assurance Briefing.
+- The account owner offers the audit and risk committee an Executive Assurance Briefing, the meeting this motion proposes.
 
 ## Suggested recipients in the existing relationship
 - Risk lane: Jordan Whitfield (fictional), Chief Risk Officer [zoominfo:contact/zi-2006]
@@ -32,6 +31,8 @@ Prepared for Kenny Nguyen, the account owner, to decide whether to share it in t
 
 ## Open questions for the account owner
 - None from the record.
+- iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance, so where any of those functions is required, we would work with a firm that holds that mandate [P-BANKING].
+- The assurance and reliance judgments stay with your business, risk, compliance and audit experts, and any audit opinion or certification stays with their auditors [P-RELIANCE].
 
 ## Sources
 - [src-sr26-2] Federal Reserve SR 26-2 - https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
@@ -40,6 +41,7 @@ Prepared for Kenny Nguyen, the account owner, to decide whether to share it in t
 - [P-EVIDENCE] iTmethods - https://itmethods.com/assurance
 - [P-ASSURANCE-STATUS] iTmethods - https://itmethods.com/assurance
 - [P-BANKING] iTmethods - https://itmethods.com/sectors/banking
+- [P-RELIANCE] iTmethods - https://itmethods.com/assurance
 - [hubspot:company/hs-1002] HubSpot company record
 - [clay:table/first-motion/row/hs-1002] Clay enrichment row
 - [zoominfo:contact/zi-2006] ZoomInfo contact record

@@ -1,7 +1,7 @@
 {
   "_label": "OFFLINE TEST MODE: template drafts for CI, not the agent. Baseline for the scorer.",
   "out": "$WIRE_OUT_DIR",
-  "run": null,
+  "run": "20260924T161702Z-52c1a8",
   "score": "22/22",
   "passed": 22,
   "total": 22,

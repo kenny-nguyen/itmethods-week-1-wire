@@ -27,6 +27,8 @@ How rules from three jurisdictions reach a Canadian bank. As I read it, SR 26-2 
 | Hospital | Any touch this month. | The packet's Slack notes say "do not spray hospitals this month", and "high-volume slop outbound" is a knockout. Hospitals go on a watch list: noticed, never contacted. |
 | Defense supplier | Any hint of CMMC (Cybersecurity Maturity Model Certification), FedRAMP (Federal Risk and Authorization Management Program) or CUI (controlled unclassified information) capability. | iTmethods' public-sector page says it is not FedRAMP authorized or CMMC certified and does not handle CUI. The claim would be false; the gate refuses those terms. |
 
+
+The limit, stated plainly: a deterministic claim gate cannot catch every paraphrase. Independent reviewers found new ones twice, and each is now a test, but the named human approver remains the final check before anything is shared.
 ## How to run
 
 ```
@@ -63,6 +65,8 @@ The direct model-API (application programming interface) path was not run (no ke
 
 I made the calls; AI agents did most of the building under the working contract below. Claude Code (Claude Opus 5.5) built the skill, server and evals. Codex, OpenAI's coding agent and so a different model, ran the independent fact-check and adversarial review. A research agent on another model checked the primary sources blind.
 
+Tools used in the window: Claude Code, a custom MCP server, Codex, Python unittest and GitHub Actions. HubSpot, Clay and ZoomInfo are fixture adapters with day-one interfaces ([day-one wiring](docs/day-one-wiring.md)).
+
 ## How I decided
 
 - [Cut, sequenced, refused](docs/cut-sequenced-refused.md): why only the bank trigger is built.
@@ -74,7 +78,7 @@ I made the calls; AI agents did most of the building under the working contract 
 
 ## About the working contract
 
-The kit is part of the agentic system I use for my own work: the method layer of my DBK Agentic OS, reapplied here as I would on any task. It contains nothing specific to this assignment. I committed it first (`Install working contract and kit`) so its rules were in place before any work began, and I used it throughout: goal and reality checkpoints, QA (quality assurance) at every stage, the ambiguity register and the writer handoff. The contract is [`AGENTS.md`](AGENTS.md); the rest is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/). The repo runs without the rest of that system; the tools that ran the method are named under [How it was built](#how-it-was-built).
+The first commit (`Install working contract and kit`) is the method layer of my own agentic operating system, committed before any work so its rules were fixed first: checkpoints, QA (quality assurance) at every stage, an ambiguity register and independent review. The contract is [`AGENTS.md`](AGENTS.md); the rest is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/).
 
 ## Repo map
 
@@ -85,7 +89,7 @@ The kit is part of the agentic system I use for my own work: the method layer of
 | `AMBIGUITY-REGISTER.md` | Every judgment call, its reason and what would flip it. |
 | `AGENTS.md`, `CLAUDE.md`, `contract/`, `.claude/agents/` | The working contract and kit. |
 | `skills/regulatory-trigger-brief/`, `.claude/skills/` | The Claude skill, and the link Claude Code finds it through. |
-| `agent/`, `.mcp.json`, `requirements.txt` | The MCP server (`mcp_server.py`, `tools.py`), the IPOF (Input, Processing, Output, Feedback) stages, R-17 audit trail, batch runner. |
+| `agent/`, `.mcp.json`, `requirements.txt` | The MCP server and its tools; adapters that read accounts, contacts, enrichment and triggers; the rules (audit record, ICP filter, applicability check, claim gate); brief writing; approvals and the kill switch; the batch runner. |
 | `prompts/` | Direct model-API system prompt (not exercised live). |
 | `evals/` | Agent-run cases and scorer; output-gate cases. |
 | `playbooks/`, `icp/` | Campaign Manager playbooks and schema; the living ICP. |

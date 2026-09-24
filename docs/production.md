@@ -137,7 +137,7 @@ A play is one buyer, one trigger and one channel. To start a new motion, copy a 
 "trigger": { "type": "regulatory", "id": "<the verified trigger id>" },
 "channel": "briefing",
 "trigger_status": "implemented",
-"claims": ["P-FORGE", "P-GATEWAY"],
+"claims": ["P-GATEWAY", "P-EVIDENCE"],
 ```
 
 3. Create `playbooks/motions/forge-launch.jsonc` listing `"playbooks": ["defense-forge-launch"]`.

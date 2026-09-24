@@ -12,7 +12,7 @@ Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, wit
 - **My cross-border lines overstated scope.** An independent fact-check failed my brief: it said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA (EU Digital Operational Resilience Act) to any EU financial entity. The sources say neither. Four product claims also overreached. Fixed, with new eval cases ([report](docs/qa/factcheck-report.md)).
 - **Four defects my tests missed.** With 92 tests green, an adversarial reviewer found enrichment running before its audit record, a "C.I.S.O." (chief information security officer) title routed to engineering, a brief re-adding an excluded CISO, and "compliance-ready" passing the claim gate. All fixed, each with a regression test ([report](docs/qa/adversarial-report.md)).
 - **Two usage-limit stops**, at 00:12 and again before 00:36, when a plan upgrade cleared it.
-- **This log** first ran to about 14,700 words.
+- **This log** first ran to about 14,700 words. To meet the packet's one-page rule I replaced the contract's append-only log with this page; the full log is in git history at `3dfa5fd:docs/decision-log.md`. The `no-mistakes(...)` commits are the validation pipeline's automatic fixes.
 
 ## What I learned
 
@@ -53,7 +53,7 @@ Try to BREAK it, running real commands:
 
 <details><summary>The live agent run (transcript: <a href="examples/README.md">examples/</a>)</summary>
 
-With no Bash, Write or Edit tools, the agent could only write a brief through the governed `request_approval` tool: structural governance.
+Because the agent was not permitted to use Bash, Write or Edit (`--allowedTools` with `--permission-mode dontAsk`), it could only write a brief through the governed `request_approval` tool: structural governance.
 
 ```sh
 WIRE_OUT_DIR=<empty scratch dir> claude -p 'Run the regulatory-trigger-brief skill for the SR 26-2 trigger against the bank account(s) in the bank playbook.' \
