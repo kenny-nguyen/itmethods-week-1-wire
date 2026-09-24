@@ -13,17 +13,19 @@ The assignment packet is private and not in this repository; short lines are quo
 3. **[One thing I did not know](#one-thing-i-did-not-know)**, below.
 4. **[What I would not ship](#what-i-would-not-ship)**, below.
 
+Also asked for in the packet: the Campaign Manager playbook (`playbooks/`, guesses marked) and the living ICP (`icp/icp.json`, invented fields marked).
+
 ## One thing I did not know
 
-How rules from three jurisdictions reach a Canadian bank. As I read it, SR 26-2 reaches it only through US operations the Federal Reserve regulates; OSFI E-23 and B-13 certainly apply; DORA applies only if an EU entity is one of its listed financial-entity types. That became the brief's structure: what changed, what is certain, what depends on structure (marked "Confirm"). My first draft still overstated the SR 26-2 and DORA lines; the independent fact-check caught it. [Full story](docs/one-thing-i-did-not-know.md).
+How rules from three jurisdictions reach a Canadian bank. As I read it, SR 26-2 reaches it only through US operations the Federal Reserve regulates; guidelines E-23 and B-13 from OSFI (Canada's Office of the Superintendent of Financial Institutions) certainly apply; DORA (the EU's Digital Operational Resilience Act) applies only if an EU entity is one of its listed financial-entity types. That became the brief's structure: what changed, what is certain, what depends on structure (marked "Confirm"). My first draft still overstated the SR 26-2 and DORA lines. The independent fact-check caught it, and those lines now keep the regulators' own scope words. [Full story](docs/one-thing-i-did-not-know.md).
 
 ## What I would not ship
 
 | Buyer | Example | Why |
 |---|---|---|
 | Bank | A brief saying SR 26-2 "applies" to the bank's US entity, or DORA to "an EU financial entity". My first draft did this. | Audit and risk readers know regulatory scope. One overstated line and nothing else in the brief is trusted. Scope questions go under "Confirm". |
-| Hospital | Any touch this month. | The packet's Slack notes say "do not spray hospitals this month", and spray is a knockout. Hospitals go on a watch list: noticed, never contacted. |
-| Defense supplier | Any hint of CMMC, FedRAMP or CUI capability. | iTmethods' public-sector page says it is not FedRAMP authorized or CMMC certified and does not handle CUI. The claim would be false; the gate refuses those terms. |
+| Hospital | Any touch this month. | The packet's Slack notes say "do not spray hospitals this month", and "high-volume slop outbound" is a knockout. Hospitals go on a watch list: noticed, never contacted. |
+| Defense supplier | Any hint of CMMC (Cybersecurity Maturity Model Certification), FedRAMP (Federal Risk and Authorization Management Program) or CUI (controlled unclassified information) capability. | iTmethods' public-sector page says it is not FedRAMP authorized or CMMC certified and does not handle CUI. The claim would be false; the gate refuses those terms. |
 
 ## How to run
 
@@ -55,11 +57,11 @@ python3 -m unittest discover -s tests -t . -v
 python3 -m evals.run_evals
 ```
 
-No live agent or direct model-API run happened in the build environment. Production setup, kill switch and recovery: [`docs/production.md`](docs/production.md).
+The direct model-API (application programming interface) path was not run (no key). The live agent run in Claude Code is in `examples/` (see [`examples/README.md`](examples/README.md), transcript included). Production setup, kill switch and recovery: [`docs/production.md`](docs/production.md).
 
 ## How it was built
 
-I made the calls; AI agents did most of the building under the working contract below. Claude Code (Claude Opus 5.5) built the skill, server and evals. Codex, a different model, ran the independent fact-check and adversarial review. A research agent on another model checked the primary sources blind.
+I made the calls; AI agents did most of the building under the working contract below. Claude Code (Claude Opus 5.5) built the skill, server and evals. Codex, OpenAI's coding agent and so a different model, ran the independent fact-check and adversarial review. A research agent on another model checked the primary sources blind.
 
 ## How I decided
 
@@ -82,11 +84,11 @@ The kit is part of the agentic system I use for my own work: the method layer of
 | `docs/` | Write-ups, intake worksheet, production guide, `research/` (sourced facts), `qa/` (independent QA reports). |
 | `AMBIGUITY-REGISTER.md` | Every judgment call, its reason and what would flip it. |
 | `AGENTS.md`, `CLAUDE.md`, `contract/`, `.claude/agents/` | The working contract and kit. |
-| `skills/regulatory-trigger-brief/` | The Claude skill. |
-| `agent/`, `.mcp.json`, `requirements.txt` | The MCP server (`mcp_server.py`, `tools.py`), IPOF stages, R-17 audit trail, batch runner. |
+| `skills/regulatory-trigger-brief/`, `.claude/skills/` | The Claude skill, and the link Claude Code finds it through. |
+| `agent/`, `.mcp.json`, `requirements.txt` | The MCP server (`mcp_server.py`, `tools.py`), the IPOF (Input, Processing, Output, Feedback) stages, R-17 audit trail, batch runner. |
 | `prompts/` | Direct model-API system prompt (not exercised live). |
 | `evals/` | Agent-run cases and scorer; output-gate cases. |
 | `playbooks/`, `icp/` | Campaign Manager playbooks and schema; the living ICP. |
-| `fixtures/` | Fictional CRM and enrichment records; real regulator publications. |
-| `tests/`, `.github/workflows/ci.yml` | Unit tests and CI. |
-| `examples/` | One labelled offline-test-mode run. |
+| `fixtures/` | Fictional CRM (customer relationship management) and enrichment records; records of real regulator publications. |
+| `tests/`, `.github/workflows/ci.yml`, `.gitignore` | Unit tests, CI, and the paths git ignores (`out/`, `.venv/`, `.env`). |
+| `examples/` | Labelled sample runs, indexed in `examples/README.md`. |

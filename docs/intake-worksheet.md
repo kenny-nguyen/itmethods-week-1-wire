@@ -4,6 +4,8 @@ First structured read of the assignment, filled from `contract/templates/intake-
 
 The assignment packet is private and is not copied here. Only the short lines a decision depends on are quoted.
 
+This is the snapshot taken before any code, kept as it was. Later decisions changed some of it: there is no volume cap (I1, reversed by A-037); the bank rule became "no cold outreach, the brief goes to the account owner" (I3, A-043); the FDA source was found and verified (row 3, A-048); and the MCP (Model Context Protocol) server moved from Could to the core of the artifact. Section numbers follow the template; its section 7 (Clarifications) and section 9 (Exit check) are not filled in here. QA means quality assurance, FDA the US Food and Drug Administration, and UI user interface.
+
 ## 1. Input QA on the assignment itself
 
 - [x] Read in full from the source files: the assignment brief, CEO (chief executive officer) notes, ICP (ideal customer profile) sketch, the Reign constraint (rule R-17), the Campaign Manager stub, and the window file. Six files, all readable.
@@ -39,7 +41,7 @@ The assignment packet is private and is not copied here. Only the short lines a 
 | I1 | "Precision, no spray" means a small, gated volume per run and a kill switch the CRO (chief revenue officer) controls. | CEO notes, Campaign Manager `kill_criteria` | High | Yes | A-010 |
 | I2 | Risk and engineering buyers at the bank get one brief routed to both lanes by title, never asked to pick. | CEO notes "Route them without asking" | High | Yes | A-011 |
 | I3 | Bank outbound is blocked unless a briefing is booked or a regulatory trigger fired. | CEO notes | High | Yes | A-009 |
-| I4 | The product must not invent facts about real companies; fixtures use fictional accounts. | "no-slop", bank/hospital/defense embarrassment test | High | Yes | A-013 |
+| I4 | The product must not invent facts about real companies; fixtures use fictional accounts. | "non-slop", bank/hospital/defense embarrassment test | High | Yes | A-013 |
 
 ### UNSPECIFIED
 

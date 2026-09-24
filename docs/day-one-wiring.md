@@ -2,7 +2,7 @@
 
 I had no HubSpot, Clay or ZoomInfo access in the window, so each is a local fixture behind an interface. This is what I would wire on day one.
 
-Each tool replaces one fixture class. The pipeline and the MCP tools only talk to these interfaces (`agent/input/base.py`, `agent/governance/audit.py`).
+Each tool replaces one fixture class. The pipeline and the MCP (Model Context Protocol) tools only talk to these interfaces (`agent/input/base.py`, `agent/governance/audit.py`). R-17 is the packet's rule that an agent writes an audit record before it touches a financial-services person or account.
 
 | Tool | Job | Interface to implement |
 |---|---|---|

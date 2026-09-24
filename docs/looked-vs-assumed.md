@@ -2,6 +2,8 @@
 
 A- rows are in [`AMBIGUITY-REGISTER.md`](../AMBIGUITY-REGISTER.md), with full reasoning and reversal triggers.
 
+Terms used below: SR 26-2 is the Federal Reserve's revised model risk guidance; OSFI is Canada's Office of the Superintendent of Financial Institutions; DORA is the EU's Digital Operational Resilience Act; EIOPA is the European Insurance and Occupational Pensions Authority; FDA PCCP is the US Food and Drug Administration's guidance on a Predetermined Change Control Plan; FedRAMP is the US Federal Risk and Authorization Management Program; CMMC is the Cybersecurity Maturity Model Certification; CUI is controlled unclassified information; ITAR is the US International Traffic in Arms Regulations; MCP is the Model Context Protocol and SDK means software development kit; R-17 is the packet's rule that an agent writes an audit record before it touches a financial-services (FS) person or account; ICP is ideal customer profile; CEO is chief executive officer and CISO chief information security officer.
+
 **Went looking (read from the source, not recalled):**
 
 | Question | What I found |
@@ -9,11 +11,11 @@ A- rows are in [`AMBIGUITY-REGISTER.md`](../AMBIGUITY-REGISTER.md), with full re
 | Is SR 26-2 real, and whom does it cover? | Federal Reserve letter of April 17, 2026; "most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve"; supersedes SR 11-7 and SR 21-8. |
 | What binds a Canadian D-SIB (domestic systemically important bank) for sure? | OSFI E-23 (model risk), page shows effective May 1, 2027; OSFI B-13 (technology and cyber risk). |
 | DORA's source? | EUR-Lex blocked automated reads; the EIOPA page names Regulation (EU) 2022/2554. |
-| What do Forge and Reign actually do, and in what state? | itmethods.com: Ops and Gateway available, Factory beta, Assurance in co-design; Gateway is the governed path for agent calls. |
-| What must iTmethods never claim? | Its own pages: no audit opinion, certification or independent assurance; no FedRAMP; per the research agent, no CMMC certification and no CUI handling. |
-| FDA PCCP guidance? | Two URLs an agent guessed were wrong; a research agent found the real guidance. |
+| What do Forge and Reign actually do, and in what state? | itmethods.com: Reign Ops and Gateway available, Factory beta, Assurance in co-design; Gateway is the governed path to approved models and tools. The Forge positioning line I first quoted is no longer on the cited pages, so briefs no longer use it (fact-check F-09). |
+| What must iTmethods never claim? | Its own pages: no audit opinion, certification or independent assurance; the public-sector page says it is not FedRAMP authorized or CMMC certified, does not handle CUI and does not claim ITAR compliance. |
+| FDA PCCP guidance? | Two URLs an agent guessed returned 404 (fda.gov also returns 404 to automated reads here for the real pages, so the 404 alone did not prove them wrong); a research agent found and verified the real guidance. |
 | The MCP SDK's current API? | Read from the installed `mcp==2.2.0`: `FastMCP` became `MCPServer` in 2.x. |
-| Did my own cross-border lines match those sources? | Not at first. The independent fact-check found my SR 26-2 and DORA "Confirm" lines stated applicability more broadly than the sources do (findings F-02, F-07 in [`qa/factcheck-report.md`](qa/factcheck-report.md)). See [One thing I did not know](one-thing-i-did-not-know.md). |
+| Did my own cross-border lines match those sources? | Not at first. The independent fact-check found my SR 26-2 and DORA "Confirm" lines stated applicability more broadly than the sources do (findings F-02, F-07 in [`qa/factcheck-report.md`](qa/factcheck-report.md)). The lines now keep the regulators' own scope words, and eval cases fail the old wording. See [One thing I did not know](one-thing-i-did-not-know.md). |
 
 **Assumed, then decided by me** (full reasoning and reversal triggers in `AMBIGUITY-REGISTER.md`):
 
