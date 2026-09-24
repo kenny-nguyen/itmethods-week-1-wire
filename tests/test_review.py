@@ -24,6 +24,18 @@ class ReviewViewTests(unittest.TestCase):
             self.assertIn("22/22", page)
             self.assertIn("hs-1007", page)  # the watched hospital, with its reason
 
+    def test_run_with_no_eval_case_is_neutral_not_a_pass(self):
+        from agent.output.review import render
+        from evals.score_run import score
+        with tempdir() as d:
+            run_dir = Path(d) / "runs" / "mcp-20260925T000000Z-aaaaaa"
+            run_dir.mkdir(parents=True)
+            sc = score(Path(d), run_dir=run_dir)
+            self.assertEqual((sc["passed"], sc["total"]), (0, 0))
+            page = render(run_dir, audit_path=Path(d) / "audit.jsonl", errors_path=Path(d) / "errors.jsonl", score=sc)
+            self.assertIn("no eval case exercised in this run", page)
+            self.assertNotIn("0/0", page)
+
     def test_record_text_is_escaped(self):
         from agent.output.review import render
         with tempdir() as d:

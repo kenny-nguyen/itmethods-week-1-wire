@@ -82,8 +82,11 @@ def render(run_dir: Path, *, audit_path: Path, errors_path: Path, score: dict | 
     out.append("</table>")
 
     if score:
-        cls = "ok" if score["passed"] == score["total"] else "bad"
-        out.append(f"<h2>Eval score</h2><p class={cls}>{escape(score['score'])}</p><table>"
+        if not score["total"]:
+            headline = "<p class=meta>no eval case exercised in this run</p>"
+        else:
+            headline = f"<p class={'ok' if score['passed'] == score['total'] else 'bad'}>{escape(score['score'])}</p>"
+        out.append(f"<h2>Eval score</h2>{headline}<table>"
                    "<tr><th>Account</th><th>Expect</th><th>Failed properties</th></tr>")
         for c in score["cases"]:
             fails = [k for k, v in c["properties"].items() if not v["pass"]]

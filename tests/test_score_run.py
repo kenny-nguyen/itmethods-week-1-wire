@@ -54,10 +54,21 @@ class ScoreRunTests(unittest.TestCase):
             r1 = score(Path(d), run_dir=runs / first["run_id"])
             self.assertEqual(r1["passed"], r1["total"])
             r2 = score(Path(d), run_dir=runs / second["run_id"])
-            skipped = {c["account"] for c in r2["cases"] if not c["exercised"]}
-            self.assertEqual(skipped, {"hs-1001", "hs-1002"})  # already briefed in the first run
-            self.assertEqual(r2["passed"], r2["total"])
-            self.assertGreater(r2["total"], 0)
+            self.assertTrue(all(c["exercised"] for c in r2["cases"]))  # the batch screens every account
+            rerun = next(c for c in r2["cases"] if c["account"] == "hs-1001")
+            self.assertFalse(rerun["properties"]["passes_output_gate"]["pass"])  # this run wrote no brief
+
+    def test_expected_brief_dropped_by_the_agent_fails(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            t.write_audit_record("bank-sr26-2", "hs-1002", "drop",
+                                 "Drop Lakeshore from this motion because the agent judged the fit wrong.",
+                                 ["hubspot:company/hs-1002"])
+            r = score(Path(d), run_dir=t.paths.run_dir)
+            case = next(c for c in r["cases"] if c["account"] == "hs-1002")
+            self.assertTrue(case["exercised"])
+            self.assertFalse(case["properties"]["passes_output_gate"]["pass"])
+            self.assertLess(r["passed"], r["total"])
 
     def test_mcp_session_scores_only_the_accounts_it_touched(self):
         with tempdir() as d:

@@ -1892,3 +1892,22 @@ A run's review view now scores only the eval cases that run exercised. Cases it 
 **Links:** D-038
 
 </details>
+
+### [R-014] 00:35 · BUILDER · REVERSAL
+Reverses the brief-case rule in D-042. In a run-scoped score, a case now counts as exercised whenever the run has any audit record for its account. A run with no exercised case shows a neutral "no eval case exercised in this run" instead of a green 0/0.
+
+<details><summary>Structured fields</summary>
+
+**What:** Under D-042 a brief case counted only when the run held, routed or created for the account. That hid a bank the eval expects a brief for when it was excluded, held or dropped: the only record is a `score`, so the case was skipped. Now any audit record counts, and such a case fails.
+
+**Why:** Operator decision in review round 3: keep it simple. The trade-off is accepted and recorded here. A scheduled batch rerun screens every account again, so a bank already briefed in an earlier run is exercised and its brief properties fail in that rerun's view. That is true for the rerun, which wrote no brief.
+
+**Evidence:** `tests/test_score_run.py` `test_expected_brief_dropped_by_the_agent_fails`, `test_run_scope_scores_only_that_run`; `tests/test_review.py` `test_run_with_no_eval_case_is_neutral_not_a_pass`.
+
+**Assumption:** none
+
+**Reversal trigger:** Reviewers find the rerun failures noisy enough to want already-briefed accounts labelled on their own.
+
+**Links:** D-042
+
+</details>
