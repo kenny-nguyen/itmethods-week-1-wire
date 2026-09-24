@@ -28,19 +28,64 @@ What the contract sets out:
 
 ## How to use
 
-This section is updated as usable pieces land.
+This section is updated as usable pieces land. Requires Python 3.11 or later; standard library only, nothing to install. Run everything from the repository root.
 
-Requires Python 3.11 or later. Standard library only; nothing to install.
+### 1. Run the playbook
 
-- Run the tests: `python -m unittest discover -s tests -t . -v`
-- The R-17 audit trail (`agent/governance/audit.py`): every create, update, enrich, score or message action goes through `AuditTrail.perform(...)`, which writes the audit record first and only then completes the action. If the record is invalid or cannot be written, the action does not happen and `AuditBlocked` is raised.
-- Input adapters (`agent/input/`): interfaces in `base.py`, local stand-ins for HubSpot, ZoomInfo, Clay and a regulator feed in `local.py`, reading `fixtures/`. To connect a real tool, write one class against the matching interface.
-- The ICP (ideal customer profile) filter (`agent/processing/icp.py`) reads `icp/icp.json`. Each field the packet did not give names the register row that proposes it. AI startups and mid-market SaaS are excluded by segment and by naming-variant patterns; the variants tested are listed in `tests/test_icp.py`.
-- The applicability preflight (`agent/processing/preflight.py`) decides whether a trigger applies to an account before anything is drafted. For SR 26-2 and a non-US bank without a confirmed US Federal Reserve-regulated entity, it holds the account or writes "applicability requires confirmation", depending on the playbook.
-- Brief generation (`agent/processing/brief.py`): a deterministic template when no API key is set, the Claude Messages API when `ANTHROPIC_API_KEY` is set (`WIRE_PROVIDER=template` forces the template, `WIRE_MODEL` picks the model). The model's instructions are in `prompts/brief_system.md`.
-- The output gate (`agent/processing/checks.py`) runs on every draft: sections, a word limit, citations only to known sources, no invented URLs, every product sentence tied to an approved claim in `docs/research/product-claims.json`, and no claim of compliance, certification, independent assurance or validation, no briefing duration, no CMMC, FedRAMP, CUI or ITAR. Run the gate's evals with `python -m evals.run_evals`.
-- The Campaign Manager playbook (`playbooks/reign-first-motion.jsonc`) drives the run. `playbooks/SCHEMA.md` lists every field, marks which ones are guesses, and says why each is useful.
-- The error log (`agent/governance/error_log.py`) is a separate JSON Lines file for anything that goes wrong in any stage.
+```
+python -m agent.run_playbook
+```
+
+This runs `playbooks/reign-first-motion.jsonc` against the fixtures and writes to `out/` (git-ignored). Without an API key it drafts with a deterministic template. With `ANTHROPIC_API_KEY` set it drafts with Claude (`WIRE_MODEL` picks the model, default `claude-opus-5`; `WIRE_PROVIDER=template` forces the template). Either way every draft goes through the same output gate.
+
+What comes out:
+
+| Path | What it is |
+|---|---|
+| `out/runs/<run>/briefs/*.md` | Briefs that passed every gate. |
+| `out/runs/<run>/approvals/*.json` | One approval request per brief, `status: pending`, `send: false`. |
+| `out/runs/<run>/summary.json` | Every account's outcome and reason, every play's status, the run metrics. |
+| `out/audit.jsonl` | The R-17 audit trail: one record per enrich, score, create, hold, approve, reject or block. |
+| `out/errors.jsonl` | The error log, kept separate from the audit trail. |
+| `out/state/kill/<playbook>.json` | Present only while the kill switch is engaged. |
+
+On the fixtures, with the playbook as committed: the US bank gets a brief pending approval; the Canadian bank is held because a US Federal Reserve-regulated entity is not established (set `unconfirmed_applicability` to `brief_with_caveat` in the playbook to brief it with "applicability requires confirmation" and the OSFI context instead; register rows A-025 and A-028); the AI startups, the mid-market SaaS firm, the hospital, the small credit union and the semiconductor firm without export-control exposure are excluded; the biopharma and defense accounts are not enriched because their plays are not implemented.
+
+### 2. Approve or reject a brief
+
+```
+python -m agent.feedback.decide --request out/runs/<run>/approvals/<account>.json \
+  --approver "Kenny Nguyen" --approve --reason "Sources and routing checked."
+```
+
+Only a named approver listed in the playbook can decide. The decision is written to the audit trail before the request changes. Approval marks the brief ready to send; no sender is wired (register row A-035), so nothing leaves the machine.
+
+### 3. Stop the motion
+
+```
+python -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Drafts read generic."
+python -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Reviewed." --clear
+```
+
+While engaged, runs are refused and approvals are refused. The playbook's kill criteria engage it automatically: any R-17 audit failure, more than one draft in five failing the gate, or more than half of decided briefs rejected.
+
+### 4. Check it
+
+```
+python -m unittest discover -s tests -t . -v
+python -m evals.run_evals
+```
+
+### How the pieces fit
+
+| Stage | Code | Gate |
+|---|---|---|
+| INPUT | `agent/input/`: adapter interfaces (`base.py`) and local stand-ins for HubSpot, ZoomInfo, Clay and a regulator feed (`local.py`); the playbook loader (`playbook.py`) | The playbook must validate, the motion must be active, the kill switch must be off. |
+| PROCESSING | `agent/processing/`: ICP filter (`icp.py`, rules in `icp/icp.json`), applicability preflight (`preflight.py`), title routing (`routing.py`), brief drafting (`brief.py`, prompt in `prompts/brief_system.md`) | Excluded companies are never enriched. The preflight holds, skips or blocks before drafting. The output gate (`checks.py`) rejects any draft with an unknown source, an invented URL, an unapproved product claim, a compliance or certification claim, a duration, or a CMMC, FedRAMP, CUI or ITAR mention. |
+| OUTPUT | `agent/output/writer.py` | Each brief and approval request is written only after its R-17 audit record (`agent/governance/audit.py`). |
+| FEEDBACK | `agent/feedback/`: decisions, kill criteria, kill switch | Named approver only; kill switch blocks approvals; kill criteria checked after every run and decision. |
+
+To connect a real tool, write one class against the matching interface in `agent/input/base.py`. The rest of the pipeline does not change.
 
 ## Repo map
 
@@ -51,6 +96,8 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 | `PROCESS-LOG.md` | Append-only decision log, written during the window. |
 | `AMBIGUITY-REGISTER.md` | Every ambiguity, the reading taken, and what would flip it. |
 | `INTAKE-WORKSHEET.md` | First structured read of the assignment. |
+| `agent/run_playbook.py` | The pipeline entry point. |
+| `agent/output/`, `agent/feedback/` | OUTPUT and FEEDBACK stages: artifacts, approval decisions, kill criteria, kill switch. |
 | `agent/governance/` | R-17 audit trail and the error log, used by every stage. |
 | `agent/input/` | INPUT stage: adapter interfaces and local fixture adapters. |
 | `agent/processing/` | PROCESSING stage: ICP filter, applicability preflight, brief generation, output checks. |

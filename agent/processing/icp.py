@@ -55,10 +55,10 @@ class Icp:
                 return pid
         return None
 
-    def evaluate(self, account: Account, enrichment: Enrichment) -> IcpDecision:
+    def prescreen(self, account: Account) -> IcpDecision | None:
+        """Decide what can be decided without enrichment, so excluded companies are never enriched."""
         fs = self.is_fs(account)
-        segments = self.raw["segments"]
-        seg = segments.get(account.segment)
+        seg = self.raw["segments"].get(account.segment)
 
         hit = self.matched_exclusion(account)
         if hit:
@@ -70,11 +70,18 @@ class Icp:
             return IcpDecision(decision, fs, [f"segment '{account.segment}' is not in the ICP (A-031)"])
 
         if account.employees is None:
-            decision = HOLD if self.raw["unknown_employees"] == "hold" else INCLUDE
-            if decision == HOLD:
+            if self.raw["unknown_employees"] == "hold":
                 return IcpDecision(HOLD, fs, ["headcount unknown; the ICP floor is 5,000 employees (A-004)"], segment=seg)
         elif account.employees < self.raw["min_employees"]:
             return IcpDecision(EXCLUDE, fs, [f"{account.employees} employees is under the {self.raw['min_employees']} floor"], segment=seg)
+        return None
+
+    def evaluate(self, account: Account, enrichment: Enrichment) -> IcpDecision:
+        early = self.prescreen(account)
+        if early is not None:
+            return early
+        fs = self.is_fs(account)
+        seg = self.raw["segments"][account.segment]
 
         for key, required in seg.get("requires", {}).items():
             actual = getattr(enrichment, key, None)

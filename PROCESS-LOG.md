@@ -1000,3 +1000,43 @@ Proposed: `briefing`, `sequence` and `unknown` count as sending, `slack` counts 
 
 </details>
 
+### [D-011] 23:37 · BUILDER · DECISION
+The pipeline now runs end to end on the fixtures: one command runs the playbook, one command lets a named human approve or reject, one command stops the motion. Nothing is ever sent.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/run_playbook.py` (INPUT gate, ICP, preflight, drafting, output gate, audited writes, kill criteria), `agent/output/writer.py` (atomic writes), `agent/feedback/` (`decide.py`, `kill.py`, kill criteria, kill switch).
+
+**Why:** Two choices worth naming. Accounts whose segment has no implemented play are not enriched: an enrichment call is an R-17 touch, and touching a biopharma company for a play that cannot run is spray. The kill switch file is written before its audit record, because stopping is the safe direction and must not depend on the audit store that may be the reason for stopping.
+
+**Evidence:** `python3 -m agent.run_playbook --out <tmp>` printed one brief pending approval (hs-1002), the Canadian bank on `preflight_hold`, seven exclusions with reasons, two `no_implemented_play`. `python3 -m agent.feedback.decide` refused "Someone Else" (exit 2) and accepted "Kenny Nguyen" (exit 0, "Nothing has been sent (sender: none)"). Audit file 17 records, error file 1 record (the refusal).
+
+**Assumption:** Rests on the proposed rows named in the playbook; A-033 decides that a model outage fails the account rather than falling back.
+
+**Reversal trigger:** Operator answers on the proposed rows.
+
+**Links:** D-008, D-009, D-010, A-033, A-035
+
+</details>
+
+### [Q-004] 23:37 · BUILDER · PROCESSING-QA
+Pipeline tests pass (13 new, 60 in total). They cover the failure paths, not only the happy path: with the audit store down, no brief or approval request is written and the kill switch trips; a sloppy draft fails the gate and trips the kill switch; a model outage fails the account; a wrong approver, a kill switch, or an audit failure each stop an approval.
+
+<details><summary>Structured fields</summary>
+
+**What:** PASS (self-QA, not independent) on "R-17 fails closed across the whole pipeline, nothing sends, and only a named approver can approve".
+
+**Why:** The pipeline could have bypassed `AuditTrail.perform` for some writes; the store-down test would show any brief written without a record.
+
+**Evidence:** `python3 -m unittest discover -s tests -t .`: "Ran 60 tests ... OK". Every audit record from the end-to-end test passes `validate_record`; enrich records exist only for hs-1001 and hs-1002.
+
+**Assumption:** none beyond the proposed rows.
+
+**Reversal trigger:** Independent QA finds a write path outside `AuditTrail.perform`.
+
+**Links:** D-011
+
+**Proof boundary:** Not independent. Not run with a live model (no API key in this session). Concurrency and crash-between-audit-and-commit not tested.
+
+</details>
+

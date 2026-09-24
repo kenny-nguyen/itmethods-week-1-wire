@@ -94,6 +94,9 @@ class LocalRegulatoryFeed:
     def __init__(self, path: str | Path):
         self.path = Path(path)
 
+    def implemented_ids(self) -> set[str]:
+        return {r["id"] for r in _load(self.path, "triggers") if r.get("implemented")}
+
     def get(self, trigger_id: str) -> Trigger:
         for row in _load(self.path, "triggers"):
             if row.get("id") != trigger_id:
