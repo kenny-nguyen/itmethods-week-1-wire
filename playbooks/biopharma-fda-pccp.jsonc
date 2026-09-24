@@ -11,7 +11,7 @@
   "product": "reign",                     // stub: reign | forge
   "audience": { "icp_id": "icp/icp.json@0.2.0", "segment": "biopharma_quality" },   // stub
   "trigger": { "type": "regulatory", "id": "FDA-PCCP-2025" },     // stub
-  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting; the brief is the document that earns it
+  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting (the meeting the CEO's notes propose, not a public iTmethods product); the brief is the document that earns it
   "trigger_status": "not_implemented",           // A-041 (decided)
   "trigger_not_implemented_reason": "One trigger is implemented deeply in this window (bank and SR 26-2, operator decision). The FDA PCCP source is verified (R-012); the biopharma brief structure and facts are not built yet.",
   "lead_product": "reign",            // A-023 (decided)

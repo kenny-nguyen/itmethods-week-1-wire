@@ -1,5 +1,5 @@
 {
-  "_about": "The only statements a brief may make about iTmethods products. Each claim's text is one sentence quoted exactly from the cited page as fetched live at the 'retrieved' time. Claims whose earlier wording is not on the current pages (Forge positioning, independent sale, the Executive Assurance Briefing funnel, 'works as first line') were removed after the independent fact-check (docs/qa/factcheck-report.md). P-DEFENSE is research only (usable_in_briefs false): the gate refuses those terms in any brief.",
+  "_about": "The only statements a brief may make about iTmethods products. Each claim's text is one sentence quoted exactly from the cited page as fetched live at the 'retrieved' time. Claims whose earlier wording is not on the current pages (Forge positioning, independent sale, the Executive Assurance Briefing funnel, 'works as first line') were removed after the independent fact-check (docs/qa/factcheck-report.md). P-DEFENSE is research only (usable_in_briefs false): the gate refuses those terms in any brief. 'placement' says where a brief uses the claim: 'body' (the forwardable part) or 'owner_notes' (limitations the account owner must know, kept out of the forwardable part).",
   "claims": [
     {
       "id": "P-GATEWAY",
@@ -8,7 +8,8 @@
         "https://itmethods.com/gateway"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "body"
     },
     {
       "id": "P-ASSURANCE-STATUS",
@@ -17,7 +18,8 @@
         "https://itmethods.com/assurance"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "body"
     },
     {
       "id": "P-ASSURANCE-BOUNDARY",
@@ -26,7 +28,8 @@
         "https://itmethods.com/assurance"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "owner_notes"
     },
     {
       "id": "P-EVIDENCE",
@@ -35,7 +38,8 @@
         "https://itmethods.com/assurance"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "body"
     },
     {
       "id": "P-RELIANCE",
@@ -44,7 +48,8 @@
         "https://itmethods.com/assurance"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "owner_notes"
     },
     {
       "id": "P-BANKING",
@@ -53,7 +58,8 @@
         "https://itmethods.com/sectors/banking"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "owner_notes"
     },
     {
       "id": "P-STATUS",
@@ -62,7 +68,8 @@
         "https://itmethods.com/status"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": true
+      "usable_in_briefs": true,
+      "placement": "body"
     },
     {
       "id": "P-DEFENSE",
@@ -71,7 +78,8 @@
         "https://itmethods.com/sectors/public-defence"
       ],
       "retrieved": "2026-09-24T15:28:19Z (00:28 KST)",
-      "usable_in_briefs": false
+      "usable_in_briefs": false,
+      "placement": "body"
     }
   ]
 }

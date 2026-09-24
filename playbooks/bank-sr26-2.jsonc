@@ -11,7 +11,7 @@
   "product": "reign",                     // stub: reign | forge
   "audience": { "icp_id": "icp/icp.json@0.2.0", "segment": "dsib_capital_markets" },   // stub
   "trigger": { "type": "regulatory", "id": "SR-26-2" },     // stub
-  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting; the brief is the document that earns it
+  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting (the meeting the CEO's notes propose, not a public iTmethods product); the brief is the document that earns it
   "trigger_status": "implemented",           // A-041 (decided)
   "lead_product": "reign",            // A-023 (decided)
   // A-043 (decided): no new cold outreach to bank contacts until a briefing is booked. On a regulatory
@@ -21,7 +21,7 @@
   // A-025 (decided): hold when applicability cannot be determined. A-044 (decided): for SR 26-2 the brief
   // itself is structured so it never claims the rule applies; each structural condition is marked "confirm".
   "unconfirmed_applicability": "structured_brief",
-  "claims": ["P-GATEWAY", "P-EVIDENCE", "P-ASSURANCE-STATUS", "P-BANKING"],   // A-029 (decided)
+  "claims": ["P-GATEWAY", "P-EVIDENCE", "P-ASSURANCE-STATUS", "P-BANKING", "P-RELIANCE"],   // A-029 (decided)
   "routing": {                                   // A-011 (decided): lanes by title, never ask the buyer to pick
     "lanes": {
       "risk": ["audit", "risk", "compliance"],

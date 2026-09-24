@@ -11,7 +11,7 @@
   "product": "reign",                     // stub: reign | forge
   "audience": { "icp_id": "icp/icp.json@0.2.0", "segment": "defense_supplier" },   // stub
   "trigger": { "type": "regulatory", "id": "DEFENSE-TBD" },     // stub
-  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting; the brief is the document that earns it
+  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting (the meeting the CEO's notes propose, not a public iTmethods product); the brief is the document that earns it
   "trigger_status": "not_implemented",           // A-041 (decided)
   "trigger_not_implemented_reason": "The packet leaves the defense trigger open (CMMC?), and iTmethods holds no CMMC certification. Decided approach (A-023): lead with Forge; Reign is the reason agents can be let near the estate, a natural ascension where one solution creates the next problem the second solves.",
   "lead_product": "forge",            // A-023 (decided)

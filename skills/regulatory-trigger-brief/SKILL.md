@@ -44,8 +44,8 @@ You decide; the tools enforce. The `week1-wire` MCP server (see `.mcp.json`) wri
 
    - **Every line** in the first five sections ends with at least one citation in square brackets, using only ids from `check_claims`' `allowed_sources`.
    - **Never say a rule applies**, governs, binds or must be complied with. Anything that depends on the bank's structure goes in "What depends on structure (confirm)", and every line there starts with "Confirm:".
-   - **Product sentences** (anything naming Reign, Forge or iTmethods) quote one approved claim word for word, with its id. Do not paraphrase them.
-   - **Suggested next step**: what the account owner does next, in the playbook's channel (for the bank playbook: offer the audit and risk committee an Executive Assurance Briefing). Never state how long a briefing takes.
+   - **Product sentences** (anything naming Reign, Forge or iTmethods) quote one approved claim word for word, with its id. Claims marked `owner_notes` (limitations) go under "Open questions for the account owner", not in the forwardable part. Do not paraphrase them.
+   - **Suggested next step**: what the account owner does next, in the playbook's channel (for the bank playbook: offer the audit and risk committee an Executive Assurance Briefing, the meeting the motion proposes; it is not a public iTmethods product). Never state how long a briefing takes.
    - **Lane framings**: one short paragraph per lane `route_contact` returned (for the bank: risk, covering model risk, audit and evidence; engineering, covering the runtime and the governed path for agent calls). Specific to this account and this trigger. No generic "AI governance" language.
    - **Sources**: one line per cited id, `- [id] title - URL` or `- [id] <system> record`.
    - Stay under 350 words before "Suggested recipients".

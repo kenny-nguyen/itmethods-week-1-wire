@@ -19,7 +19,7 @@ Every field below says where it came from (the stub, an operator decision, or a 
 | `product` | stub | `reign` or `forge`. | - |
 | `audience.icp_id`, `audience.segment` | stub | Which ICP version and segment the playbook targets. | - |
 | `trigger.type`, `trigger.id` | stub | `regulatory`, `event` or `manual`, and the trigger record in the regulator feed. | - |
-| `channel` | stub | `briefing`, `sequence`, `slack` or `unknown`. `briefing` is the booked Executive Assurance Briefing meeting; the forwardable brief is the document that earns it. | A-042 (operator) |
+| `channel` | stub | `briefing`, `sequence`, `slack` or `unknown`. `briefing` is the booked Executive Assurance Briefing meeting (the meeting the CEO's notes propose, not a public iTmethods product); the forwardable brief is the document that earns it. | A-042 (operator) |
 | `approval` | stub (empty object) | See below. | - |
 | `kill_criteria[]` | stub (empty list) | See below. | - |
 | `audit` | stub (empty object) | See below. | - |

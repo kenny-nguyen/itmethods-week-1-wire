@@ -161,15 +161,18 @@ class TemplateProvider:
             lines.append("- " + cite("Enrichment records a board risk committee.", e.source))
 
         lines += ["", "## Where Reign fits"]
-        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims]
+        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims if c.get("placement", "body") == "body"]
 
         lines += ["", "## Suggested next step"]
-        lines.append("- The account owner offers the audit and risk committee an Executive Assurance Briefing.")
+        lines.append("- The account owner offers the audit and risk committee an Executive Assurance Briefing, "
+                     "the meeting this motion proposes.")
 
         lines += ["", "## Suggested recipients in the existing relationship"] + ctx.recipient_lines()
 
         lines += ["", "## Open questions for the account owner"]
         lines += [f"- {q}" for q in ctx.flags] or ["- None from the record."]
+        # Limitations the owner must know; kept out of the forwardable part.
+        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims if c.get("placement") == "owner_notes"]
         cited = set(re.findall(r"\[([A-Za-z0-9][A-Za-z0-9:_/.\-]*)\]", "\n".join(lines)))
         lines += ["", "## Sources"] + [f"- [{i}] {d}" for i, d in ctx.sources() if i in cited]
         return "\n".join(lines) + "\n"
