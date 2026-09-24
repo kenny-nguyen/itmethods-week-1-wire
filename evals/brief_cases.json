@@ -1,25 +1,331 @@
 {
   "_about": "Deterministic evals for the brief output gate. Each case takes a brief that passes, applies one edit, and names the problem the gate must report. The content rules come from docs/research/itmethods-product-facts.md (proposed reading A-029).",
   "cases": [
-    {"name": "clean brief passes", "edit": null, "expect": null},
-    {"name": "compliance claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign makes the bank compliant with SR 26-2 [P-GATEWAY]."}, "expect": "claims compliance"},
-    {"name": "certification claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign Assurance is certified for model risk work [P-ASSURANCE]."}, "expect": "claims compliance"},
-    {"name": "independent assurance claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign provides independent assurance to the audit committee [P-ASSURANCE]."}, "expect": "claims compliance"},
-    {"name": "independent validation claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign will independently validate your models [P-GATEWAY]."}, "expect": "claims compliance"},
-    {"name": "briefing duration", "edit": {"append_to": "## Where Reign fits", "text": "- The briefing takes 45 minutes [P-BRIEFING]."}, "expect": "duration"},
-    {"name": "briefing duration range", "edit": {"append_to": "## Open questions for the approver", "text": "- Book a 45-60 min slot."}, "expect": "duration"},
-    {"name": "CMMC capability", "edit": {"append_to": "## Where Reign fits", "text": "- Reign supports CMMC Level 2 programmes [P-GATEWAY]."}, "expect": "CMMC"},
-    {"name": "FedRAMP mention", "edit": {"append_to": "## Open questions for the approver", "text": "- Ask whether FedRAMP matters to them."}, "expect": "CMMC"},
-    {"name": "product claim without claim id", "edit": {"append_to": "## Where Reign fits", "text": "- Reign cuts model validation time in half."}, "expect": "product mention without an approved claim id"},
-    {"name": "invented URL", "edit": {"append_to": "## Why now", "text": "- See the regulator's summary [src-sr26-2] at https://example.com/sr26-2-summary."}, "expect": "not an approved source"},
-    {"name": "unknown citation id", "edit": {"append_to": "## Why now", "text": "- The bank's CRO spoke about SR 26-2 last week [linkedin:post/123]."}, "expect": "unknown source id"},
-    {"name": "filler phrasing", "edit": {"append_to": "## Why now", "text": "- In today's rapidly evolving landscape, banks must act [src-sr26-2]."}, "expect": "filler"},
-    {"name": "em dash", "edit": {"append_to": "## Why now", "text": "- Model risk guidance changed \u2014 again [src-sr26-2]."}, "expect": "filler"},
-    {"name": "missing section", "edit": {"remove_section": "## Routing"}, "expect": "missing section"},
-    {"name": "over length", "edit": {"append_to": "## Open questions for the approver", "text_repeat": "- Confirm the owner of model inventory for agent workloads before the call.", "times": 30}, "expect": "limit is"}
+    {
+      "name": "clean brief passes",
+      "edit": null,
+      "expect": null
+    },
+    {
+      "name": "compliance claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign makes the bank compliant with SR 26-2 [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "certification claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign Assurance is certified for model risk work [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "independent assurance claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign provides independent assurance to the audit committee [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "independent validation claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign will independently validate your models [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "briefing duration",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- The briefing takes 45 minutes [P-BRIEFING]."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "briefing duration range",
+      "edit": {
+        "append_to": "## Open questions for the approver",
+        "text": "- Book a 45-60 min slot."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "CMMC capability",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign supports CMMC Level 2 programmes [P-GATEWAY]."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "FedRAMP mention",
+      "edit": {
+        "append_to": "## Open questions for the approver",
+        "text": "- Ask whether FedRAMP matters to them."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "product claim without claim id",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign cuts model validation time in half."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "invented URL",
+      "edit": {
+        "append_to": "## Why now",
+        "text": "- See the regulator's summary [src-sr26-2] at https://example.com/sr26-2-summary."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "unknown citation id",
+      "edit": {
+        "append_to": "## Why now",
+        "text": "- The bank's CRO spoke about SR 26-2 last week [linkedin:post/123]."
+      },
+      "expect": "unknown source id"
+    },
+    {
+      "name": "filler phrasing",
+      "edit": {
+        "append_to": "## Why now",
+        "text": "- In today's rapidly evolving landscape, banks must act [src-sr26-2]."
+      },
+      "expect": "filler"
+    },
+    {
+      "name": "em dash",
+      "edit": {
+        "append_to": "## Why now",
+        "text": "- Model risk guidance changed \u2014 again [src-sr26-2]."
+      },
+      "expect": "filler"
+    },
+    {
+      "name": "missing section",
+      "edit": {
+        "remove_section": "## Routing"
+      },
+      "expect": "missing section"
+    },
+    {
+      "name": "over length",
+      "edit": {
+        "append_to": "## Open questions for the approver",
+        "text_repeat": "- Confirm the owner of model inventory for agent workloads before the call.",
+        "times": 30
+      },
+      "expect": "limit is"
+    },
+    {
+      "name": "paraphrase: in line with",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign keeps the bank fully in line with SR 26-2 [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "paraphrase: satisfies expectations",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign satisfies every SR 26-2 expectation [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "paraphrase: handles compliance",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign handles SR 26-2 compliance for you [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "negation bypass",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign makes the bank compliant with no manual work [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "third-party validation",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Models run through the platform are validated by a third party [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "third-party assurance",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The board gets third-party assurance from this work [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "accreditation",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform is SOC 2 accredited [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "duration in words",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The briefing takes half an hour."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration spelled out",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Plan for about thirty minutes."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration short form",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Book a 45m session."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "FedRAMP spaced",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform supports Fed RAMP High workloads."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "ITAR spelled out",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Fits International Traffic in Arms Regulations programs."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "CMMC dotted",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Ready for C.M.M.C. assessments."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "bare domain",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- See www.evil-example.com/report for more."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "protocol-relative link",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Deck at //attacker.example/p for the approver."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "markdown image beacon",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- ![](https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm)"
+      },
+      "expect": "HTML or markdown"
+    },
+    {
+      "name": "HTML image",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- <img src=x>"
+      },
+      "expect": "HTML or markdown"
+    },
+    {
+      "name": "uppercase product name",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- REIGN runs the model inventory for the bank."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "wrong claim id",
+      "source": "independent QA Q-005 or security review D-020",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign replaces the bank's model validation team [P-BRIEFING]."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "heading bypass",
+      "source": "independent QA Q-005",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "### Reign guarantees SR 26-2 compliance and certifies your models"
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "after-Sources bypass",
+      "source": "independent QA Q-005",
+      "edit": {
+        "append_to": "## Sources",
+        "text": "Reign guarantees SR 26-2 compliance and is certified. The briefing is 45 minutes."
+      },
+      "expect": "unexpected text in Sources"
+    }
   ],
   "caveat_cases": [
-    {"name": "caveat present passes", "remove_caveat": false, "expect": null},
-    {"name": "caveat removed fails", "remove_caveat": true, "expect": "applicability requires confirmation"}
+    {
+      "name": "caveat present passes",
+      "remove_caveat": false,
+      "expect": null
+    },
+    {
+      "name": "caveat removed fails",
+      "remove_caveat": true,
+      "expect": "applicability requires confirmation"
+    }
   ]
 }

@@ -15,7 +15,7 @@ class BriefTests(unittest.TestCase):
                 text, ctx, needs = golden_brief(caveat)
                 self.assertEqual(needs, caveat)
                 self.assertEqual(check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                                             product_ids=ctx.product_ids(), caveat_required=needs), [])
+                                             claim_texts=ctx.claim_texts(), caveat_required=needs), [])
 
     def test_canadian_brief_carries_caveat_and_osfi_context(self):
         text, _, _ = golden_brief(caveat=True)

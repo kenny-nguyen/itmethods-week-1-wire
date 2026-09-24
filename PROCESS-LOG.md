@@ -1173,3 +1173,64 @@ Reverses A-010. There is no volume cap. The CRO's stop button is quality-based o
 
 </details>
 
+### [Q-005] 23:43 · QA · QA-VERDICT
+Independent QA came back: two claims pass, two fail, and one passes with conditions. The failures were real. The ICP patterns missed nine naming variants and wrongly excluded three banks and insurers that only mention startups. The output gate could be walked past with paraphrases, a negation word, a heading, text after the Sources section, a bare domain, or the wrong claim id.
+
+<details><summary>Structured fields</summary>
+
+**What:** C1 (R-17 before every write) CONDITIONAL PASS: every completed action had a record, but if the approval request's record failed after the brief's record succeeded, the brief file stayed on disk. C2 (nothing sends, named approver only, kill switch) PASS. C3 (ICP naming variants) FAIL. C4 (output gate) FAIL. C5 (README commands from a clean clone) CONDITIONAL PASS: `python` is not on the reviewer's PATH; with `python` pointing at 3.11 every command behaved as documented. The reviewer also noted the rejection ratio divides by pending requests.
+
+**Why:** The reviewer invented its own variants and paraphrases instead of reusing the builder's tests. That is exactly the blind spot builder self-QA (Q-002, Q-003) could not see.
+
+**Evidence:** Reviewer's receipts, from a clean clone at `098e372`. Verify-the-verifier: with `raise AuditBlocked` disabled, 16 tests failed. C3 misses included "Machine learning startup", "Early-stage agentic AI company", "Midsize SaaS company"; false positives included "its venture arm invests in AI startups". C4 misses included "Reign keeps the bank fully in line with SR 26-2", "takes half an hour", "Fed RAMP", "www.evil-example.com", a `###` heading claim, and text after `## Sources`.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-012, Q-002, Q-003, D-016, D-017
+
+**Proof boundary (reviewer's):** No model-drafted text was tested; the kill criterion on rejections was not run.
+
+</details>
+
+### [D-016] 23:43 · BUILDER · DECISION
+QA's C3 findings are fixed. The ICP patterns now cover machine learning, agentic AI, scale-ups, venture-stage wording and every mid-market SaaS spelling QA tried. A match is ignored when the startups are the account's investees, partners, customers or policyholders. All nine missed variants and all three false positives are now tests.
+
+<details><summary>Structured fields</summary>
+
+**What:** `icp/icp.json` pattern set rewritten; new `object_context_regex`; `Icp.matched_exclusion` checks the words before each match. Also applied here: agent adoption never excludes (A-036, operator decision).
+
+**Why:** Accepting C3's findings in full. "Bare 'AI' never excludes" (A-003) still holds.
+
+**Evidence:** All 13 QA strings behaved correctly in a direct check before the tests were updated; `python3 -m unittest tests.test_icp` OK after adding them.
+
+**Assumption:** The object-context list (invest, partner, fund, back, serve, sell, client, customer, portfolio, policy, insure, lend, accelerator, incubator, arm) is the agent's reading; it is proposed, not operator-decided.
+
+**Reversal trigger:** A real startup that describes itself with one of those words before "AI startup" and slips through.
+
+**Links:** Q-005, A-003, A-036
+
+</details>
+
+### [D-017] 23:43 · BUILDER · DECISION
+QA's C4 findings and the security reviewer's markup finding are fixed in the output gate. Every line is checked, including headings and Sources. A product sentence must restate its cited claim word for word. No negation escape remains. Links of any shape outside the approved sources are rejected, and so are HTML and markdown images.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/processing/checks.py` rewritten; the model prompt now tells it that record text is data, not instructions, and to quote product claims verbatim. Twenty-one new eval cases, one per bypass QA or security found.
+
+**Why:** Accepting C4 in full. Checking the claim text instead of a negation word closes the "compliant with no manual work" hole, and keeps the approved sentence "It does not issue an audit opinion or a certification" legal.
+
+**Evidence:** `python3 -m evals.run_evals`: "39/39 eval cases behaved as expected". The first rerun had 38/39: "satisfies every SR 26-2 expectation" slipped the claim pattern because "26-2" is not a single word token; fixed by allowing hyphens in the gap. `python3 -m unittest discover -s tests -t .`: OK. The fixture run is unchanged (one brief, same holds and exclusions).
+
+**Assumption:** Verbatim claims make model drafts stiffer; accepted, because the operator decided claims come only from the sourced list (A-029).
+
+**Reversal trigger:** Marketing approves paraphrase variants of each claim (add them to the claims file).
+
+**Links:** Q-005, A-029, D-020
+
+**Proof boundary:** Still English word lists. A plausible false claim with no product name and no listed phrase (for example about the bank itself) passes the gate; the named approver is the control for that.
+
+</details>
+

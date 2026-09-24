@@ -220,7 +220,7 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
         entry["status"] = "draft_failed"
         return
     problems = check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                           product_ids=ctx.product_ids(), caveat_required=pf.CAVEAT in result.caveats)
+                           claim_texts=ctx.claim_texts(), caveat_required=pf.CAVEAT in result.caveats)
     if problems:
         errors.record("processing.gate", "brief failed the output gate", context={"account": acct.id, "problems": problems})
         counts["gate_failed"] += 1

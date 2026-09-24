@@ -26,13 +26,13 @@ def run() -> list[tuple[str, bool, list[str]]]:
     spec = json.loads(CASES.read_text(encoding="utf-8"))
     results = []
     text, ctx, caveat = golden_brief(caveat=False)
-    kwargs = dict(allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(), product_ids=ctx.product_ids())
+    kwargs = dict(allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(), claim_texts=ctx.claim_texts())
     for case in spec["cases"]:
         problems = check_brief(_apply(text, case["edit"]), caveat_required=caveat, **kwargs)
         ok = (not problems) if case["expect"] is None else any(case["expect"] in p for p in problems)
         results.append((case["name"], ok, problems))
     text, ctx, caveat = golden_brief(caveat=True)
-    kwargs = dict(allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(), product_ids=ctx.product_ids())
+    kwargs = dict(allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(), claim_texts=ctx.claim_texts())
     for case in spec["caveat_cases"]:
         variant = text.replace("applicability requires confirmation", "may apply") if case["remove_caveat"] else text
         problems = check_brief(variant, caveat_required=caveat, **kwargs)

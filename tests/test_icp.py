@@ -23,12 +23,23 @@ AI_STARTUP_VARIANTS = [
     "startup building AI agents", "start-up shipping LLM copilots", "Series B copilot company",
     "Series B AI platform", "seed-stage AI tooling", "YC-backed agents platform", "copilot startup",
     "AI-first company", "mid-market SaaS", "Mid market SaaS vendor", "SMB SaaS",
+    # Found by independent QA (Q-005), missed by the first pattern set:
+    "Machine learning startup, founded 2023.", "Venture-backed AI company, 40 employees, founded 2024.",
+    "Early-stage agentic AI company.", "Generative-AI scale-up selling copilots to banks.",
+    "Mid-market B2B SaaS platform for finance teams.", "SaaS for mid-sized companies.",
+    "Software-as-a-service vendor for the mid-market.", "Midsize SaaS company.",
+    "Artificial intelligence start-up.",
 ]
 
 MUST_NOT_EXCLUDE = [
     "Bank with AI models in production.", "Runs an AI governance programme across capital markets.",
     "Started a model risk programme for AI in 2025.", "Uses generative AI for document review.",
     "Global biopharma with AI-enabled device software.", "Agents on the estate under export control.",
+    # Wrongly excluded by the first pattern set, found by independent QA (Q-005):
+    "US bank holding company; its venture arm invests in AI startups.",
+    "Insurer selling startup business policies through 20,000 agents.",
+    "Bank that partners with fintech startups and is piloting AI agents in lending.",
+    "Large bank deploying generative AI across operations.",
 ]
 
 
@@ -73,8 +84,10 @@ class IcpTests(unittest.TestCase):
         self.assertEqual(ICP.evaluate(semi, replace(ENRICHED, export_control_exposure=True)).decision, INCLUDE)
         self.assertEqual(ICP.evaluate(semi, replace(ENRICHED, export_control_exposure=None)).decision, EXCLUDE)
 
-    def test_agent_adoption_none_excludes_unknown_flags(self):
-        self.assertEqual(ICP.evaluate(BANK, replace(ENRICHED, agent_adoption="none")).decision, EXCLUDE)
+    def test_agent_adoption_never_excludes(self):  # A-036, operator decision
+        d = ICP.evaluate(BANK, replace(ENRICHED, agent_adoption="none"))
+        self.assertEqual(d.decision, INCLUDE)
+        self.assertTrue(any("no agents" in f for f in d.flags))
         d = ICP.evaluate(BANK, replace(ENRICHED, agent_adoption=None, risk_committee=None))
         self.assertEqual(d.decision, INCLUDE)
         self.assertEqual(len(d.flags), 2)

@@ -61,8 +61,8 @@ class BriefContext:
         urls = {s.url for s in self.trigger.sources + self.trigger.context_sources if s.verified and s.url}
         return urls | {u for c in self.claims for u in c["urls"]}
 
-    def product_ids(self) -> set[str]:
-        return {c["id"] for c in self.claims}
+    def claim_texts(self) -> dict[str, str]:
+        return {c["id"]: c["text"] for c in self.claims}
 
     def to_json(self) -> dict:
         t, p, a, e = self.trigger, self.preflight, self.account, self.enrichment

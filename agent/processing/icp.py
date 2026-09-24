@@ -32,12 +32,13 @@ class IcpDecision:
 class Icp:
     raw: dict
     patterns: list[tuple[str, re.Pattern]]
+    object_context: re.Pattern
 
     @classmethod
     def load(cls, path: str | Path) -> "Icp":
         raw = json.loads(Path(path).read_text(encoding="utf-8"))
         patterns = [(p["id"], re.compile(p["regex"], re.IGNORECASE)) for p in raw["exclusion_patterns"]]
-        return cls(raw, patterns)
+        return cls(raw, patterns, re.compile(raw["object_context_regex"], re.IGNORECASE))
 
     def is_fs(self, account: Account) -> bool:
         seg = self.raw["segments"].get(account.segment, {})
@@ -48,11 +49,19 @@ class Icp:
         return account.industry.strip().lower() in self.raw["fs_industries"]
 
     def matched_exclusion(self, account: Account) -> str | None:
+        """First exclusion pattern that describes the account itself.
+
+        A match is ignored when the startups are someone the account deals with
+        ("invests in AI startups", "partners with fintech startups"): the
+        `object_context` pattern is checked on the words just before the match.
+        """
         text = " . ".join(filter(None, [account.name, account.description, account.segment.replace("_", " "),
                                         account.industry or ""]))
         for pid, pattern in self.patterns:
-            if pattern.search(text):
-                return pid
+            for m in pattern.finditer(text):
+                before = text[max(0, m.start() - 40):m.start()]
+                if not self.object_context.search(before):
+                    return pid
         return None
 
     def prescreen(self, account: Account) -> IcpDecision | None:
@@ -89,11 +98,11 @@ class Icp:
                 return IcpDecision(EXCLUDE, fs, [f"segment requires {key}={required}, enrichment has {actual} (A-019)"], segment=seg)
 
         flags = []
-        adoption = enrichment.agent_adoption
-        if adoption in self.raw["agent_adoption"]["exclude_values"]:
-            return IcpDecision(EXCLUDE, fs, [f"enrichment says agent adoption is '{adoption}' (A-005)"], segment=seg)
+        adoption = enrichment.agent_adoption  # a signal only, never a reason to exclude (A-036, operator decision)
         if adoption is None:
-            flags.append("agent adoption unknown: confirm agents are in production or planned (A-005)")
+            flags.append("agent adoption unknown: confirm whether agents are in production or planned (A-036)")
+        elif adoption == "none":
+            flags.append("enrichment says no agents in production or planned: confirm before the briefing (A-036)")
         if enrichment.risk_committee is not True:
             flags.append("no risk committee on record: the briefing may not land (A-021, unvetted)")
 
