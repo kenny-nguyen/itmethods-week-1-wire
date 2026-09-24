@@ -132,7 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     from evals.score_run import score as score_run
     run_dir = Path(args.run)
     out_root = run_dir.parent.parent
-    print(write(run_dir, out_root=out_root, score=score_run(out_root)))
+    print(write(run_dir, out_root=out_root, score=score_run(out_root, run_dir=run_dir)))
     return 0
 
 

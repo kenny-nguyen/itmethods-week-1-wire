@@ -53,7 +53,8 @@ class Icp:
 
         A match is ignored when the startups are someone the account deals with
         ("invests in AI startups", "partners with fintech startups"): the
-        `object_context` pattern is checked on the words just before the match.
+        `object_context` pattern, which needs a relational phrase rather than an
+        adjective such as "well-funded", is checked on the words just before the match.
         """
         text = " . ".join(filter(None, [account.name, account.description, account.segment.replace("_", " "),
                                         account.industry or ""]))

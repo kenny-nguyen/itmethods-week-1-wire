@@ -19,6 +19,11 @@ Every failure raises `ToolFailure`, whose message names the recovery
 State is kept per server process: the tools must be called in order
 (screen -> check applicability -> route -> check claims -> request approval)
 for each account and playbook.
+
+FEEDBACK: one server session is one run. After every governed decision the
+playbook's quality kill criteria are checked against the session's counts
+(audit blocks, drafts, output-gate refusals) and the playbook's reports, and a
+tripped criterion engages the kill switch, as the batch runner does per run.
 """
 
 from __future__ import annotations
@@ -30,7 +35,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agent import AGENT_ID, __version__, config
-from agent.feedback import kill_switch, trusted
+from agent.feedback import kill_criteria, kill_switch, reports, trusted
 from agent.governance.audit import AuditBlocked, AuditTrail, JsonlAuditSink
 from agent.governance.error_log import ErrorLog
 from agent.input import playbook as pbmod
@@ -65,6 +70,7 @@ class GovernedTools:
         self.io = inputs or _load_inputs(root)
         self.sink = sink or JsonlAuditSink(self.paths.audit)
         self.state: dict[tuple[str, str], dict] = {}
+        self.counts: dict[str, dict] = {}
 
     # ---- helpers ---------------------------------------------------------------------------
     def _fail(self, stage: str, message: str, recovery: str) -> None:
@@ -107,7 +113,7 @@ class GovernedTools:
                    "use a HubSpot company id such as hs-1001.")
 
     def _step(self, playbook_id: str, account_id: str, needs: str) -> dict:
-        st = self.state.get((playbook_id, account_id))
+        st = self.state.get((playbook_id, self._account(account_id).id))
         order = ["screened", "applicable", "routed"]
         if not st or order.index(st["stage"]) < order.index(needs):
             self._fail("order", f"{account_id} has not passed '{needs}' for {playbook_id} in this session.",
@@ -115,12 +121,45 @@ class GovernedTools:
                        "request_approval.")
         return st
 
-    def _guard(self, fn, stage: str):
+    def _counts(self, pid: str) -> dict:
+        since = kill_switch.last_cleared(self.paths.state, pid)  # a clear means a human reviewed the earlier counts
+        if self.counts.get(pid, {}).get("since") != since:
+            self.counts[pid] = {"since": since, "audit_blocked": 0, "drafted": 0, "gate_failed": 0}
+        return self.counts[pid]
+
+    def _count(self, pb: dict, metric: str) -> None:
+        self._counts(pb["playbook_id"])[metric] += 1
+
+    def _check_kill(self, pb: dict) -> None:
+        """FEEDBACK: the playbook's quality kill criteria over this session's counts (A-037)."""
+        pid = pb["playbook_id"]
+        counts = {k: v for k, v in self._counts(pid).items() if k != "since"}
+        attempted = counts["drafted"] + counts["gate_failed"]
+        metrics = {**counts, "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
+                   **reports.metrics(self.paths.state, pid)}
+        hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
+        if not hits or kill_switch.engaged(self.paths.state, pid):
+            return
+        reason = "kill criteria tripped: " + "; ".join(f"{h['id']} ({h['metric']}={h['value']})" for h in hits)
+        kill_switch.engage(self.paths.state, pid, by=pb["owner"], reason=reason)  # engage first: the safe direction
+        self.errors.record("feedback.kill_criteria", f"{pid}: {reason}", severity="warning")
         try:
-            return fn()
+            self._pb_trail(pb).perform(action="block", object_id=f"playbook:{pid}", fs=True, commit=lambda: None,
+                                       purpose=f"Pause the {pid} playbook because its quality kill criteria tripped.",
+                                       sources=[f"run:{self.run_id}"], detail={"tripped": hits, "via": "mcp"})
+        except AuditBlocked:
+            pass  # the switch is engaged; the failure is in the error log
+
+    def _guard(self, pb: dict, fn, stage: str):
+        try:
+            result = fn()
         except AuditBlocked as exc:
+            self._count(pb, "audit_blocked")
+            self._check_kill(pb)
             self._fail(stage, str(exc), "the audit record could not be written, so nothing happened. Fix the audit "
                                         "store (see errors.jsonl), then retry. Do not work around it.")
+        self._check_kill(pb)
+        return result
 
     # ---- tools -------------------------------------------------------------------------------
     def list_playbooks(self, motion_id: str = "reign-first-motion") -> dict:
@@ -131,12 +170,19 @@ class GovernedTools:
             self._fail("playbook", str(exc), "use motion_id 'reign-first-motion'.")
         out = []
         for pid in motion["playbooks"]:
-            pb = pbmod.load(trusted.playbook_file(pid, self.playbooks_dir))
+            try:
+                pb = pbmod.load(trusted.playbook_file(pid, self.playbooks_dir))
+            except (trusted.Untrusted, pbmod.PlaybookError) as exc:
+                self._fail("playbook", f"playbook {pid} in motion {motion_id} could not be loaded: {exc}",
+                           "ask the playbook owner to fix the file; playbooks/SCHEMA.md explains each field.")
             out.append({"playbook_id": pid, "segment": pb["audience"]["segment"], "trigger": pb["trigger"],
                         "channel": pb["channel"], "trigger_status": pb["trigger_status"],
                         "reason": pb.get("trigger_not_implemented_reason"),
                         "kill_switch": kill_switch.engaged(self.paths.state, pid)})
-        accounts = [{"id": a.id, "name": a.name, "segment": a.segment} for a in self.io["accounts"].list_accounts()]
+        try:
+            accounts = [{"id": a.id, "name": a.name, "segment": a.segment} for a in self.io["accounts"].list_accounts()]
+        except InputError as exc:
+            self._fail("input", f"account source failed: {exc}", "check the HubSpot adapter and retry.")
         return {"motion": motion["motion_id"], "playbooks": out, "accounts": accounts}
 
     def fetch_source(self, trigger_id: str) -> dict:
@@ -170,13 +216,16 @@ class GovernedTools:
         decision = icp.prescreen(acct)
         enrichment = Enrichment.empty(acct.id)
         if decision is None:
-            fetched = self.io["enrichment"].enrich(acct.id)
-            enrichment = self._guard(lambda: motion_trail.perform(
+            try:
+                fetched = self.io["enrichment"].enrich(acct.id)
+            except InputError as exc:
+                self._fail("screen", f"enrichment source failed for {acct.id}: {exc}", "check the Clay adapter and retry.")
+            enrichment = self._guard(pb, lambda: motion_trail.perform(
                 action="enrich", object_id=acct.system_id, fs=fs, commit=lambda: fetched,
                 purpose=f"Attach enrichment to {acct.name} to test the first Reign motion ICP criteria.",
                 sources=[fetched.source or f"clay:row/{acct.id}"]), "screen")
             decision = icp.evaluate(acct, enrichment)
-        self._guard(lambda: motion_trail.perform(
+        self._guard(pb, lambda: motion_trail.perform(
             action="score", object_id=acct.system_id, fs=fs, commit=lambda: None,
             purpose=f"Record the ICP decision '{decision.decision}' for {acct.name} in the first Reign motion.",
             sources=[acct.system_id] + ([enrichment.source] if enrichment.source else []),
@@ -199,14 +248,18 @@ class GovernedTools:
         """Preflight: may a brief be drafted, and what must it say about applicability?"""
         pb, _ = self._playbook(playbook_id)
         st = self._step(playbook_id, account_id, "screened")
-        acct, trigger = st["account"], self.io["feed"].get(pb["trigger"]["id"])
+        acct = st["account"]
+        try:
+            trigger = self.io["feed"].get(pb["trigger"]["id"])
+        except InputError as exc:
+            self._fail("applicability", f"regulatory feed failed: {exc}", "check the regulator feed adapter and retry.")
         prior = _already_briefed(self.paths, acct.system_id, trigger.id, playbook_id)
         if prior:
             self._fail("applicability", f"{acct.name} already has a brief for {trigger.id}: {prior}.",
                        "do not draft again; the account owner decides on the existing request.")
         result = pf.check(trigger, acct, st["enrichment"], pb)
         if result.status != pf.READY:
-            self._guard(lambda: self._pb_trail(pb).perform(
+            self._guard(pb, lambda: self._pb_trail(pb).perform(
                 action="hold", object_id=acct.system_id, fs=st["decision"].fs, commit=lambda: None,
                 purpose=f"Record that no {trigger.id} brief is drafted for {acct.name}: preflight {result.status}.",
                 sources=[s.url for s in trigger.sources if s.url] + [acct.system_id],
@@ -231,7 +284,7 @@ class GovernedTools:
         routing = pb.get("routing", {})
         lanes = routing.get("lanes", {})
         routed, skipped = route(contacts, lanes, routing.get("do_not_route", []), list(lanes))
-        self._guard(lambda: self._pb_trail(pb).perform(
+        self._guard(pb, lambda: self._pb_trail(pb).perform(
             action="route", object_id=acct.system_id, fs=st["decision"].fs, commit=lambda: None,
             purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
             sources=[c.system_id for c in contacts] or [acct.system_id],
@@ -271,7 +324,7 @@ class GovernedTools:
             self._fail("audit", f"decision {decision!r} is not one an agent may record.",
                        f"use one of {sorted(AGENT_DECISIONS)}; drafting goes through request_approval.")
         acct = self._account(account_id)
-        rec = self._guard(lambda: self._pb_trail(pb).perform(
+        rec = self._guard(pb, lambda: self._pb_trail(pb).perform(
             action=AGENT_DECISIONS[decision], object_id=acct.system_id, fs=self.io["icp"].is_fs(acct),
             purpose=purpose, sources=list(sources), commit=lambda: {"recorded": True},
             detail={"agent_decision": decision, "via": "mcp"}), "audit")
@@ -290,6 +343,8 @@ class GovernedTools:
         if problems:  # enforced here, whatever the agent was told
             self.errors.record("tool.request_approval", "brief failed the output gate",
                                context={"account": acct.id, "problems": problems})
+            self._count(pb, "gate_failed")
+            self._check_kill(pb)
             raise ToolFailure("the brief failed the output gate: " + "; ".join(problems),
                               "fix each problem (check_claims lists them) and call request_approval again.")
         prior = _already_briefed(self.paths, acct.system_id, trigger.id, playbook_id)
@@ -316,8 +371,9 @@ class GovernedTools:
             except Exception:
                 bpath.unlink(missing_ok=True)
                 raise
+            self._count(pb, "drafted")
 
-        self._guard(lambda: self._pb_trail(pb).perform(
+        self._guard(pb, lambda: self._pb_trail(pb).perform(
             action="create", object_id=acct.system_id, fs=st["decision"].fs,
             sources=sorted(ctx.allowed_urls() | {acct.system_id}),
             purpose=(f"Draft the {trigger.title.split(':')[0]} brief for {acct.name} and route it to the account "
@@ -330,7 +386,7 @@ class GovernedTools:
             from agent.output import review
             from evals.score_run import score as score_run
             self.paths.run_dir.mkdir(parents=True, exist_ok=True)
-            review_path = str(review.write(self.paths.run_dir, out_root=self.paths.out, score=score_run(self.paths.out)))
+            review_path = str(review.write(self.paths.run_dir, out_root=self.paths.out, score=score_run(self.paths.out, run_dir=self.paths.run_dir)))
         except Exception as exc:
             self.errors.record("output.review", exc)
         return {"brief": str(bpath), "approval_request": str(apath), "route_to": acct.owner, "sent": False,

@@ -124,7 +124,7 @@
       "regex": "\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b[^.]{0,30}\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b|\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b[^.]{0,40}\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b"
     }
   ],
-  "object_context_regex": "\\b(?:invest\\w*|partner\\w*|fund\\w*|back\\w*|serv\\w*|sell\\w*|client\\w*|customers?|portfolio|polic\\w*|insur\\w*|lend\\w*|accelerator|incubator|arm)\\b[^.]{0,30}$",
+  "object_context_regex": "\\b(?:invest(?:s|ed|ing|ments?)?\\s+in|partner(?:s|ed|ing|ships?)?\\s+with|backs|funds|finances|serves|serving|advises|(?:sells?|selling|lends?|lending|provides?|providing|offers?|offering)\\b[^.]{0,30}\\bto|portfolio\\s+(?:of|includes?|companies)|(?:clients?|customers?)\\s+(?:include|including|are|such\\s+as)|(?:accelerator|incubator)\\s+for)\\b[^.]{0,30}$",
   "watch_list": {
     "_about": "Noticed and logged in the audit trail and the run summary; never enriched, routed, briefed or contacted.",
     "hospitals": "all hospitals this month (A-040)",

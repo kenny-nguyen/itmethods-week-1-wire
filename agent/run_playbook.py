@@ -200,7 +200,7 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
     try:  # the review view is a convenience for humans; the JSON and Markdown files stay the source of truth
         from agent.output import review
         from evals.score_run import score as score_run
-        summary["review"] = str(review.write(paths.run_dir, out_root=paths.out, score=score_run(paths.out)))
+        summary["review"] = str(review.write(paths.run_dir, out_root=paths.out, score=score_run(paths.out, run_dir=paths.run_dir)))
     except Exception as exc:  # never hide it, never let it block the run's real outputs
         errors.record("output.review", exc)
     return summary

@@ -33,6 +33,9 @@ AI_STARTUP_VARIANTS = [
     "Fintech startup using large language models.", "YC W24 company building LLM agents.",
     "Venture-funded autonomous agent company.", "Deep-learning startup.", "Seed-funded foundation model lab.",
     "Cloud software vendor for mid-sized manufacturers.", "B2B subscription software for midmarket lenders.",
+    # Adjectives about the account itself used to read as "the startups are someone else" (review F2):
+    "Well-funded AI startup building copilots for banks.", "VC-funded AI startup.",
+    "Backed by a16z, Acme is an AI startup.", "Insurtech AI startup.", "Customer-obsessed GenAI startup.",
 ]
 
 MUST_NOT_EXCLUDE = [
@@ -44,6 +47,7 @@ MUST_NOT_EXCLUDE = [
     "Insurer selling startup business policies through 20,000 agents.",
     "Bank that partners with fintech startups and is piloting AI agents in lending.",
     "Large bank deploying generative AI across operations.",
+    "Bank whose clients include AI startups.", "Bank lending to AI startups across Canada.",
 ]
 
 

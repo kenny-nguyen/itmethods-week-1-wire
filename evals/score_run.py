@@ -37,16 +37,25 @@ def _context(io: dict, pb: dict, account_id: str) -> BriefContext:
     return BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, [])
 
 
-def score(out: Path) -> dict:
+def _run_order(brief: Path) -> str:
+    """Runs sort by the UTC timestamp in their id, whether the batch runner or an MCP session wrote them."""
+    return brief.parent.parent.name.removeprefix("mcp-")
+
+
+def score(out: Path, run_dir: Path | None = None) -> dict:
+    """Score every run under `out`, or only the run in `run_dir` (what that run's review view shows)."""
     spec = json.loads(CASES.read_text(encoding="utf-8"))
     io = _load_inputs(ROOT)
     pb = load(ROOT / "playbooks" / f"{spec['playbook']}.jsonc")
+    runs = run_dir.name if run_dir else "*"
     audit = [json.loads(l) for l in (out / "audit.jsonl").read_text().splitlines()] if (out / "audit.jsonl").exists() else []
-    requests = [json.loads(p.read_text()) for p in out.glob("runs/*/approvals/*.json")]
+    if run_dir:
+        audit = [r for r in audit if r.get("run_id") == run_dir.name]
+    requests = [json.loads(p.read_text()) for p in out.glob(f"runs/{runs}/approvals/*.json")]
     results, passed, total = [], 0, 0
     for case in spec["cases"]:
         sid = f"hubspot:company/{case['account']}"
-        briefs = sorted(out.glob(f"runs/*/briefs/hubspot_company_{case['account']}.md"))
+        briefs = sorted(out.glob(f"runs/{runs}/briefs/hubspot_company_{case['account']}.md"), key=_run_order)
         text = briefs[-1].read_text() if briefs else ""
         recs = [r for r in audit if r.get("object") == sid]
         props = {}
@@ -96,7 +105,8 @@ def score(out: Path) -> dict:
             passed += bool(props[prop][0])
         results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                         "properties": {k: {"pass": bool(v[0]), "evidence": v[1]} for k, v in props.items()}})
-    return {"out": str(out), "score": f"{passed}/{total}", "passed": passed, "total": total, "cases": results}
+    return {"out": str(out), "run": run_dir.name if run_dir else None, "score": f"{passed}/{total}", "passed": passed,
+            "total": total, "cases": results}
 
 
 def main(argv: list[str] | None = None) -> int:

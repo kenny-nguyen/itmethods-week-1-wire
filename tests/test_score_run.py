@@ -46,6 +46,27 @@ class ScoreRunTests(unittest.TestCase):
             brief_cases = [c for c in r["cases"] if c["expect"] == "brief"]
             self.assertTrue(all(v["pass"] for c in brief_cases for v in c["properties"].values()))
 
+    def test_run_scope_scores_only_that_run(self):
+        with tempdir() as d:
+            first = run(MOTION, Path(d), provider=TemplateProvider())
+            second = run(MOTION, Path(d), provider=TemplateProvider())  # hs-1001 is already briefed
+            runs = Path(d) / "runs"
+            r1 = score(Path(d), run_dir=runs / first["run_id"])
+            self.assertEqual(r1["passed"], r1["total"])
+            case = next(c for c in score(Path(d), run_dir=runs / second["run_id"])["cases"] if c["account"] == "hs-1001")
+            self.assertFalse(case["properties"]["passes_output_gate"]["pass"])
+
+    def test_latest_brief_is_by_run_time_not_directory_name(self):
+        with tempdir() as d:
+            old, new = Path(d) / "runs/mcp-20260101T000000Z-aaaaaa", Path(d) / "runs/20260601T000000Z-bbbbbb"
+            s = run(MOTION, Path(d), provider=TemplateProvider())
+            good = Path(s["accounts"]["hs-1001"]["brief"]).read_text()
+            for run_dir, text in ((old, "stale brief\n"), (new, good)):
+                (run_dir / "briefs").mkdir(parents=True)
+                (run_dir / "briefs/hubspot_company_hs-1001.md").write_text(text)
+            case = next(c for c in score(Path(d))["cases"] if c["account"] == "hs-1001")
+            self.assertTrue(case["properties"]["passes_output_gate"]["pass"], case["properties"]["passes_output_gate"])
+
 
 if __name__ == "__main__":
     unittest.main()

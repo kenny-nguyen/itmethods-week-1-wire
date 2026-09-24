@@ -5,9 +5,11 @@ import unittest
 from pathlib import Path
 
 from agent.feedback import kill_switch
+from agent.input.base import InputError
 from agent.processing import preflight as pf
 from agent.processing.brief import BriefContext, TemplateProvider
-from agent.tools import GovernedTools, ToolFailure
+from agent.run_playbook import _load_inputs
+from agent.tools import ROOT, GovernedTools, ToolFailure
 from tests.helpers import tempdir
 
 BANK = "bank-sr26-2"
@@ -106,6 +108,71 @@ class GovernedToolTests(unittest.TestCase):
             with self.assertRaises(ToolFailure) as cm:
                 t.screen_account(BANK, "hs-1002")
             self.assertIn("nothing happened", str(cm.exception))
+
+    def test_audit_failure_engages_kill_switch(self):
+        class FailingSink:
+            def append(self, record):
+                raise OSError("audit store unreachable")
+
+        with tempdir() as d:
+            t = GovernedTools(Path(d), sink=FailingSink())
+            with self.assertRaises(ToolFailure):
+                t.screen_account(BANK, "hs-1002")
+            killed = kill_switch.engaged(Path(d) / "state", BANK)
+            self.assertIn("audit-write-failure", killed["reason"])
+            with self.assertRaises(ToolFailure) as cm:
+                t.screen_account(BANK, "hs-1001")
+            self.assertIn("kill switch", str(cm.exception))
+
+    def test_gate_refusal_engages_kill_switch(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            t.screen_account(BANK, "hs-1002"); t.check_applicability(BANK, "hs-1002"); t.route_contact(BANK, "hs-1002")
+            bad = offline_draft(t, "hs-1002").replace("## What changed\n", "## What changed\n- SR 26-2 applies to the bank [src-sr26-2].\n")
+            with self.assertRaises(ToolFailure):
+                t.request_approval(BANK, "hs-1002", bad)
+            self.assertIn("gate-failures", kill_switch.engaged(Path(d) / "state", BANK)["reason"])
+            self.assertIn("block", [r["action"] for r in jsonl(Path(d) / "audit.jsonl")])
+
+    def test_clean_session_leaves_kill_switch_off(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            t.screen_account(BANK, "hs-1001"); t.check_applicability(BANK, "hs-1001"); t.route_contact(BANK, "hs-1001")
+            t.request_approval(BANK, "hs-1001", offline_draft(t, "hs-1001"))
+            self.assertIsNone(kill_switch.engaged(Path(d) / "state", BANK))
+
+    def test_system_id_works_through_every_step(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            sid = "hubspot:company/hs-1001"
+            self.assertEqual(t.screen_account(BANK, sid)["decision"], "include")
+            self.assertEqual(t.check_applicability(BANK, sid)["status"], pf.READY)
+            t.route_contact(BANK, sid)
+            draft = offline_draft(t, "hs-1001")
+            self.assertTrue(t.check_claims(BANK, sid, draft)["passed"])
+            self.assertFalse(t.request_approval(BANK, sid, draft)["sent"])
+
+    def test_adapter_failures_are_logged_with_recovery(self):
+        class Broken:
+            def enrich(self, account_id):
+                raise InputError("Clay timed out")
+
+            def list_accounts(self):
+                raise InputError("HubSpot timed out")
+
+            def get(self, trigger_id):
+                raise InputError("feed unreachable")
+
+        for key, call in (("enrichment", lambda t: t.screen_account(BANK, "hs-1001")),
+                          ("accounts", lambda t: t.list_playbooks()),
+                          ("feed", lambda t: (t.screen_account(BANK, "hs-1001"), t.check_applicability(BANK, "hs-1001")))):
+            with self.subTest(adapter=key), tempdir() as d:
+                t = GovernedTools(Path(d), inputs={**_load_inputs(ROOT), key: Broken()})
+                with self.assertRaises(ToolFailure) as cm:
+                    call(t)
+                self.assertIn("Recovery:", str(cm.exception))
+                self.assertTrue(any("timed out" in e["message"] or "unreachable" in e["message"]
+                                    for e in jsonl(Path(d) / "errors.jsonl")))
 
 
 if __name__ == "__main__":

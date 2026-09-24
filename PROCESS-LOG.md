@@ -1778,3 +1778,41 @@ Stuck, then recovered: the first no-mistakes validation run failed at its review
 
 </details>
 
+
+### [D-038] 00:21 · BUILDER · DECISION
+The pipeline review raised five findings on the MCP tool path, the ICP exclusions and the review view's eval score. All five were reproduced and fixed, with a regression test for each.
+
+<details><summary>Structured fields</summary>
+
+**What:** (F1) The tools now resolve a HubSpot system id such as `hubspot:company/hs-1001` to the short id before looking up session state, so the tool order works with either id. (F2) The ICP's "the startups are someone else" check now needs a relational phrase ("invests in", "partners with", "lends to", "clients include"). Adjectives such as "well-funded", "VC-funded", "Backed by" and "Customer-obsessed" no longer cancel an AI-startup exclusion. (F4) The review view scores only its own run, and "latest brief" means the latest by the run's UTC timestamp, not by directory name. (F5) Enrichment, regulator feed, account list and per-playbook load failures on the MCP path are logged to `errors.jsonl` and end with a recovery.
+
+**Why:** Each finding broke a rule the tools claim to enforce. F2 let common "AI startup" phrasings through, which goes against the operator's exclusion decision. F4 showed a pass on the review page for a run that wrote no brief.
+
+**Evidence:** `tests/test_icp.py` (5 new excluded phrasings, 2 new relational phrasings that must not exclude), `tests/test_tools.py` (`test_system_id_works_through_every_step`, `test_adapter_failures_are_logged_with_recovery`), `tests/test_score_run.py` (`test_run_scope_scores_only_that_run`, `test_latest_brief_is_by_run_time_not_directory_name`).
+
+**Assumption:** none
+
+**Reversal trigger:** A real account description that is the account's own relationship but reads as adjectival (for example "funding AI startups" as a noun phrase) would need the relational list widened.
+
+**Links:** D-016, A-033
+
+</details>
+
+### [D-039] 00:21 · BUILDER · DECISION
+Per the operator, the MCP agent path is the real agent, so the playbook's quality kill criteria are now checked on it after every governed decision. Before this they ran only in the batch runner, `decide` and `report`.
+
+<details><summary>Structured fields</summary>
+
+**What:** One MCP server session counts as one run. After every audited tool action, whether it succeeds or is blocked, and after every output-gate refusal in `request_approval`, the tools compute `audit_blocked`, `drafted`, `gate_failed` and `gate_failed_ratio` for the session. They add the playbook's complaint and wrong-account reports, evaluate the playbook's `kill_criteria`, and engage the kill switch on a hit. The engagement is written to the error log and attempted as an R-17 `block` record. Session counts restart after a human clears the switch, the same way the report counts do.
+
+**Why:** The operator chose to make docs/production.md true for the agent path rather than narrow the docs to the batch path. Per session mirrors the batch runner's per-run counting.
+
+**Evidence:** `agent/tools.py` `_check_kill`, `_guard`; `tests/test_tools.py` `test_audit_failure_engages_kill_switch`, `test_gate_refusal_engages_kill_switch`, `test_clean_session_leaves_kill_switch_off`.
+
+**Assumption:** A `request_approval` refusal counts as a gate failure, but a `check_claims` failure does not, because `check_claims` is the agent's drafting loop. As in the batch runner, one refusal with no other attempt is a ratio of 1.0 and trips `gate-failures`.
+
+**Reversal trigger:** The operator wants agent sessions to tolerate a first refusal (for example a minimum number of attempts before the ratio counts).
+
+**Links:** D-038, A-037
+
+</details>
