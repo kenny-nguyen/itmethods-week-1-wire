@@ -1542,3 +1542,43 @@ After the restructure: 74 unit tests and 42 eval cases pass, and the command-lin
 
 </details>
 
+### [D-029] 23:56 · BUILDER · DECISION
+Two changes the production guide needed. Configuration is read in one place, including `WIRE_OUT_DIR` for where the audit trail and error log live. Scheduled reruns are safe: an account already briefed for the same trigger and playbook is not drafted again.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/config.py`; every command reads the output root from it. `_already_briefed()` in `agent/run_playbook.py` reads our own approval requests (a plain read, not an R-17 touch) and skips any account with a request that is not rejected.
+
+**Why:** The operator asked for configurable audit and error log locations (supervisor message at 23:55 KST). A per-command `--out` flag was the security finding S-2 (D-019); one deployment-level variable read by every command keeps a single trail, and the guide says to set it once per deployment. Without the rerun check, an hourly schedule would send the account owner the same brief every hour.
+
+**Evidence:** `tests/test_pipeline.py::test_scheduled_rerun_does_not_brief_twice`; "Ran 75 tests ... OK".
+
+**Assumption:** A rejected brief may be redrafted on a later run; any other status blocks a redraft. This is the agent's reading and is logged here for the operator.
+
+**Reversal trigger:** The operator wants rejected briefs to stay blocked until the trigger changes.
+
+**Links:** D-019, D-030
+
+</details>
+
+### [D-030] 23:56 · QA · OUTPUT-QA
+Every command in `docs/production.md` was run from a clean clone of commit `acba336` and did what the guide says. The live model call was not run: there is no API key in this environment, and the guide says so at the top.
+
+<details><summary>Structured fields</summary>
+
+**What:** Verified from `git clone` into a scratch directory with `WIRE_OUT_DIR` set: run (exit 0, two briefs); rerun (both banks `already_briefed`); approve (exit 0, "Nothing has been sent"); reject (exit 0); complaint report (exit 3, "KILL SWITCH ENGAGED: complaint"); manual engage (exit 0); clear (exit 0). Then with `WIRE_OUT_DIR` unset: run exit 0, files under `./out`. Test suite 75 OK; evals 42/42.
+
+**Why:** The operator asked for every command in the guide to be verified from a clean clone and the verification logged.
+
+**Evidence:** Audit trail after the sequence: 36 records, last seven `score, approve, reject, update, block, block, unblock`; no `errors.jsonl` (nothing failed).
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-029
+
+**Proof boundary:** Builder-run verification, not independent. Not run: the live Claude call, cron itself (the cron line was not installed), any real HubSpot, Clay or ZoomInfo connection.
+
+</details>
+
