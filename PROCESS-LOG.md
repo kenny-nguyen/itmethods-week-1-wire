@@ -903,3 +903,43 @@ Found while coding routing: the CEO warns against a CISO inbox, so the proposal 
 
 </details>
 
+### [D-009] 23:32 · BUILDER · DECISION
+Briefs are drafted by a deterministic template when there is no API key, and by Claude through the raw Messages API when there is one. The raw HTTP call keeps the repository standard-library only; the default model is `claude-opus-5`.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/processing/brief.py` with `TemplateProvider` and `AnthropicProvider` (urllib POST to `https://api.anthropic.com/v1/messages`, headers `x-api-key`, `anthropic-version: 2023-06-01`). Model from `WIRE_MODEL`, default `claude-opus-5`.
+
+**Why:** The operator asked for standard-library Python where possible, which rules out the Anthropic SDK dependency, the usual default for Python. The request shape and default model were read from the Claude API reference bundled with this session's tooling, not recalled. A refusal (`stop_reason: "refusal"`) or empty reply raises `ProviderError`.
+
+**Evidence:** Claude API reference, raw HTTP example: `anthropic-version: 2023-06-01`, model `claude-opus-5`. Provider selection covered by `tests/test_brief.py`.
+
+**Assumption:** Rests on proposed row A-015. What happens when the call fails is proposed row A-033.
+
+**Reversal trigger:** Operator allows a dependency (then the official SDK), or names a model.
+
+**Links:** A-015, A-033
+
+</details>
+
+### [Q-003] 23:32 · BUILDER · PROCESSING-QA
+The output gate catches every forbidden-content case in the eval set (18 of 18), and both template briefs, the US bank and the Canadian bank with the caveat, pass it clean. The gate first failed my own template on two points, which were fixed in the template and the URL pattern.
+
+<details><summary>Structured fields</summary>
+
+**What:** PASS (self-QA, not independent) on "a brief that claims compliance, certification, independent assurance or validation, states a duration, mentions CMMC, FedRAMP, CUI or ITAR, cites an unknown source, links an unapproved URL, mentions a product without an approved claim id, uses filler, drops a section, runs long, or drops the applicability caveat does not pass".
+
+**Why:** Each case starts from a brief that passes and changes one thing, so a miss points at exactly one rule.
+
+**Evidence:** `python -m evals.run_evals`: "18/18 eval cases behaved as expected". `python3 -m unittest discover -s tests -t .`: "Ran 44 tests ... OK". First template run failed the gate on: a URL with a trailing comma, and product sentences whose citation came after the full stop. Fixed by citing inside each sentence (`cite()` in `brief.py`) and excluding trailing punctuation from the URL pattern.
+
+**Assumption:** Rests on proposed row A-029 (content rules as eval checks).
+
+**Reversal trigger:** A real model draft that the gate passes but a human would reject.
+
+**Links:** A-029, D-005
+
+**Proof boundary:** Word lists are English and literal; a paraphrase such as "meets every SR 26-2 expectation" is not caught. No live model draft has been gated yet (no API key in this session).
+
+</details>
+

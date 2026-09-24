@@ -1,0 +1,25 @@
+{
+  "_about": "Deterministic evals for the brief output gate. Each case takes a brief that passes, applies one edit, and names the problem the gate must report. The content rules come from docs/research/itmethods-product-facts.md (proposed reading A-029).",
+  "cases": [
+    {"name": "clean brief passes", "edit": null, "expect": null},
+    {"name": "compliance claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign makes the bank compliant with SR 26-2 [P-GATEWAY]."}, "expect": "claims compliance"},
+    {"name": "certification claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign Assurance is certified for model risk work [P-ASSURANCE]."}, "expect": "claims compliance"},
+    {"name": "independent assurance claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign provides independent assurance to the audit committee [P-ASSURANCE]."}, "expect": "claims compliance"},
+    {"name": "independent validation claim", "edit": {"append_to": "## Where Reign fits", "text": "- Reign will independently validate your models [P-GATEWAY]."}, "expect": "claims compliance"},
+    {"name": "briefing duration", "edit": {"append_to": "## Where Reign fits", "text": "- The briefing takes 45 minutes [P-BRIEFING]."}, "expect": "duration"},
+    {"name": "briefing duration range", "edit": {"append_to": "## Open questions for the approver", "text": "- Book a 45-60 min slot."}, "expect": "duration"},
+    {"name": "CMMC capability", "edit": {"append_to": "## Where Reign fits", "text": "- Reign supports CMMC Level 2 programmes [P-GATEWAY]."}, "expect": "CMMC"},
+    {"name": "FedRAMP mention", "edit": {"append_to": "## Open questions for the approver", "text": "- Ask whether FedRAMP matters to them."}, "expect": "CMMC"},
+    {"name": "product claim without claim id", "edit": {"append_to": "## Where Reign fits", "text": "- Reign cuts model validation time in half."}, "expect": "product mention without an approved claim id"},
+    {"name": "invented URL", "edit": {"append_to": "## Why now", "text": "- See the regulator's summary [src-sr26-2] at https://example.com/sr26-2-summary."}, "expect": "not an approved source"},
+    {"name": "unknown citation id", "edit": {"append_to": "## Why now", "text": "- The bank's CRO spoke about SR 26-2 last week [linkedin:post/123]."}, "expect": "unknown source id"},
+    {"name": "filler phrasing", "edit": {"append_to": "## Why now", "text": "- In today's rapidly evolving landscape, banks must act [src-sr26-2]."}, "expect": "filler"},
+    {"name": "em dash", "edit": {"append_to": "## Why now", "text": "- Model risk guidance changed \u2014 again [src-sr26-2]."}, "expect": "filler"},
+    {"name": "missing section", "edit": {"remove_section": "## Routing"}, "expect": "missing section"},
+    {"name": "over length", "edit": {"append_to": "## Open questions for the approver", "text_repeat": "- Confirm the owner of model inventory for agent workloads before the call.", "times": 30}, "expect": "limit is"}
+  ],
+  "caveat_cases": [
+    {"name": "caveat present passes", "remove_caveat": false, "expect": null},
+    {"name": "caveat removed fails", "remove_caveat": true, "expect": "applicability requires confirmation"}
+  ]
+}
