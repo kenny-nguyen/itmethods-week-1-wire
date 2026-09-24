@@ -1,0 +1,14 @@
+{
+  "_fixture": "Fictional people standing in for ZoomInfo contact search results. Register rows A-012, A-013.",
+  "contacts": [
+    {"id": "zi-2001", "company_id": "hs-1001", "name": "Avery Lindqvist (fictional)", "title": "Chief Audit Executive"},
+    {"id": "zi-2002", "company_id": "hs-1001", "name": "Morgan Achebe (fictional)", "title": "Chief Risk Officer"},
+    {"id": "zi-2003", "company_id": "hs-1001", "name": "Priya Raman (fictional)", "title": "Head of Model Risk Management"},
+    {"id": "zi-2004", "company_id": "hs-1001", "name": "Daniel Okafor (fictional)", "title": "VP, Platform Engineering"},
+    {"id": "zi-2005", "company_id": "hs-1001", "name": "Sofia Marchetti (fictional)", "title": "Chief Information Security Officer"},
+    {"id": "zi-2006", "company_id": "hs-1002", "name": "Jordan Whitfield (fictional)", "title": "Chief Risk Officer"},
+    {"id": "zi-2007", "company_id": "hs-1002", "name": "Casey Nakamura (fictional)", "title": "Head of AI Engineering"},
+    {"id": "zi-2008", "company_id": "hs-1003", "name": "Elena Petrova (fictional)", "title": "VP, Quality and Regulatory Affairs"},
+    {"id": "zi-2009", "company_id": "hs-1004", "name": "Marcus Bell (fictional)", "title": "Director, Engineering Platforms"}
+  ]
+}

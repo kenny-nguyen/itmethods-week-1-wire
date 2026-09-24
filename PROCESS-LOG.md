@@ -806,3 +806,22 @@ The R-17 core is in and its tests pass (11 tests). The tests were then checked f
 
 </details>
 
+### [D-007] 23:27 · BUILDER · DECISION
+The input layer is in: one adapter interface per tool, with local fixture versions standing in for HubSpot, ZoomInfo, Clay and a regulator feed. The regulator feed holds real, fetched sources; everything else is fictional and labelled so.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/input/base.py` (interfaces), `agent/input/local.py` (fixture adapters), `fixtures/` (11 fictional companies, 9 fictional contacts, 7 enrichment rows, 3 triggers: SR 26-2 implemented; FDA PCCP and the defense trigger marked not implemented with the reason).
+
+**Why:** The pipeline should not know whether it is talking to a fixture or to HubSpot. Fixtures include the hard cases on purpose: an AI startup filed under "fintech" with 6,200 employees, a mid-market SaaS firm over the headcount floor, a bank with unknown headcount, a hospital, a semiconductor firm with unknown export-control exposure.
+
+**Evidence:** `python3 -m unittest discover -s tests -t .` printed "Ran 19 tests ... OK". OSFI E-23 page re-read: "Effective date May 1, 2027". OSFI B-13 effective date not found on the page in this pass, so the feed says so rather than stating it.
+
+**Assumption:** Rests on proposed rows A-012 (fixture adapters) and A-013 (fictional accounts). The three-trigger feed shape follows proposed row A-030; with A-017 instead, the feed is unchanged and only the playbook differs.
+
+**Reversal trigger:** Tool access in the window, or the operator rejecting A-012 or A-013.
+
+**Links:** A-012, A-013, A-014, A-030
+
+</details>
+

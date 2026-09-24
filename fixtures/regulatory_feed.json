@@ -1,0 +1,60 @@
+{
+  "_about": "Regulator publications, standing in for a live feed. Unlike the other fixtures these are real documents; every URL was fetched during the window (process log D-003). A trigger whose source is not verified cannot produce a brief.",
+  "triggers": [
+    {
+      "id": "SR-26-2",
+      "type": "regulatory",
+      "implemented": true,
+      "title": "SR 26-2: Revised Guidance on Model Risk Management",
+      "issuer": "Board of Governors of the Federal Reserve System, with the OCC and FDIC",
+      "published": "2026-04-17",
+      "jurisdiction": "US",
+      "regulator": "Federal Reserve",
+      "relevance_threshold_total_assets_usd": 30000000000,
+      "facts": [
+        {"text": "Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021).", "source": "src-sr26-2"},
+        {"text": "The letter says it is expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve.", "source": "src-sr26-2"},
+        {"text": "The guidance emphasises a risk-based approach tailored to a banking organization's model risk profile and the size and complexity of its operations.", "source": "src-sr26-2"}
+      ],
+      "sources": [
+        {"id": "src-sr26-2", "title": "Federal Reserve SR 26-2", "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm", "verified": true, "verified_how": "HTTP 200 and page text read, 2026-09-24 23:17 KST"}
+      ],
+      "context_by_jurisdiction": {
+        "CA": [
+          {"text": "OSFI Guideline E-23 (Model Risk Management) takes effect on May 1, 2027.", "source": "src-osfi-e23"},
+          {"text": "OSFI Guideline B-13 (Technology and Cyber Risk Management) sets expectations for federally regulated financial institutions.", "source": "src-osfi-b13"}
+        ]
+      },
+      "context_sources": [
+        {"id": "src-osfi-e23", "title": "OSFI Guideline E-23 - Model Risk Management (2027)", "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027", "verified": true, "verified_how": "HTTP 200; page shows 'Effective date May 1, 2027'"},
+        {"id": "src-osfi-b13", "title": "OSFI Guideline B-13 - Technology and Cyber Risk Management", "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management", "verified": true, "verified_how": "HTTP 200; effective date (2024-01-01, per the researcher report) not re-read on the page"}
+      ]
+    },
+    {
+      "id": "FDA-PCCP-2025",
+      "type": "regulatory",
+      "implemented": false,
+      "not_implemented_reason": "Only one trigger is implemented in this window (bank and SR 26-2). The guidance page URL has not been located (two guessed URLs returned 404), so there is no verified source to cite yet. Register row A-014.",
+      "title": "FDA final guidance on Predetermined Change Control Plans for AI-enabled device software functions (August 2025)",
+      "issuer": "US Food and Drug Administration",
+      "published": "2025-08",
+      "jurisdiction": "US",
+      "facts": [],
+      "sources": [
+        {"id": "src-fda-pccp", "title": "FDA PCCP final guidance", "url": null, "verified": false, "verified_how": "[NEEDS VERIFICATION: guidance page URL]"}
+      ]
+    },
+    {
+      "id": "DEFENSE-TBD",
+      "type": "regulatory",
+      "implemented": false,
+      "not_implemented_reason": "The packet lists the defense trigger as an open question ('CMMC? agent on the estate'). No trigger has been chosen, and iTmethods holds no CMMC certification, so a CMMC-led brief would be wrong.",
+      "title": "Defense supplier trigger (not chosen)",
+      "issuer": null,
+      "published": null,
+      "jurisdiction": "US",
+      "facts": [],
+      "sources": []
+    }
+  ]
+}
