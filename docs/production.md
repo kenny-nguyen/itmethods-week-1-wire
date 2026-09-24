@@ -52,7 +52,7 @@ Reruns are safe: an account already briefed for the same trigger and playbook (a
 
 ## 4. Approval and the kill switch
 
-The agent never contacts a bank. On a regulatory trigger it writes the brief and routes the approval request to the named iTmethods account owner, who decides whether to share it in the existing relationship.
+The agent never contacts a bank. On a regulatory trigger, it writes the brief and routes the approval request to the named iTmethods account owner, who decides whether to share it in the existing relationship.
 
 ```
 python3 -m agent.feedback.decide --request "$WIRE_OUT_DIR/runs/<run>/approvals/<account>.json" \

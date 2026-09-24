@@ -2,7 +2,7 @@
 
 Take-home for iTmethods (Growth Engineer, AI-Native). Timed window: 2026-09-24 22:50 to 2026-09-25 01:50 KST.
 
-The chosen artifact is option 3 of the assignment: a small agent that turns a regulatory trigger into a short account brief with sources, built so that every touch on a financial-services (FS) account leaves an audit record before it counts, and nothing sends without a named human approver.
+The chosen artifact is option 3 of the assignment: a small agent that turns a regulatory trigger into a short account brief with sources. It's built so every touch on a financial-services (FS) account leaves an audit record before it counts, and nothing sends without a named human approver.
 
 The assignment packet itself is private and is not in this repository. Where a decision depends on a line of it, that short line is quoted in `PROCESS-LOG.md` or `AMBIGUITY-REGISTER.md`.
 
@@ -40,7 +40,7 @@ python3 -m agent.run_playbook
 
 This runs the first Reign motion (`playbooks/motions/reign-first-motion.jsonc`) against the fixtures and writes to `out/` (git-ignored). The motion filters the account list once against the ICP, then runs each playbook whose trigger is implemented. Only the bank playbook (`playbooks/bank-sr26-2.jsonc`, SR 26-2) is implemented; the biopharma and defense playbooks are reported as "trigger not implemented yet" with the reason.
 
-Without an API key the brief is drafted from a deterministic template. With `ANTHROPIC_API_KEY` set it is drafted by Claude (`WIRE_MODEL` picks the model, default `claude-opus-5`; `WIRE_PROVIDER=template` forces the template). Either way every draft passes the same output gate. A failed model call fails that account loudly and names the recovery options; it never falls back silently.
+Without an API key, the brief is drafted from a deterministic template. With `ANTHROPIC_API_KEY` set, it is drafted by Claude (`WIRE_MODEL` picks the model, default `claude-opus-5`; `WIRE_PROVIDER=template` forces the template). Either way every draft passes the same output gate. A failed model call fails that account loudly and names the recovery options; it never falls back silently.
 
 What comes out:
 
