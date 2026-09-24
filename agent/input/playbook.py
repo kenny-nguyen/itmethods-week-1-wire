@@ -9,6 +9,7 @@ named by register row (see playbooks/SCHEMA.md).
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from agent.governance.audit import is_named_human
@@ -69,6 +70,8 @@ def validate(pb: dict, *, fs_segments: set[str], claim_ids: set[str], implemente
             p.append(f"missing '{key}'")
     if p:
         return p
+    if not isinstance(pb["playbook_id"], str) or not re.match(r"^[a-z0-9][a-z0-9-]{0,63}$", pb["playbook_id"]):
+        p.append("playbook_id must be lowercase letters, digits and hyphens")
     if pb["product"] not in PRODUCTS:
         p.append(f"product must be one of {sorted(PRODUCTS)}")
     if pb.get("status", "active") not in {"active", "paused", "retired"}:
@@ -124,7 +127,6 @@ def validate(pb: dict, *, fs_segments: set[str], claim_ids: set[str], implemente
         p.append("an FS audience requires audit.rule = R-17")
     if audit.get("required_for") not in {"all_segments", "fs_only"}:
         p.append("audit.required_for must be all_segments or fs_only")
-    cap = (pb.get("limits") or {}).get("max_accounts_per_run")
-    if cap is not None and (not isinstance(cap, int) or cap < 1):
-        p.append("limits.max_accounts_per_run must be a positive integer")
+    if "limits" in pb:  # operator decision A-037: no volume cap
+        p.append("volume limits are not allowed; stop a motion with quality-based kill criteria (A-037)")
     return p

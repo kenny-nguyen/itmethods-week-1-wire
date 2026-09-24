@@ -66,18 +66,21 @@
   },
 
   // stub: "kill_criteria is how CRO stops a motion that goes sloppy".
-  // GUESS (A-010): each criterion is checked after every run; tripping one pauses the playbook (kill switch)
-  // until a named human clears it. Metrics come from the run summary.
+  // Operator decision (A-037): quality-based only, never a count ceiling, and no volume cap.
+  // Checked after every run, decision and report; tripping one engages the kill switch
+  // until the owner or an approver clears it.
   "kill_criteria": [
     { "id": "audit-write-failure", "metric": "audit_blocked", "op": ">", "threshold": 0,
       "why": "Any R-17 block means the motion cannot prove what it did." },
     { "id": "gate-failures", "metric": "gate_failed_ratio", "op": ">", "threshold": 0.2,
       "why": "More than one draft in five failing the content gate means the drafts are sloppy." },
     { "id": "approver-rejections", "metric": "rejected_ratio", "op": ">", "threshold": 0.5,
-      "why": "If the approver rejects most briefs, stop drafting more." }
+      "why": "If the approver rejects most decided briefs, stop drafting more." },
+    { "id": "complaint", "metric": "complaints", "op": ">=", "threshold": 1,
+      "why": "One complaint from a prospect stops the motion for review." },
+    { "id": "wrong-account", "metric": "wrong_account_reports", "op": ">=", "threshold": 1,
+      "why": "A brief about the wrong account is the embarrassment the CEO warned about." }
   ],
-
-  "limits": { "max_accounts_per_run": 5 },   // GUESS (A-010): precision over volume; caps briefs drafted per run
 
   // stub: "audit should satisfy Reign rule R-17 when the audience is FS".
   "audit": {

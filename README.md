@@ -28,12 +28,12 @@ What the contract sets out:
 
 ## How to use
 
-This section is updated as usable pieces land. Requires Python 3.11 or later; standard library only, nothing to install. Run everything from the repository root.
+This section is updated as usable pieces land. Requires Python 3.11 or later, run as `python3`; standard library only, nothing to install. Run everything from the repository root.
 
 ### 1. Run the playbook
 
 ```
-python -m agent.run_playbook
+python3 -m agent.run_playbook
 ```
 
 This runs `playbooks/reign-first-motion.jsonc` against the fixtures and writes to `out/` (git-ignored). Without an API key it drafts with a deterministic template. With `ANTHROPIC_API_KEY` set it drafts with Claude (`WIRE_MODEL` picks the model, default `claude-opus-5`; `WIRE_PROVIDER=template` forces the template). Either way every draft goes through the same output gate.
@@ -54,7 +54,7 @@ On the fixtures, with the playbook as committed: the US bank gets a brief pendin
 ### 2. Approve or reject a brief
 
 ```
-python -m agent.feedback.decide --request out/runs/<run>/approvals/<account>.json \
+python3 -m agent.feedback.decide --request out/runs/<run>/approvals/<account>.json \
   --approver "Kenny Nguyen" --approve --reason "Sources and routing checked."
 ```
 
@@ -63,8 +63,8 @@ Only a named approver listed in the playbook can decide. The decision is written
 ### 3. Stop the motion
 
 ```
-python -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Drafts read generic."
-python -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Reviewed." --clear
+python3 -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Drafts read generic."
+python3 -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Reviewed." --clear
 ```
 
 While engaged, runs are refused and approvals are refused. The playbook's kill criteria engage it automatically: any R-17 audit failure, more than one draft in five failing the gate, or more than half of decided briefs rejected.
@@ -72,8 +72,8 @@ While engaged, runs are refused and approvals are refused. The playbook's kill c
 ### 4. Check it
 
 ```
-python -m unittest discover -s tests -t . -v
-python -m evals.run_evals
+python3 -m unittest discover -s tests -t . -v
+python3 -m evals.run_evals
 ```
 
 ### How the pieces fit
@@ -102,7 +102,7 @@ To connect a real tool, write one class against the matching interface in `agent
 | `agent/input/` | INPUT stage: adapter interfaces and local fixture adapters. |
 | `agent/processing/` | PROCESSING stage: ICP filter, applicability preflight, brief generation, output checks. |
 | `prompts/` | The system prompt the model drafts briefs with. |
-| `evals/` | Deterministic eval cases for the brief output gate (`python -m evals.run_evals`). |
+| `evals/` | Deterministic eval cases for the brief output gate (`python3 -m evals.run_evals`). |
 | `playbooks/` | The Campaign Manager playbook for the first Reign motion, and `SCHEMA.md` explaining every field. |
 | `icp/` | The living ICP, with the source or register row of every field. |
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |

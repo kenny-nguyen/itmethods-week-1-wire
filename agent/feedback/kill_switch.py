@@ -7,11 +7,17 @@ direction, so the file is written first and the audit record second.
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 
+PLAYBOOK_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
+
+
 def _path(state_dir: Path, playbook_id: str) -> Path:
+    if not isinstance(playbook_id, str) or not PLAYBOOK_ID.match(playbook_id):  # no path traversal (D-020, S-3)
+        raise ValueError(f"invalid playbook id {playbook_id!r}")
     return Path(state_dir) / "kill" / f"{playbook_id}.json"
 
 

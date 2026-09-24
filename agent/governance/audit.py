@@ -35,7 +35,7 @@ from agent.governance.error_log import ErrorLog
 
 R17_ACTIONS = ("create", "update", "enrich", "score", "message")
 # Governance decisions are recorded in the same trail so an auditor sees them in sequence.
-DECISION_ACTIONS = ("approve", "reject", "block", "hold")
+DECISION_ACTIONS = ("approve", "reject", "block", "unblock", "hold")
 ALLOWED_ACTIONS = R17_ACTIONS + DECISION_ACTIONS
 
 # "purpose - one sentence, specific, not 'engagement'" (R-17).
@@ -168,7 +168,18 @@ class AuditTrail:
                 self.sink.append(record)
             except Exception as exc:  # any sink failure blocks the action
                 self._fail(record, f"audit record could not be written: {exc}", required, exc)
-        return commit()
+        try:
+            return commit()
+        except Exception as exc:
+            # The record above says the action happened; it did not. Say so in both logs, then re-raise.
+            self.error_log.record("governance.commit", exc, context={"action": action, "object": object_id,
+                                                                     "record_id": record["record_id"]})
+            try:
+                self.sink.append({**record, "record_id": str(uuid.uuid4()), "ts": datetime.now(timezone.utc).isoformat(),
+                                  "detail": {"outcome": "failed", "of_record": record["record_id"], "error": str(exc)}})
+            except Exception as sink_exc:
+                self.error_log.record("governance.audit", sink_exc, context={"note": "failed-outcome record not written"})
+            raise
 
     def _fail(self, record: dict, message: str, required: bool, exc: BaseException | None = None) -> None:
         context = {"action": record["action"], "object": record["object"], "fs": record["fs"],

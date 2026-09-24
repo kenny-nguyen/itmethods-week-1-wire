@@ -1234,3 +1234,119 @@ QA's C4 findings and the security reviewer's markup finding are fixed in the out
 
 </details>
 
+### [D-018] 23:47 · SECURITY · DECISION
+Independent security review, finding S-1 (high): whoever could edit an approval request chose who may approve it, because the approval step loaded the playbook from a path inside the request. Fixed. The playbook now comes by id from `playbooks/` only, must be unchanged since the request was created, and must validate.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/feedback/trusted.py` (load by format-checked id, SHA-256 match, validate); `decide.py` rewritten to use it; the approval record's FS flag is always true instead of read from the request.
+
+**Why:** The approver list is the control that stands between a drafted brief and a send. It cannot live in a file the approval is about.
+
+**Evidence:** Reviewer's reproduction (edited `playbook_path` and id, "Mallory Attacker" approved, exit 0) now prints "DECISION REFUSED: playbook not trusted: no playbook 'reign-first-motion-evil'", exit 2. Regression tests in `tests/test_security.py`: edited request refused; playbook changed after the request refused.
+
+**Assumption:** The `playbooks/` directory itself is trusted (reviewed through git).
+
+**Reversal trigger:** n/a
+
+**Links:** D-012
+
+</details>
+
+### [D-019] 23:47 · SECURITY · DECISION
+Finding S-2 (medium): pointing `--out` at another directory got a listed approver past the kill switch and kept the approval out of the real audit trail. Fixed by removing every `--out` flag: the command-line tools always use the repository's `out/`, and a request outside it is refused.
+
+<details><summary>Structured fields</summary>
+
+**What:** `run_playbook`, `decide`, `kill` and `report` take no output-root flag; `decide` refuses requests not under `out/runs`.
+
+**Why:** The kill switch and the audit trail only work if there is exactly one of each.
+
+**Evidence:** `--out /tmp/elsewhere` now fails argument parsing; `tests/test_security.py` covers the function-level refusal.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-018
+
+</details>
+
+### [D-020] 23:47 · SECURITY · DECISION
+Finding S-3 (medium): anyone could clear the kill switch, nothing was audited, and a crafted playbook id could delete any JSON file under `out/`. Fixed. Only the playbook owner or a listed approver can engage or clear it, both directions are audited, clearing is refused if its audit record cannot be written, and ids must be lowercase letters, digits and hyphens everywhere.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/feedback/kill.py` rewritten; id check in `kill_switch._path` and in the playbook validator; automatic engagements from decisions and reports are audited.
+
+**Why:** Stopping is the safe direction, so engaging still happens even if the audit store is down. Restarting is the unsafe direction, so it fails closed.
+
+**Evidence:** "Random Person ... --clear" now REFUSED, exit 2; `--playbook-id "../../runs/x"` now REFUSED "invalid playbook id", exit 2. Tests: accountable-only, audited both ways, clear refused on audit failure, four traversal ids rejected.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-018
+
+</details>
+
+### [D-021] 23:47 · SECURITY · DECISION
+Finding S-4 (low to medium): an audit record could say an approval happened when writing the request failed. Fixed. When the step after the audit record fails, a second record marks the first as failed, the error log gets the detail, and the error is raised. The same review, with QA's C1-a, led to the brief and its approval request being written together or not at all.
+
+<details><summary>Structured fields</summary>
+
+**What:** `AuditTrail.perform` writes a `detail.outcome = "failed"` record pointing at the original; `run_playbook` writes brief and request in one audited action and removes the brief if the request write fails.
+
+**Why:** R-17 only has value if the trail is true.
+
+**Evidence:** `tests/test_security.py::AuditOutcome` and `tests/test_pipeline.py::test_request_write_failure_leaves_no_brief` pass.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** Q-005
+
+**Proof boundary:** A process killed between the audit write and the commit still leaves a record without an outcome; production needs an idempotent commit keyed by record id.
+
+</details>
+
+### [D-022] 23:47 · SECURITY · DECISION
+Finding S-5 (medium, production only): text planted in CRM or enrichment data could steer a model draft past the gate, including tracking images. Fixed as far as a gate can: markup, images and links of any shape are rejected, product sentences must quote an approved claim, and the model is told that record text is data, not instructions. Accepted limits, not fixed: the approver's identity is a typed name, and a plausible but false sentence can still pass the gate.
+
+<details><summary>Structured fields</summary>
+
+**What:** Covered by D-017 (gate) and the prompt change. Null results from the same review: no API key leaks into any log, output or traceback (canary test); account ids cannot escape their directory as file names; unbounded reads only from the fixed model endpoint.
+
+**Why:** The named human approver is the real control for plausible falsehoods, which is why S-1 mattered most.
+
+**Evidence:** Reviewer's injection lines are eval cases now ("markdown image beacon", "HTML image", "protocol-relative link", "bare domain"); 39/39 pass.
+
+**Assumption:** Accepted for the demo: approver identity is a string. Production must bind it to an authenticated identity (listed in the README).
+
+**Reversal trigger:** n/a
+
+**Links:** D-017, D-018
+
+</details>
+
+### [D-023] 23:47 · BUILDER · DECISION
+The operator's two changes are in the code: agent adoption never excludes, there is no volume cap (a `limits` block is now rejected), and the kill criteria are quality-based: audit failures, gate failures, approver rejections over decided briefs, complaints and wrong-account reports. A new command records complaints and wrong-account reports.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/feedback/report.py` and `reports.py`; rejection ratio now divides by decided requests only (QA note in Q-005); playbook kill criteria updated.
+
+**Why:** Operator decisions A-036 and A-037.
+
+**Evidence:** `python3 -m unittest discover -s tests -t .`: "Ran 69 tests ... OK", including a wrong-account report engaging the kill switch.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-036, A-037, R-005, R-006
+
+</details>
+

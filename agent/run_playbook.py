@@ -1,6 +1,6 @@
 """Run a Campaign Manager playbook end to end: INPUT -> PROCESSING -> OUTPUT -> FEEDBACK.
 
-    python -m agent.run_playbook --playbook playbooks/reign-first-motion.jsonc
+    python3 -m agent.run_playbook                      # playbooks/reign-first-motion.jsonc
 
 Every stage has a gate:
 - INPUT: the playbook must validate, the motion must be active, the kill switch
@@ -25,7 +25,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agent import AGENT_ID, __version__
-from agent.feedback import kill_criteria, kill_switch
+from agent.feedback import kill_criteria, kill_switch, reports, trusted
 from agent.governance.audit import AuditBlocked, AuditTrail, JsonlAuditSink
 from agent.governance.error_log import ErrorLog
 from agent.input import playbook as pbmod
@@ -91,7 +91,7 @@ def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, pr
                        pb["version"], run_id, errors, pb["audit"]["required_for"])
     provider = provider or get_provider()
     summary = {"run_id": run_id, "playbook": {"id": pb["playbook_id"], "version": pb["version"]},
-               "playbook_path": str(Path(playbook_path).resolve()),
+               "playbook_sha256": trusted.sha256(Path(playbook_path)),
                "provider": provider.name, "accounts": {}, "plays": [], "outputs": [], "kill_switch": None}
     counts = {"audit_blocked": 0, "drafted": 0, "gate_failed": 0, "draft_failed": 0, "held": 0}
 
@@ -138,7 +138,6 @@ def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, pr
             counts["held"] += 1
 
     # ---- PROCESSING 2 + OUTPUT: each play ------------------------------------------------------
-    cap = (pb.get("limits") or {}).get("max_accounts_per_run")
     claims_by_id = {c["id"]: c for c in io["claims"]}
     for play in pb["plays"]:
         record = {"play_id": play["play_id"], "status": play["status"], "trigger": play["trigger"]["id"]}
@@ -147,11 +146,7 @@ def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, pr
             record["reason"] = play.get("not_implemented_reason")
             continue
         trigger = io["feed"].get(play["trigger"]["id"])
-        targets = [t for t in included if t[0].segment == play["audience"]["segment"]]
-        if cap is not None and len(targets) > cap:
-            for acct, _, _ in targets[cap:]:
-                summary["accounts"][acct.id].update(status="deferred", reasons=[f"volume cap of {cap} per run (A-010)"])
-            targets = targets[:cap]
+        targets = [t for t in included if t[0].segment == play["audience"]["segment"]]  # no volume cap (A-037)
         record["targets"] = [a.id for a, _, _ in targets]
         for acct, enrichment, decision in targets:
             _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, provider, trail,
@@ -161,7 +156,8 @@ def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, pr
     attempted = counts["drafted"] + counts["gate_failed"]
     metrics = {"audit_blocked": counts["audit_blocked"], "drafted": counts["drafted"],
                "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
-               "held_ratio": counts["held"] / len(accounts) if accounts else 0.0, "rejected_ratio": 0.0}
+               "held_ratio": counts["held"] / len(accounts) if accounts else 0.0,
+               **reports.metrics(paths.state, pb["playbook_id"])}
     summary["metrics"] = {**counts, **metrics}
     hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
     if hits:
@@ -229,26 +225,38 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
 
     sources = sorted(ctx.allowed_urls() | {acct.system_id})
     bpath, apath = brief_path(paths, acct.system_id), approval_path(paths, acct.system_id)
+    request = {
+        "request_id": uuid.uuid4().hex, "run_id": summary["run_id"], "status": "pending",
+        "playbook": summary["playbook"], "playbook_sha256": summary["playbook_sha256"], "play_id": play["play_id"],
+        "account": {"id": acct.system_id, "name": acct.name}, "trigger": trigger.id, "channel": play["channel"],
+        "brief": str(bpath), "send": False, "blockable": True, "sender": pb["approval"].get("sender", "none"),
+        "recipients": {lane: [c.system_id for c in cs] for lane, cs in routed.items()},
+        "note": "Nothing has been sent. A named approver decides with python3 -m agent.feedback.decide; "
+                "approvers come from the playbook, never from this file.",
+    }
+
+    def commit():
+        # Brief and approval request land together or not at all (QA finding C1-a, Q-005).
+        write_text(bpath, text)
+        try:
+            write_json(apath, request)
+        except Exception:
+            bpath.unlink(missing_ok=True)
+            raise
+
     try:
         trail.perform(action="create", object_id=acct.system_id, fs=decision.fs, sources=sources,
-                      purpose=f"Draft the {trigger.title.split(':')[0]} account brief for {acct.name} for {approver} to review before any send.",
-                      commit=lambda: write_text(bpath, text), detail={"brief": str(bpath), "provider": provider.name})
-        request = {
-            "request_id": uuid.uuid4().hex, "run_id": summary["run_id"], "status": "pending",
-            "playbook": summary["playbook"], "playbook_path": summary["playbook_path"], "play_id": play["play_id"],
-            "account": {"id": acct.system_id, "name": acct.name, "fs": decision.fs},
-            "trigger": trigger.id, "channel": play["channel"], "brief": str(bpath),
-            "approvers": pb["approval"]["approvers"], "send": False, "blockable": True,
-            "sender": pb["approval"].get("sender", "none"),
-            "recipients": {lane: [c.system_id for c in cs] for lane, cs in routed.items()},
-            "note": "Nothing has been sent. A named approver decides with python -m agent.feedback.decide.",
-        }
-        trail.perform(action="create", object_id=acct.system_id, fs=decision.fs, sources=[str(bpath)],
-                      purpose=f"Open an approval request so {approver} decides whether the {acct.name} brief may be sent.",
-                      commit=lambda: write_json(apath, request), detail={"request_id": request["request_id"]})
+                      purpose=(f"Draft the {trigger.title.split(':')[0]} brief for {acct.name} and open an approval "
+                               f"request so {approver} decides before any send."),
+                      commit=commit, detail={"brief": str(bpath), "approval_request": str(apath),
+                                             "request_id": request["request_id"], "provider": provider.name})
     except AuditBlocked as exc:
         counts["audit_blocked"] += 1
         entry.update(status="audit_blocked", reasons=[str(exc)])
+        return
+    except OSError as exc:
+        counts["draft_failed"] += 1
+        entry.update(status="write_failed", reasons=[str(exc)])
         return
     counts["drafted"] += 1
     entry.update(status="brief_pending_approval", brief=str(bpath), approval_request=str(apath))
@@ -257,12 +265,12 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Run a Campaign Manager playbook (nothing is ever sent).")
-    ap.add_argument("--playbook", default=str(ROOT / "playbooks/reign-first-motion.jsonc"))
-    ap.add_argument("--out", default=str(ROOT / "out"))
+    ap.add_argument("--playbook-id", default="reign-first-motion", help="a playbook in playbooks/")
     args = ap.parse_args(argv)
     try:
-        s = run(args.playbook, args.out)
-    except RunRefused as exc:
+        # Output root is fixed so the audit trail and kill switch cannot be redirected (D-020, S-2).
+        s = run(trusted.playbook_file(args.playbook_id), ROOT / "out")
+    except (RunRefused, trusted.Untrusted) as exc:
         print(f"RUN REFUSED: {exc}", file=sys.stderr)
         return 2
     print(f"run {s['run_id']}  playbook {s['playbook']['id']}@{s['playbook']['version']}  provider {s['provider']}")

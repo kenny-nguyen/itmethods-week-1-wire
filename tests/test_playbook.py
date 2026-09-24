@@ -43,7 +43,8 @@ class PlaybookTests(unittest.TestCase):
         self.assertTrue(any("not an implemented trigger" in p for p in problems(plays__0__trigger={"type": "regulatory", "id": "FDA-PCCP-2025"})))
         self.assertTrue(any("claim ids" in p for p in problems(plays__0__claims=["P-CERTIFIED"])))
         self.assertTrue(any("principal" in p for p in problems(approval__principal="agent")))
-        self.assertTrue(any("max_accounts_per_run" in p for p in problems(limits={"max_accounts_per_run": 0})))
+        self.assertTrue(any("A-037" in p for p in problems(limits={"max_accounts_per_run": 5})))
+        self.assertTrue(any("playbook_id" in p for p in problems(playbook_id="../../evil")))
 
 
 if __name__ == "__main__":

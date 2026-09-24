@@ -16,7 +16,7 @@ Files are JSONC (JSON with `//` comments) so each guess can be marked where it s
 | `plays[]` | guess | The stub has one `audience`, `trigger`, `channel`. One playbook covering several buyers needs a list; each play keeps the stub's shapes unchanged, so one trigger per play and every audit record is tied to one reason. A playbook with one play is the stub's shape. | A-030 (A-017 stands until answered) |
 | `approval` | stub (empty object) | See below. | - |
 | `kill_criteria[]` | stub (empty list) | See below. | - |
-| `limits.max_accounts_per_run` | guess | Makes "precision, no spray" enforceable: a run drafts at most this many briefs. | A-010 |
+| (no volume cap) | operator decision | There is no per-run account cap; the validator rejects a `limits` block. Precision comes from the ICP, the preflight and the gate, and the stop button is quality-based. | A-037 (reversed A-010) |
 | `audit` | stub (empty object) | See below. | - |
 
 ## Each play
@@ -46,9 +46,9 @@ Files are JSONC (JSON with `//` comments) so each guess can be marked where it s
 
 ## `kill_criteria[]`
 
-The stub: "how CRO stops a motion that goes sloppy". Each entry has `id`, `metric`, `op`, `threshold` and `why`. After every run the metrics are computed from the run summary; if any criterion trips, the kill switch engages and every later run is refused until a named human clears it (`python -m agent.feedback.kill --clear`). Proposed row A-010.
+The stub: "how CRO stops a motion that goes sloppy". Each entry has `id`, `metric`, `op`, `threshold` and `why`. Operator decision A-037: criteria are quality-based only, never a count ceiling. Metrics are computed after every run, every approval decision and every feedback report; if any criterion trips, the kill switch engages and every later run and approval is refused until the playbook owner or an approver clears it (`python3 -m agent.feedback.kill --clear`).
 
-Metrics available: `audit_blocked`, `gate_failed_ratio`, `rejected_ratio`, `held_ratio`, `drafted`.
+Metrics available: `audit_blocked` (R-17 blocks in the run), `gate_failed_ratio` (drafts failing the output gate), `rejected_ratio` (rejected over decided approval requests), `complaints` and `wrong_account_reports` (from `python3 -m agent.feedback.report`).
 
 ## `audit`
 

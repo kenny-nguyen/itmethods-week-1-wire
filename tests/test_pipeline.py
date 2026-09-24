@@ -70,7 +70,8 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(enriched, {"hubspot:company/hs-1001", "hubspot:company/hs-1002"},
                              "only in-profile accounts with a live play are enriched")
             creates = [r for r in audit if r["action"] == "create"]
-            self.assertEqual(len(creates), 2)  # the brief, then the approval request
+            self.assertEqual(len(creates), 1)  # brief and approval request land together (Q-005, C1-a)
+            self.assertIn("approval_request", creates[0]["detail"])
             self.assertTrue(all(r["send"] is False for r in audit if r["action"] != "approve"))
 
     def test_audit_store_down_blocks_everything_and_trips_kill_switch(self):
@@ -125,14 +126,27 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "draft_failed")
             self.assertTrue(any(e["stage"] == "processing.draft" for e in jsonl(Path(d) / "errors.jsonl")))
 
-    def test_volume_cap(self):
+    def test_no_volume_cap_allowed(self):  # operator decision A-037
         with tempdir() as d:
             tmp = Path(d)
-            s = run(variant(tmp, limits__max_accounts_per_run=1,
-                            plays__0__unconfirmed_applicability="brief_with_caveat"), tmp / "out",
-                    provider=TemplateProvider())
-            self.assertEqual(s["metrics"]["drafted"], 1)
-            self.assertEqual(s["accounts"]["hs-1002"]["status"], "deferred")
+            with self.assertRaises(RunRefused) as cm:
+                run(variant(tmp, limits={"max_accounts_per_run": 1}), tmp / "out", provider=TemplateProvider())
+            self.assertIn("A-037", str(cm.exception))
+
+    def test_request_write_failure_leaves_no_brief(self):  # QA finding C1-a
+        import agent.run_playbook as rp
+        original = rp.write_json
+        rp.write_json = lambda path, data: (_ for _ in ()).throw(OSError("disk full")) if "approvals" in str(path) else original(path, data)
+        try:
+            with tempdir() as d:
+                out = Path(d)
+                s = run(PLAYBOOK, out, provider=TemplateProvider())
+                self.assertEqual(s["accounts"]["hs-1002"]["status"], "write_failed")
+                self.assertEqual(list((out / "runs" / s["run_id"]).glob("briefs/*.md")), [])
+                failed = [r for r in jsonl(out / "audit.jsonl") if r["detail"].get("outcome") == "failed"]
+                self.assertEqual(len(failed), 1, "the audit trail says the create did not complete")
+        finally:
+            rp.write_json = original
 
 
 class DecisionTests(unittest.TestCase):
