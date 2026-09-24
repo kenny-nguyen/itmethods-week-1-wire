@@ -91,7 +91,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
             results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                             "exercised": False, "properties": {}})
             continue
-        if case["account"] in already:
+        if case["account"] in already and not briefs and not any(r["action"] == "create" for r in recs):
             # Correctly skipped on a rerun: this run found a live request for the account from an earlier run.
             results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                             "exercised": False, "note": "already briefed", "properties": {}})
