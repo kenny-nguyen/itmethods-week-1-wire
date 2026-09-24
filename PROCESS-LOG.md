@@ -1040,3 +1040,22 @@ Pipeline tests pass (13 new, 60 in total). They cover the failure paths, not onl
 
 </details>
 
+### [D-012] 23:37 · PM · DECISION
+Two independent reviews were started, each in a separate agent context that did not build the code: a QA pass on five claims and a security pass on the approval step, injection, secrets, audit integrity and unbounded reads. Neither may edit the repository; their verdicts are logged as they return.
+
+<details><summary>Structured fields</summary>
+
+**What:** QA claims: C1 R-17 fails closed on every write path; C2 nothing sends and only a named approver approves, kill switch blocks runs and approvals; C3 AI-startup naming variants the reviewer invents are excluded without excluding regulated enterprises that mention AI; C4 the output gate catches forbidden claims, including paraphrases; C5 the README commands work from a clean clone.
+
+**Why:** The contract turns independent adversarial QA on by default for this assignment: there is no owner in the feedback loop, no next cycle, and the review is itself graded. The builder's self-QA entries (Q-001 to Q-004) are labelled as such and are not the sign-off.
+
+**Evidence:** Briefs sent to the `qa-engineer` and `security-engineer` role definitions in `.claude/agents/`, bounded to the claims above.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** Q-001, Q-002, Q-003, Q-004
+
+</details>
+
