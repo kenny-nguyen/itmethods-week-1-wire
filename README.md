@@ -35,6 +35,7 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 - Run the tests: `python -m unittest discover -s tests -t . -v`
 - The R-17 audit trail (`agent/governance/audit.py`): every create, update, enrich, score or message action goes through `AuditTrail.perform(...)`, which writes the audit record first and only then completes the action. If the record is invalid or cannot be written, the action does not happen and `AuditBlocked` is raised.
 - Input adapters (`agent/input/`): interfaces in `base.py`, local stand-ins for HubSpot, ZoomInfo, Clay and a regulator feed in `local.py`, reading `fixtures/`. To connect a real tool, write one class against the matching interface.
+- The ICP (ideal customer profile) filter (`agent/processing/icp.py`) reads `icp/icp.json`. Each field the packet did not give names the register row that proposes it. AI startups and mid-market SaaS are excluded by segment and by naming-variant patterns; the variants tested are listed in `tests/test_icp.py`.
 - The error log (`agent/governance/error_log.py`) is a separate JSON Lines file for anything that goes wrong in any stage.
 
 ## Repo map
@@ -48,6 +49,8 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 | `INTAKE-WORKSHEET.md` | First structured read of the assignment. |
 | `agent/governance/` | R-17 audit trail and the error log, used by every stage. |
 | `agent/input/` | INPUT stage: adapter interfaces and local fixture adapters. |
+| `agent/processing/` | PROCESSING stage: ICP filter, applicability preflight, brief generation, output checks. |
+| `icp/` | The living ICP, with the source or register row of every field. |
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |
 | `tests/` | Unit tests, one file per stage. |
 | `.github/workflows/ci.yml` | CI (continuous integration): runs the tests on every push. |

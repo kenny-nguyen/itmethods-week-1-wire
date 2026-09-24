@@ -825,3 +825,43 @@ The input layer is in: one adapter interface per tool, with local fixture versio
 
 </details>
 
+### [A-031] 23:28 · PM · AMBIGUITY
+Found while coding the ICP: the packet never says what happens to an account whose segment is not listed. The proposal is to hold it for a human.
+
+<details><summary>Structured fields</summary>
+
+**What:** Unlisted segment: exclude, hold, or include? Options: (a) exclude; (b) hold; (c) include if other rules pass.
+
+**Why:** "Regulated enterprise" is broader than the four listed segments, so silent exclusion could drop a real target, and inclusion would be spray.
+
+**Evidence:** Packet ICP sketch lists five segments; CEO notes add semiconductor. Register row A-031.
+
+**Assumption:** (b), proposed and awaiting the operator; it is the config value `unlisted_segment: "hold"` in `icp/icp.json`.
+
+**Reversal trigger:** The operator lists the full segment set.
+
+**Links:** A-003, D-006
+
+</details>
+
+### [Q-002] 23:28 · BUILDER · PROCESSING-QA
+The ICP filter passes its 11 tests, including 26 spellings of "AI startup" and "mid-market SaaS" that must be excluded and 6 ordinary uses of "AI" that must not be. With the pattern list emptied, 28 checks fail, so the tests do test the patterns.
+
+<details><summary>Structured fields</summary>
+
+**What:** PASS (self-QA, not independent) on "AI startups and mid-market SaaS are excluded whatever segment they are filed under, and a bank that mentions AI is not".
+
+**Why:** The fixture AI startup is filed as "fintech" with 6,200 employees and a financial-services industry, so only the naming patterns can catch it.
+
+**Evidence:** `python3 -m unittest tests.test_icp`: "Ran 11 tests ... OK". Mutation (patterns set to an empty list): "FAILED (failures=28)". Fixture outcomes asserted per account: hs-1001 to hs-1004 include; hs-1005 to hs-1008, hs-1010, hs-1011 exclude; hs-1009 hold.
+
+**Assumption:** Rests on proposed rows A-004, A-005, A-006, A-019, A-020, A-021, A-031 through config values in `icp/icp.json`.
+
+**Reversal trigger:** A real account name that the patterns wrongly exclude.
+
+**Links:** A-003, A-031
+
+**Proof boundary:** Patterns are English only. Not tested against real CRM data. A startup that never describes itself with any listed phrase will pass the pattern check and fall to the headcount floor.
+
+</details>
+
