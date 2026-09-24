@@ -38,7 +38,7 @@ To see the output without running anything, read `examples/brief-hs-1001.md` (th
 python3 -m agent.run_playbook
 ```
 
-This runs the first Reign motion (`playbooks/motions/reign-first-motion.jsonc`) against the fixtures and writes to `out/` (git-ignored). The motion filters the account list once against the ICP, then runs each playbook whose trigger is implemented. Only the bank playbook (`playbooks/bank-sr26-2.jsonc`, SR 26-2) is implemented; the biopharma and defense playbooks are reported as "trigger not implemented yet" with the reason.
+This runs the first Reign motion (`playbooks/motions/reign-first-motion.jsonc`) against the fixtures and writes to `out/` (git-ignored). The motion filters the account list once against the ICP (ideal customer profile), then runs each playbook whose trigger is implemented. Only the bank playbook (`playbooks/bank-sr26-2.jsonc`, SR 26-2) is implemented; the biopharma and defense playbooks are reported as "trigger not implemented yet" with the reason.
 
 Without an API key, the brief is drafted from a deterministic template. With `ANTHROPIC_API_KEY` set, it is drafted by Claude (`WIRE_MODEL` picks the model, default `claude-opus-5`; `WIRE_PROVIDER=template` forces the template). Either way every draft passes the same output gate. A failed model call fails that account loudly and names the recovery options; it never falls back silently.
 

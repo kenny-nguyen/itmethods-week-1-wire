@@ -36,8 +36,15 @@ def engage(state_dir: Path, playbook_id: str, *, by: str, reason: str) -> dict:
 
 
 def clear(state_dir: Path, playbook_id: str) -> bool:
+    """Clear the switch. Quality counts (complaints, wrong-account reports) restart from here (QA pass 2, C5)."""
     p = _path(state_dir, playbook_id)
+    p.with_suffix(".cleared").write_text(datetime.now(timezone.utc).isoformat(), encoding="utf-8") if p.parent.exists() else None
     if p.exists():
         p.unlink()
         return True
     return False
+
+
+def last_cleared(state_dir: Path, playbook_id: str) -> str:
+    c = _path(state_dir, playbook_id).with_suffix(".cleared")
+    return c.read_text(encoding="utf-8").strip() if c.exists() else ""

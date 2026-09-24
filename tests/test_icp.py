@@ -29,6 +29,10 @@ AI_STARTUP_VARIANTS = [
     "Mid-market B2B SaaS platform for finance teams.", "SaaS for mid-sized companies.",
     "Software-as-a-service vendor for the mid-market.", "Midsize SaaS company.",
     "Artificial intelligence start-up.",
+    # Found by independent QA pass 2 (Q-007):
+    "Fintech startup using large language models.", "YC W24 company building LLM agents.",
+    "Venture-funded autonomous agent company.", "Deep-learning startup.", "Seed-funded foundation model lab.",
+    "Cloud software vendor for mid-sized manufacturers.", "B2B subscription software for midmarket lenders.",
 ]
 
 MUST_NOT_EXCLUDE = [

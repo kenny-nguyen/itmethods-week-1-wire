@@ -36,6 +36,22 @@ class DecisionRefused(Exception):
     pass
 
 
+def created_record(out: Path, request_id: str | None) -> dict | None:
+    """The audited create record that produced this approval request, or None."""
+    audit = Path(out) / "audit.jsonl"
+    if not request_id or not audit.exists():
+        return None
+    found = None
+    for line in audit.read_text(encoding="utf-8").splitlines():
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if r.get("action") == "create" and r.get("detail", {}).get("request_id") == request_id:
+            found = None if r.get("detail", {}).get("outcome") == "failed" else r
+    return found
+
+
 def account_owner(system_id: str) -> str | None:
     """The account owner from the system of record, never from the request file (A-043, D-018)."""
     from agent.input.local import LocalHubSpotAccounts
@@ -58,15 +74,25 @@ def decide(request_path: str | Path, *, approver: str, approve: bool, reason: st
     if (out / "runs") not in request_path.parents:  # D-020, S-2: no decisions against another output root
         refuse(f"request is not under {out / 'runs'}")
     req = json.loads(request_path.read_text(encoding="utf-8"))
+    # Bind the request to the audit trail (QA pass 2, C2): the account and playbook come from the audited
+    # create record for this request id, never from the editable request file alone.
+    created = created_record(out, req.get("request_id"))
+    if created is None:
+        refuse("no audited create record for this request id; the request cannot be trusted")
+    if (req.get("account", {}).get("id") != created["object"]
+            or req.get("playbook", {}).get("id") != created["playbook"]["id"]):
+        refuse("the request file does not match its audited create record (account or playbook changed)")
+    if not req.get("playbook_sha256"):
+        refuse("the request has no playbook hash")
     try:
-        pb = trusted.load_trusted(req["playbook"]["id"], playbooks_dir, expected_sha=req.get("playbook_sha256"))
+        pb = trusted.load_trusted(created["playbook"]["id"], playbooks_dir, expected_sha=req["playbook_sha256"])
     except (trusted.Untrusted, KeyError) as exc:
         refuse(f"playbook not trusted: {exc}")
     if req["status"] != "pending":
         refuse(f"request is already {req['status']}")
     if not is_named_human(approver) or approver not in pb["approval"]["approvers"]:
         refuse(f"{approver!r} is not a named approver for {pb['playbook_id']}")
-    owner = account_owner(req["account"]["id"])
+    owner = account_owner(created["object"])
     if pb.get("handoff", {}).get("route_to") == "account_owner" and approver != owner:
         refuse(f"{approver!r} is not the named account owner ({owner!r}) on record in HubSpot (A-043)")
     killed = kill_switch.engaged(out / "state", pb["playbook_id"])

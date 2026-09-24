@@ -1601,3 +1601,45 @@ The operator redefined the artifact. It is a Claude skill plus an MCP server wit
 
 </details>
 
+### [Q-007] 00:03 · QA · QA-VERDICT
+The second independent QA pass found three real failures in the restructured code, and all three are fixed. The gate let a brief say a rule "governs" or "binds" the bank, and it did not require a citation on every line. Editing an approval request's account or playbook got past the owner check and the kill switch. And more naming variants and paraphrases slipped through.
+
+<details><summary>Structured fields</summary>
+
+**What:** C1 (brief never asserts applicability; Confirm rule; every factual line cited) FAIL. C2 (only the listed owner can approve; request edits cannot change that; kill switch holds) FAIL. C3 (dropped and watched accounts never enriched, routed or briefed) CONDITIONAL PASS: true on the fixtures; a future semiconductor playbook would enrich chipmakers before deciding "watch". C4 (new naming variants and paraphrases) FAIL: 7 of 8 ICP variants and 10 of 10 gate paraphrases passed. C5 (production guide from a clean clone) CONDITIONAL PASS: every command worked; the guide omitted the report command's exit code 3, and a complaint re-tripped the kill switch right after it was cleared.
+
+**Why:** Accepting every finding. The reviewer verified its checks were live: the unmodified brief passed, a control line was blocked.
+
+**Evidence:** Reviewer's probes in a clean clone at `0bcbc1b`. The fixes are in D-031.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-012, Q-005, D-031
+
+**Proof boundary (reviewer's):** No live model path; no live semiconductor playbook; a HubSpot fixture with other owners was simulated.
+
+</details>
+
+### [D-031] 00:03 · BUILDER · DECISION
+Every Q-007 failure is fixed and each of the reviewer's probes is now a regression case. The approval step now trusts only the audit trail: the account and playbook must match the audited create record for that request id, and the playbook hash is mandatory. The gate checks every line: a citation in each factual section, "Confirm" on every line of the conditional section whatever its bullet, and a much wider applicability, claim, duration and defense vocabulary. Clearing a kill switch now restarts the quality counts.
+
+<details><summary>Structured fields</summary>
+
+**What:** `decide.py` `created_record()`; `checks.py` line-by-line section checks, `CITED_SECTIONS`, wider `APPLIES`, `CLAIMS`, `DURATION`, `DEFENSE`; `icp.json` wider AI, stage and SaaS terms; `kill_switch.last_cleared()` and `reports.metrics()` counting since the last clear; guide updated. C3's semiconductor condition is logged, not changed: no semiconductor playbook exists.
+
+**Why:** Q-007.
+
+**Evidence:** First rerun after the gate rewrite: 31/42 evals. My new loop variable `text` shadowed the brief text, so the whole-brief checks (duration, defense, filler) only saw the last line. Renamed; 42/42. With the reviewer's 20 probes added as cases: "62/62 eval cases behaved as expected". Tests: "Ran 79 tests ... OK", including three request-tampering tests and the clear-then-rerun test.
+
+**Assumption:** A report made before a clear was reviewed by the person who cleared the switch.
+
+**Reversal trigger:** The operator wants complaints to accumulate across clears.
+
+**Links:** Q-007
+
+**Proof boundary:** Word lists still cannot prove a sentence true; the owner's review remains the control for plausible falsehoods.
+
+</details>
+

@@ -28,10 +28,17 @@ REQUIRED_SECTIONS = ["## What changed", "## What is certain for this account", "
                      "## What we know about the account", "## Where Reign fits", "## Suggested next step",
                      "## Suggested recipients in the existing relationship", "## Open questions for the account owner",
                      "## Sources"]
-KNOWN_HEADINGS = set(REQUIRED_SECTIONS)
+# Optional owner-only section after the recipients: the agent's risk-lane and engineering-lane framings.
+OPTIONAL_SECTIONS = ["## Lane framings for the account owner"]
+KNOWN_HEADINGS = set(REQUIRED_SECTIONS) | set(OPTIONAL_SECTIONS)
 CONDITIONAL_SECTION = "## What depends on structure (confirm)"
 # "Never claim a rule applies" (A-044): applicability wording only inside the conditional section.
-APPLIES = re.compile(r"\b(applies|apply to (you|the bank|them)|in scope|subject to|is covered by|falls under)\b", re.IGNORECASE)
+APPLIES = re.compile(r"\b(applies|apply to (you|the bank|them)|applicable to|in scope|subject to|covered by|falls (under|within)|"
+                     r"governs?|governed by|binds?|binding on|must (comply|follow|meet|adopt)|required to (comply|follow)|"
+                     r"obliged|obligated|regulated under|compl(y|ies) with)\b", re.IGNORECASE)
+# Sections where every line must carry a citation (QA pass 2, C1).
+CITED_SECTIONS = {"## What changed", "## What is certain for this account", CONDITIONAL_SECTION,
+                  "## What we know about the account", "## Where Reign fits"}
 # Template sentences about the account that name a product but make no product claim.
 ACCOUNT_FACT_SENTENCES = {"existing forge customer."}
 
@@ -48,17 +55,21 @@ CLAIMS = re.compile(
     r"validated\s+by|validat\w*\s+(your|their|the\s+bank)|"
     r"(ensure|ensures|guarantee\w*|achieve\w*|deliver\w*|handles?|provides?)\s+([\w-]+\s+){0,3}compliance|"
     r"in\s+line\s+with\s+(sr|osfi|dora|the\s+guidance|every|all)|"
-    r"(satisf\w*|meets?|fulfil\w*)\s+([\w-]+\s+){0,3}(expectation|requirement|obligation|guidance|rule)s?)\b",
+    r"(satisf\w*|meets?|fulfil\w*)\s+([\w-]+\s+){0,3}(expectation|requirement|obligation|guidance|rule)s?|"
+    r"sign[\s-]*off|pass\w*\s+([\w-]+\s+){0,4}(exam|examination|audit|inspection)s?|soc[\s-]*(2|ii)\b|vouch\w*|"
+    r"(examiner|regulator|auditor)s?\s+([\w-]+\s+){0,3}(approv|accept|sign)\w*)\b",
     re.IGNORECASE)
 # Rule 2: never state a briefing or meeting duration, in digits or words.
-NUMBER_WORDS = r"(one|two|three|four|five|ten|fifteen|twenty|thirty|forty|forty[\s-]*five|fifty|sixty|ninety)"
+NUMBER_WORDS = (r"(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|"
+                r"forty[\s-]*five|fifty|sixty|ninety|a\s+couple\s+of|a\s+few|several)")
 DURATION = re.compile(
     r"\b\d+\s*(?:-|to|–)?\s*\d*\s*(?:m|min|mins|minute|minutes|h|hr|hrs|hour|hours)\b|"
-    rf"\b(half|quarter)[\s-]+(an|of\s+an)[\s-]+hour\b|\ban\s+hour\b|\b{NUMBER_WORDS}[\s-]+(minute|minutes|hour|hours)\b",
+    rf"\b(half|quarter)[\s-]+(an|of\s+an)[\s-]+hour\b|\ban\s+hour\b|\b{NUMBER_WORDS}[\s-]+(min|mins|minute|minutes|hour|hours|hrs?)\b",
     re.IGNORECASE)
 # Rule 3: never imply CMMC, FedRAMP or CUI capability, and no ITAR claim.
 DEFENSE = re.compile(r"(\bc\.?\s?m\.?\s?m\.?\s?c\b|cybersecurity\s+maturity\s+model|\bfed\s*-?\s*ramp\b|"
-                     r"\bcui\b|controlled\s+unclassified|\bitar\b|international\s+traffic\s+in\s+arms)", re.IGNORECASE)
+                     r"federal\s+risk\s+and\s+authori[sz]ation|\bcui\b|controlled[\s-]+unclassified|\bitar\b|"
+                     r"international\s+traffic\s+in\s+arms|\bnist\s*(sp\s*)?800[\s-]*171\b|\bdfars\b)", re.IGNORECASE)
 SLOP = re.compile(r"(in today's|rapidly evolving|game[- ]changer|\bunlock\w*|\bleverag\w*|seamless\w*|"
                   r"cutting[- ]edge|revolutioni\w+|synerg\w+|\bdelve\w*|hope this finds you|—)", re.IGNORECASE)
 # Links and markup that are not approved sources.
@@ -66,6 +77,11 @@ MARKUP = re.compile(r"(<\s*[a-z!/]|!\[|\]\()", re.IGNORECASE)
 BARE_LINK = re.compile(r"(//[a-z0-9-]+\.[a-z0-9.-]+|\bwww\.[a-z0-9-]+|"
                        r"\b(?:[a-z0-9-]+\.)+(?:com|net|org|io|ai|gov|ca|co|dev|app|info|biz|us|uk|eu|xyz|site|example)\b)",
                        re.IGNORECASE)
+
+
+def _is_claim_line(text: str, claim_texts: dict[str, str]) -> bool:
+    plain = _norm(text)
+    return bool(plain) and any(plain in _norm(t) for t in claim_texts.values())
 
 
 def _norm(text: str) -> str:
@@ -124,19 +140,29 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
         problems.append("contains HTML or markdown links or images")
 
     section = ""
-    for line in body.splitlines():
-        if line.startswith("## "):
-            section = line.strip()
+    for raw in body.splitlines():
+        line = raw.strip()
+        if not line:
             continue
-        if not line.strip().startswith("- "):
-            if APPLIES.search(line):
-                problems.append(f"says a rule applies outside the conditional section: {line.strip()[:80]!r}")
+        if line.startswith("## "):
+            section = line
+            if line not in KNOWN_HEADINGS:
+                problems.append(f"unexpected section {line[:60]!r}")
+            continue
+        if line.startswith("# ") and not section:
+            continue  # the title
+        content = re.sub(r"^([-*+]|\d+[.)])\s+", "", line)
+        if not section:
+            if not content.startswith("Prepared for "):
+                problems.append(f"unexpected text before the first section: {line[:80]!r}")
             continue
         if section == CONDITIONAL_SECTION:
-            if not line.strip()[2:].lower().startswith("confirm"):
-                problems.append(f"every line in '{CONDITIONAL_SECTION}' must start with 'Confirm': {line.strip()[:80]!r}")
-        elif APPLIES.search(line):
-            problems.append(f"says a rule applies outside the conditional section: {line.strip()[:80]!r}")
+            if not content.lower().startswith("confirm"):
+                problems.append(f"every line in '{CONDITIONAL_SECTION}' must start with 'Confirm': {line[:80]!r}")
+        elif APPLIES.search(CITATION.sub("", content)) and not _is_claim_line(content, claim_texts):
+            problems.append(f"says a rule applies outside the conditional section: {line[:80]!r}")
+        if section in CITED_SECTIONS and not CITATION.search(line):
+            problems.append(f"line has no citation: {line[:80]!r}")
 
     approved = {cid: _norm(t) for cid, t in claim_texts.items()}
     for sentence in _sentences(body.splitlines()):

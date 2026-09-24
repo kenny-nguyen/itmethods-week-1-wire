@@ -97,15 +97,15 @@
   "exclusion_patterns": [
     {
       "id": "ai-startup",
-      "regex": "\\b(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|gpt|agentic(?:[\\s_-]*ai)?)[\\s_-]*(?:native[\\s_-]*|first[\\s_-]*|powered[\\s_-]*|based[\\s_-]*)?(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
+      "regex": "\\b(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)[\\s_-]*(?:native[\\s_-]*|first[\\s_-]*|powered[\\s_-]*|based[\\s_-]*)?(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
     },
     {
       "id": "ai-near-startup",
-      "regex": "\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|gpt|agentic(?:[\\s_-]*ai)?)|copilots?)\\b[^.]{0,40}\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
+      "regex": "\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?)\\b[^.]{0,40}\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
     },
     {
       "id": "startup-near-ai",
-      "regex": "\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|gpt|agentic(?:[\\s_-]*ai)?)|copilots?)\\b"
+      "regex": "\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?)\\b"
     },
     {
       "id": "ai-native",
@@ -117,11 +117,11 @@
     },
     {
       "id": "venture-stage-ai",
-      "regex": "\\b(?:series[\\s_-]*[a-d]|seed[\\s_-]*stage|pre[\\s_-]*seed|early[\\s_-]*stage|venture[\\s_-]*backed|vc[\\s_-]*backed|yc[\\s_-]*backed)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|gpt|agentic(?:[\\s_-]*ai)?)|copilots?|agents?)\\b"
+      "regex": "\\b(?:series[\\s_-]*[a-d]|seed[\\s_-]*(?:stage|funded)|pre[\\s_-]*seed|early[\\s_-]*stage|venture[\\s_-]*(?:backed|funded)|vc[\\s_-]*backed|yc[\\s_-]*(?:backed|[wsf]\\d{2})|y[\\s_-]*combinator)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?|agents?)\\b"
     },
     {
       "id": "mid-market-saas",
-      "regex": "\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b[^.]{0,30}\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service)\\b|\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service)\\b[^.]{0,40}\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b"
+      "regex": "\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b[^.]{0,30}\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b|\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b[^.]{0,40}\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b"
     }
   ],
   "object_context_regex": "\\b(?:invest\\w*|partner\\w*|fund\\w*|back\\w*|serv\\w*|sell\\w*|client\\w*|customers?|portfolio|polic\\w*|insur\\w*|lend\\w*|accelerator|incubator|arm)\\b[^.]{0,30}$"

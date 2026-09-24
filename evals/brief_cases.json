@@ -341,6 +341,186 @@
         "text": "- The bank has a US entity supervised by the Federal Reserve [src-sr26-2]."
       },
       "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "applies: governs",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- SR 26-2 governs Lakeshore Bancorp (fictional) [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: must comply",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank must comply with SR 26-2 [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: binds",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- E-23 binds the bank now [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: applicable to",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- SR 26-2 is applicable to the bank [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: regulated under",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank is regulated under SR 26-2 and must follow it [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "confirm rule: unbulleted line",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "SR 26-2 governs this bank [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "confirm rule: star bullet",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "* The bank has a US entity [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "uncited fact",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Lakeshore runs 40 AI agents in production today."
+      },
+      "expect": "line has no citation"
+    },
+    {
+      "name": "uncited paragraph",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "Lakeshore was fined by the Federal Reserve last year."
+      },
+      "expect": "line has no citation"
+    },
+    {
+      "name": "claim: examiners sign off",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Gives your examiners everything they need to sign off [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: pass the exam",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank will pass its next Federal Reserve exam [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: SOC-II",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform is SOC-II audited [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: vouched",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- An outside firm has vouched for the controls [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "duration: twelve minutes",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- The briefing runs twelve minutes."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration: ninety mins",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Block ninety mins."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration: couple of hours",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- It takes a couple of hours."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "defense: controlled-unclassified",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Handles controlled-unclassified data."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "defense: FedRAMP spelled out",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Ready for the Federal Risk and Authorization Management Program."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "defense: NIST 800-171 and DFARS",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Supports NIST SP 800-171 and DFARS 7012 workloads."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "unknown section",
+      "source": "independent QA pass 2 (Q-007)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "## Bonus claims"
+      },
+      "expect": "unexpected section"
     }
   ],
   "caveat_cases": [

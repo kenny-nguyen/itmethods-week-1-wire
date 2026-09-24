@@ -37,5 +37,8 @@ def metrics(state_dir: Path, playbook_id: str) -> dict:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
+    from agent.feedback.kill_switch import last_cleared
+    since = last_cleared(state_dir, playbook_id)  # reports before the last clear were reviewed by a human
+    rows = [r for r in rows if r.get("at", "") > since]
     return {"complaints": sum(r.get("kind") == "complaint" for r in rows),
             "wrong_account_reports": sum(r.get("kind") == "wrong_account" for r in rows)}

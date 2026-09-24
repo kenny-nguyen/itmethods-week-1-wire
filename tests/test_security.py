@@ -68,6 +68,41 @@ class ApprovalAuthorization(unittest.TestCase):  # S-1
             self.assertIn("changed", str(cm.exception))
 
 
+class RequestBoundToAuditTrail(unittest.TestCase):  # QA pass 2, C2
+    def test_swapped_playbook_without_hash_is_refused_and_kill_switch_holds(self):
+        with tempdir() as d:
+            out = Path(d) / "out"
+            req_path = one_request(out)
+            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="stop the motion")
+            req = json.loads(req_path.read_text())
+            req["playbook"]["id"] = "biopharma-fda-pccp"
+            del req["playbook_sha256"]
+            req_path.write_text(json.dumps(req))
+            with self.assertRaises(DecisionRefused):
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
+
+    def test_swapped_account_is_refused(self):
+        with tempdir() as d:
+            out = Path(d) / "out"
+            req_path = one_request(out)
+            req = json.loads(req_path.read_text())
+            req["account"]["id"] = "hubspot:company/hs-1001"
+            req_path.write_text(json.dumps(req))
+            with self.assertRaises(DecisionRefused) as cm:
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
+            self.assertIn("audited create record", str(cm.exception))
+
+    def test_missing_hash_is_refused(self):
+        with tempdir() as d:
+            out = Path(d) / "out"
+            req_path = one_request(out)
+            req = json.loads(req_path.read_text())
+            del req["playbook_sha256"]
+            req_path.write_text(json.dumps(req))
+            with self.assertRaises(DecisionRefused):
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
+
+
 class OwnerOnly(unittest.TestCase):  # A-043: the named account owner decides
     def test_listed_approver_who_is_not_the_owner_is_refused(self):
         with tempdir() as d:
@@ -126,6 +161,19 @@ class KillSwitchControl(unittest.TestCase):  # S-3
                         kill_switch.clear(Path(d), bad)
                     with self.assertRaises(KillRefused):
                         kill(bad, by="Kenny Nguyen", reason="reviewed the drafts", clear=True, out_dir=Path(d))
+
+
+class ClearResetsQualityCounts(unittest.TestCase):  # QA pass 2, C5
+    def test_complaint_before_clear_does_not_retrip(self):
+        with tempdir() as d:
+            out = Path(d) / "out"
+            req_path = one_request(out)
+            report(req_path, by="Kenny Nguyen", kind="complaint", detail="Prospect said the brief misread things.", out_dir=out)
+            self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
+            kill(BANK, by="Kenny Nguyen", reason="reviewed the complaint with the prospect", clear=True, out_dir=out)
+            s = run(MOTION, out, provider=TemplateProvider())
+            self.assertIsNone(s["playbooks"][BANK].get("kill_switch"))
+            self.assertEqual(s["playbooks"][BANK]["metrics"]["complaints"], 0)
 
 
 class AuditOutcome(unittest.TestCase):  # S-4

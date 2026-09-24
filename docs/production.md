@@ -72,6 +72,8 @@ python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --r
 python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --reason "Reviewed the drafts." --clear
 ```
 
+Exit codes for `decide`, `report` and `kill`: `0` done; `2` refused; `report` returns `3` when the report trips a kill criterion and engages the switch. Clearing the switch restarts the complaint and wrong-account counts from that moment, so reports a human has already reviewed do not re-trip it on the next run.
+
 Only the playbook owner or a listed approver can report, engage or clear. The kill criteria (quality-based: audit failures, gate failures, rejections, complaints, wrong-account reports) are checked after every run, decision and report, and engage the switch automatically. Engaging never waits on the audit store; clearing is refused if its audit record cannot be written.
 
 ## 5. Wire the real stack on day one
@@ -105,6 +107,7 @@ Alert on exit code `2` (refused) and `3` (kill switch engaged), and on any new l
 | Audit store down or record invalid | Account status `audit_blocked`; `errors.jsonl` stage `governance.audit`; kill switch engaged by `audit-write-failure` | Restore the sink, review the error log, then clear the kill switch with a reason. |
 | Write failed after the audit record | `errors.jsonl` stage `governance.commit`; a second audit record with `detail.outcome = "failed"` | Fix the file system; rerun. The brief and request are written together or not at all. |
 | Draft failed the output gate | Account status `gate_failed` with `gate_problems` in `summary.json`; `errors.jsonl` stage `processing.gate` | Read the problems; fix the prompt, claims or source data. More than one failure in five engages the kill switch. |
+| A request file was edited | `decide` refuses: "does not match its audited create record" or "no playbook hash" | Do not edit requests; rerun the motion to get a new request. |
 | Playbook or motion invalid | Exit code 2, `RUN REFUSED:` with each problem; `errors.jsonl` stage `input.playbook` | Fix the file; `playbooks/SCHEMA.md` explains each field. |
 | Adapter failed | `errors.jsonl` stages `input.accounts`, `input.enrichment`, `input.contacts` | Account-level failures skip that account; an account-list failure refuses the run. |
 
