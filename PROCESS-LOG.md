@@ -1643,3 +1643,22 @@ Every Q-007 failure is fixed and each of the reviewer's probes is now a regressi
 
 </details>
 
+### [D-032] 00:04 · BUILDER · DECISION
+The MCP server is in. It exposes eight governed tools to any MCP client, and every rule is enforced inside them: the audit record comes first, closed accounts cannot go further, the CISO is never returned, the gate re-runs before any brief is written, and nothing sends. It was checked over a real MCP client, both in-process and over stdio exactly as `.mcp.json` launches it.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/tools.py` (the governed logic, standard library), `agent/mcp_server.py` (`MCPServer` wrapper; `ToolFailure` becomes `ToolError`), `requirements.txt` (`mcp==2.2.0`), `.mcp.json` (`.venv/bin/python -m agent.mcp_server`), CI split into an offline job and an MCP job.
+
+**Why:** A-046, A-047. Keeping the logic out of the server file means CI can test every rule without the MCP package, and a second client (Claude Desktop, any MCP client) gets the same enforcement.
+
+**Evidence:** `tests/test_tools.py`: 7 tests OK (full path, closed accounts, order, gate enforced in `request_approval`, unimplemented trigger and kill switch, hold/drop only, audit failure). `tests/test_mcp_server.py` over `mcp.Client`: tools listed; `route_contact` on a dropped account returns an error ending "Recovery: call the tools in order ...". Stdio smoke check from `.mcp.json`: eight tools listed, `fetch_source` returned the SR 26-2 URL.
+
+**Assumption:** Tools keep state per server process, so one agent session runs one account through the steps in order. A restart loses in-flight state, never audited state.
+
+**Reversal trigger:** Several agents need to share one server concurrently.
+
+**Links:** A-046, A-047, R-011
+
+</details>
+
