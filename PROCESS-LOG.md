@@ -61,3 +61,5 @@ WIRE_OUT_DIR=<empty scratch dir> claude -p 'Run the regulatory-trigger-brief ski
   --allowedTools 'mcp__week1-wire__*' Skill WebFetch Read Grep Glob
 ```
 </details>
+
+Window: 22:50 to 01:50 KST. Work stopped at 01:44 KST; submitted at 01:50 KST.
