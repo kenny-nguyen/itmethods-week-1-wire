@@ -1,5 +1,12 @@
 # Example output
 
+## Live agent re-runs on the final code (newest first)
+
+- [`mcp-20260924T163741Z-fed70f/`](mcp-20260924T163741Z-fed70f/) - Claude Code with only the week1-wire MCP tools and WebFetch allowed (no Read, Grep, Glob, Bash, Write or Edit), the skill passed as its instructions. It wrote the Lakeshore Bancorp (hs-1002) brief as a forwardable part and owner notes, routed to the account owner and not sent; closed hs-1010 as do-not-contact; and chose to hold Northbridge (hs-1001) because routing now includes the CISO, which it flagged for the account owner. Transcript: `transcript.jsonl`.
+- [`live-rerun-1-stopped/`](live-rerun-1-stopped/) - the first re-run on the final code stopped on a real defect: the claims gate rejected the recipient lines that `route_contact` itself returned. The agent stopped instead of working around it. Fixed in `30332ef` (the tools now write the recipients section from the audited routing). Transcript kept as evidence.
+
+The earlier complete live run below remains the reference run.
+
 ## Live agent run (first)
 
 [`mcp-20260924T155247Z-d0965b/`](mcp-20260924T155247Z-d0965b/TRANSCRIPT.md) is Claude Code driving the skill and the MCP tools on SR 26-2 for the bank playbook. `evals.score_run` scored it 20/22 (16/16 on the four cases the run exercised), and it includes a blocked attempt on the do-not-contact account.
