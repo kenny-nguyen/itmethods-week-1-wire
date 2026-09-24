@@ -1078,3 +1078,22 @@ The supervisor's agent-memory helper refused to touch the kit's `CLAUDE.md` and 
 
 </details>
 
+### [G-002] 23:38 · PM · GRAA
+Checkpoint after the end-to-end run went green. The foundation does what the goal asked, on fixtures; what is not true yet is that anyone independent has checked it, and that the operator has answered the proposed readings.
+
+<details><summary>Goal, Reality, Analysis, Action</summary>
+
+**Goal:** Option 3, a small agent turning a regulatory trigger (SR 26-2, operator-approved) into a short, sourced, non-slop account brief, obeying R-17 and sending nothing without a named human; built as IPOF stages with seams for HubSpot, Clay and ZoomInfo; every assumption recorded.
+
+**Reality:** Observed at commit `098e372` and after: `python -m agent.run_playbook` drafts one brief (US bank), holds the Canadian bank, excludes seven accounts with reasons, skips two plays marked not implemented; approvals, kill switch and kill criteria work from the command line; 60 unit tests and 18 eval cases pass locally; CI passed on the first pushed commit. 28 register rows are proposals awaiting the operator (batches `assumptions-1` and `assumptions-2`). No live model draft has been produced (no API key in this session). Independent QA and security reviews are running and have not returned.
+
+**Analysis:** The biggest risk to the goal is no longer missing code; it is an unverified claim. The builder's own tests could share the builder's blind spots, especially on the output gate's word lists and on the approval step. The second risk is that several operator answers (A-028 caveat versus hold, A-030 plays list) change what the demo shows; both are playbook values, so the cost is low.
+
+**Action:** Continue: fold the reviewers' findings back in as they arrive, each logged with the decision made about it. No new capability until then. Deliberately not doing: a live connector, a sender, a second deep trigger.
+
+**Evidence:** Commits `aae4e31` to `167c6f7`; D-011, Q-004; `gh-axi run list` showing the first CI run `success`.
+
+**Links:** G-001, D-011, D-012
+
+</details>
+
