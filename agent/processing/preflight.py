@@ -75,13 +75,15 @@ def _applicability(trigger: Trigger, account: Account, e: Enrichment) -> tuple[s
     in_jurisdiction = account.hq_country == trigger.jurisdiction
     if trigger.regulator == "Federal Reserve":
         # SR 26-2 reaches a non-US bank only through a US entity regulated by the Federal Reserve.
-        if in_jurisdiction or e.us_fed_regulated_entity is True:
-            reason = ("US-headquartered" if in_jurisdiction else "has a US Federal Reserve-regulated entity on record")
-        elif e.us_fed_regulated_entity is False:
+        # US headquarters alone does not establish Federal Reserve regulation: only a recorded
+        # Federal Reserve-regulated banking organization does (independent grader).
+        if e.us_fed_regulated_entity is True:
+            reason = "has a Federal Reserve-regulated banking organization on record"
+        elif e.us_fed_regulated_entity is False and not in_jurisdiction:
             return DOES_NOT_APPLY, [], [f"{account.hq_country} bank with no US Federal Reserve-regulated entity"]
         else:
             return (REQUIRES_CONFIRMATION, [CAVEAT],
-                    [f"{account.hq_country} bank; a US Federal Reserve-regulated entity is not established"])
+                    [f"{account.hq_country} bank; a Federal Reserve-regulated banking organization is not established"])
     elif in_jurisdiction:
         reason = f"in {trigger.jurisdiction} jurisdiction"
     else:

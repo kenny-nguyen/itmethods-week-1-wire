@@ -74,7 +74,7 @@ class PipelineTests(unittest.TestCase):
                 self.assertTrue(s["playbooks"][pid]["reason"])
             req = json.loads(Path(s["outputs"][0]["approval_request"]).read_text())
             self.assertEqual((req["status"], req["send"], req["sender"]), ("pending", False, "none"))
-            self.assertEqual(req["route_to"], {"account_owner": "Kenny Nguyen"})  # A-043
+            self.assertEqual(req["route_to"], {"account_owner": "Jordan Reyes (fictional)"})  # A-043
             audit = jsonl(out / "audit.jsonl")
             self.assertTrue(audit)
             self.assertEqual([r for r in audit if validate_record(r)], [], "every audit record satisfies R-17")
@@ -112,7 +112,7 @@ class PipelineTests(unittest.TestCase):
     def test_manual_kill_switch_skips_the_playbook(self):
         with tempdir() as d:
             out = Path(d)
-            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="drafts read generic")
+            kill_switch.engage(out / "state", BANK, by="Jordan Reyes (fictional)", reason="drafts read generic")
             s = run(MOTION, out, provider=TemplateProvider())
             self.assertIn("kill switch", s["playbooks"][BANK]["skipped"])
             self.assertEqual(s["outputs"], [])
@@ -131,11 +131,11 @@ class PipelineTests(unittest.TestCase):
         with tempdir() as d:
             s = run(MOTION, Path(d), provider=TemplateProvider())
             text = Path(s["accounts"]["hs-1001"]["brief"]).read_text()
-            self.assertIn("SR 26-2 applicability requires confirmation", text)
+            self.assertIn("so applicability requires confirmation", text)
             self.assertIn("OSFI Guideline E-23", text)
             self.assertIn("## What depends on structure (confirm)", text)
             self.assertIn("DORA", text)
-            self.assertNotIn("Chief Information Security Officer [", text, "CISO is on the do-not-route list")
+            self.assertIn("Chief Information Security Officer", text)  # trigger-specific briefs may go to the CISO
 
     def test_hold_setting_holds_the_canadian_bank(self):  # A-025 general case
         with tempdir() as d:
@@ -209,33 +209,33 @@ class DecisionTests(unittest.TestCase):
             for who in ("Someone Else", "system", ""):
                 with self.subTest(who=who), self.assertRaises(DecisionRefused):
                     decide(req, approver=who, approve=True, reason="looks fine to me", out_dir=out)
-            r = decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.", out_dir=out)
+            r = decide(req, approver="Jordan Reyes (fictional)", approve=True, reason="Sources and routing checked.", out_dir=out)
             self.assertEqual(r["status"], "approved_ready_to_send")
             rec = [x for x in jsonl(out / "audit.jsonl") if x["action"] == "approve"][0]
-            self.assertEqual((rec["send"], rec["approver"], rec["blockable"]), (True, "Kenny Nguyen", True))
+            self.assertEqual((rec["send"], rec["approver"], rec["blockable"]), (True, "Jordan Reyes (fictional)", True))
             with self.assertRaises(DecisionRefused):  # already decided
-                decide(req, approver="Kenny Nguyen", approve=False, reason="changed my mind now", out_dir=out)
+                decide(req, approver="Jordan Reyes (fictional)", approve=False, reason="changed my mind now", out_dir=out)
 
     def test_kill_switch_blocks_approval(self):
         with tempdir() as d:
             out = Path(d)
             req = self._run(out)
-            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="stop the motion")
+            kill_switch.engage(out / "state", BANK, by="Jordan Reyes (fictional)", reason="stop the motion")
             with self.assertRaises(DecisionRefused):
-                decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.", out_dir=out)
+                decide(req, approver="Jordan Reyes (fictional)", approve=True, reason="Sources and routing checked.", out_dir=out)
             self.assertEqual(json.loads(req.read_text())["status"], "pending")
 
     def test_rejection_ratio_needs_minimum_sample(self):  # A-049
         with tempdir() as d:
             out = Path(d)
             req = self._run(out)
-            decide(req, approver="Kenny Nguyen", approve=False, reason="Reads too generic for a CAE.", out_dir=out)
+            decide(req, approver="Jordan Reyes (fictional)", approve=False, reason="Reads too generic for a CAE.", out_dir=out)
             self.assertIsNone(kill_switch.engaged(out / "state", BANK))  # one decision is not a sample
             pb = trusted.load_trusted(BANK)
             trail = trusted.trail_for(pb, out, "test", ErrorLog(out / "errors.jsonl", "test"))
             for i, status in enumerate(["rejected", "rejected", "approved_ready_to_send", "rejected"]):
                 (req.parent / f"extra-{i}.json").write_text(json.dumps({"status": status}))
-            hits = check_kill_criteria(pb, out, req.parent, trail, by="Kenny Nguyen")
+            hits = check_kill_criteria(pb, out, req.parent, trail, by="Jordan Reyes (fictional)")
             self.assertEqual([h["id"] for h in hits], ["approver-rejections"])  # 4 of 5 rejected
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
 
@@ -244,7 +244,7 @@ class DecisionTests(unittest.TestCase):
             out = Path(d)
             req = self._run(out)
             with self.assertRaises(DecisionRefused):
-                decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.",
+                decide(req, approver="Jordan Reyes (fictional)", approve=True, reason="Sources and routing checked.",
                        out_dir=out, sink=FailingSink())
             self.assertEqual(json.loads(req.read_text())["status"], "pending")
 

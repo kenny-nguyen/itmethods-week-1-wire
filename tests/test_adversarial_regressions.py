@@ -16,6 +16,16 @@ ROOT = Path(__file__).resolve().parent.parent
 BANK = "bank-sr26-2"
 
 
+def blocked_ciso_playbooks(tmp: Path) -> Path:
+    """A copy of playbooks/ whose bank playbook blocks the CISO, so the excluded-contact rules can be tested."""
+    import shutil, re as _re
+    dst = tmp / "playbooks"
+    shutil.copytree(ROOT / "playbooks", dst)
+    f = dst / "bank-sr26-2.jsonc"
+    f.write_text(_re.sub(r'"do_not_route": \[\]', '"do_not_route": ["information security", "ciso"]', f.read_text()))
+    return dst
+
+
 class OrderedSink:
     def __init__(self, events):
         self.events = events
@@ -96,7 +106,7 @@ class F3RecipientsOnlyFromRouting(unittest.TestCase):
 
     def test_brief_naming_excluded_ciso_is_refused(self):
         with tempdir() as d:
-            t = GovernedTools(Path(d))
+            t = GovernedTools(Path(d) / "out", playbooks_dir=blocked_ciso_playbooks(Path(d)))
             self._ready(t)
             draft = offline_draft(t, "hs-1001").replace(
                 "## Open questions for the account owner\n",
@@ -107,7 +117,7 @@ class F3RecipientsOnlyFromRouting(unittest.TestCase):
 
     def test_excluded_ciso_named_the_ordinary_way_is_refused(self):
         with tempdir() as d:
-            t = GovernedTools(Path(d))
+            t = GovernedTools(Path(d) / "out", playbooks_dir=blocked_ciso_playbooks(Path(d)))
             self._ready(t)
             for line in ("- Also loop in Sofia Marchetti.", "- Also loop in the CISO, Sofia Marchetti.",
                          "- Also loop in SOFIA  MARCHETTI."):
@@ -118,7 +128,7 @@ class F3RecipientsOnlyFromRouting(unittest.TestCase):
 
     def test_extra_recipient_line_is_refused(self):
         with tempdir() as d:
-            t = GovernedTools(Path(d))
+            t = GovernedTools(Path(d) / "out", playbooks_dir=blocked_ciso_playbooks(Path(d)))
             self._ready(t)
             draft = offline_draft(t, "hs-1001").replace(
                 "## Suggested recipients in the existing relationship\n",

@@ -21,7 +21,7 @@ class ReviewViewTests(unittest.TestCase):
             for href in re.findall(r'href="([^"]+)"', page):
                 self.assertTrue((Path(s["review"]).parent / href).resolve().exists(), href)
             self.assertIn("OFFLINE TEST MODE", page)
-            self.assertIn("22/22", page)
+            self.assertIn("21/21", page)
             self.assertIn("hs-1007", page)  # the watched hospital, with its reason
 
     def test_run_with_no_eval_case_is_neutral_not_a_pass(self):

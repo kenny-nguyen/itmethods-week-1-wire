@@ -5,7 +5,7 @@ from agent.governance.audit import AuditTrail, JsonlAuditSink
 from agent.governance.error_log import ErrorLog
 
 
-def make_trail(tmp: Path, *, sink=None, principal="Kenny Nguyen", required_for="all_segments"):
+def make_trail(tmp: Path, *, sink=None, principal="Casey Morgan (fictional)", required_for="all_segments"):
     errors = ErrorLog(tmp / "errors.jsonl", run_id="test-run")
     trail = AuditTrail(
         sink=sink or JsonlAuditSink(tmp / "audit.jsonl"),

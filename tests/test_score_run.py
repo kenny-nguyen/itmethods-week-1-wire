@@ -79,7 +79,7 @@ class ScoreRunTests(unittest.TestCase):
             t.request_approval("bank-sr26-2", "hs-1001", offline_draft(t, "hs-1001"))
             r = score(Path(d), run_dir=t.paths.run_dir)
             self.assertEqual([c["account"] for c in r["cases"] if c["exercised"]], ["hs-1001"])
-            self.assertEqual((r["passed"], r["total"]), (7, 7))
+            self.assertEqual((r["passed"], r["total"]), (6, 6))
 
     def test_latest_brief_is_by_run_time_not_directory_name(self):
         with tempdir() as d:

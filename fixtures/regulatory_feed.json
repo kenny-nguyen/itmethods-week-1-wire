@@ -68,7 +68,7 @@
       "structural_conditions": [
         {
           "when": "outside_jurisdiction",
-          "text": "Confirm: SR 26-2 applicability requires confirmation. The letter addresses Federal Reserve-regulated banking organizations and is expected to be most relevant above $30 billion in total assets; confirm whether {account} has one.",
+          "text": "Confirm: whether {account} has a US banking organization regulated by the Federal Reserve; the letter addresses those organizations and is expected to be most relevant above $30 billion in total assets, so applicability requires confirmation.",
           "source": "src-sr26-2"
         },
         {

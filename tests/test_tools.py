@@ -36,12 +36,12 @@ class GovernedToolTests(unittest.TestCase):
             app = t.check_applicability(BANK, "hs-1001")
             self.assertEqual((app["status"], app["must_include_phrase"]), (pf.READY, pf.CAVEAT))
             lanes = t.route_contact(BANK, "hs-1001")
-            self.assertNotIn("Chief Information Security Officer",
-                             [c["title"] for cs in lanes["lanes"].values() for c in cs])
+            self.assertIn("Chief Information Security Officer",
+                          [c["title"] for cs in lanes["lanes"].values() for c in cs])
             draft = offline_draft(t, "hs-1001")
             self.assertTrue(t.check_claims(BANK, "hs-1001", draft)["passed"])
             res = t.request_approval(BANK, "hs-1001", draft)
-            self.assertEqual((res["route_to"], res["sent"]), ("Kenny Nguyen", False))
+            self.assertEqual((res["route_to"], res["sent"]), ("Jordan Reyes (fictional)", False))
             actions = [r["action"] for r in jsonl(Path(d) / "audit.jsonl")]
             self.assertEqual(actions, ["enrich", "score", "route", "create"])
 
@@ -82,7 +82,7 @@ class GovernedToolTests(unittest.TestCase):
                 t.fetch_source("FDA-PCCP-2025")
             with self.assertRaises(ToolFailure):
                 t.screen_account("biopharma-fda-pccp", "hs-1003")
-            kill_switch.engage(Path(d) / "state", BANK, by="Kenny Nguyen", reason="stop the motion now")
+            kill_switch.engage(Path(d) / "state", BANK, by="Jordan Reyes (fictional)", reason="stop the motion now")
             with self.assertRaises(ToolFailure):
                 t.screen_account(BANK, "hs-1002")
 

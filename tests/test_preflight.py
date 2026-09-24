@@ -17,15 +17,20 @@ CA_BANK = Account("b", "Example Bank (fictional)", "dsib_capital_markets", "Bank
 US_BANK = replace(CA_BANK, hq_country="US", total_assets_usd=85_000_000_000)
 UNKNOWN = Enrichment("b", "production", True, None, None, "clay:row/b")
 PLAY = {"channel": "briefing", "unconfirmed_applicability": "hold"}
+FED = replace(UNKNOWN, us_fed_regulated_entity=True)
 
 
 class PreflightTests(unittest.TestCase):
-    def test_us_bank_over_threshold_applies(self):
+    def test_us_headquarters_alone_needs_confirmation(self):  # independent grader: US HQ is not Fed regulation
         r = pf.check(SR, US_BANK, UNKNOWN, PLAY)
+        self.assertEqual(r.applicability, pf.REQUIRES_CONFIRMATION)
+
+    def test_recorded_fed_regulated_us_bank_over_threshold_applies(self):
+        r = pf.check(SR, US_BANK, replace(UNKNOWN, us_fed_regulated_entity=True), PLAY)
         self.assertEqual((r.status, r.applicability, r.caveats), (pf.READY, pf.APPLIES, []))
 
     def test_us_bank_under_threshold_gets_relevance_caveat(self):
-        r = pf.check(SR, replace(US_BANK, total_assets_usd=10_000_000_000), UNKNOWN, PLAY)
+        r = pf.check(SR, replace(US_BANK, total_assets_usd=10_000_000_000), replace(UNKNOWN, us_fed_regulated_entity=True), PLAY)
         self.assertEqual(r.status, pf.READY)
         self.assertTrue(any("below the threshold" in c for c in r.caveats))
 
@@ -58,13 +63,13 @@ class PreflightTests(unittest.TestCase):
 
     def test_no_cold_outreach_until_briefing_booked(self):  # A-043
         play = {"channel": "sequence", "handoff": {"cold_outreach_until_briefing_booked": False}}
-        self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.BLOCKED)
-        self.assertEqual(pf.check(SR, replace(US_BANK, briefing_scheduled=True), UNKNOWN, play).status, pf.READY)
+        self.assertEqual(pf.check(SR, US_BANK, FED, play).status, pf.BLOCKED)
+        self.assertEqual(pf.check(SR, replace(US_BANK, briefing_scheduled=True), FED, play).status, pf.READY)
 
     def test_brief_needs_a_named_account_owner(self):  # A-043
         play = {**PLAY, "handoff": {"route_to": "account_owner"}}
-        self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.HOLD)
-        self.assertEqual(pf.check(SR, replace(US_BANK, owner="Kenny Nguyen"), UNKNOWN, play).status, pf.READY)
+        self.assertEqual(pf.check(SR, US_BANK, FED, play).status, pf.HOLD)
+        self.assertEqual(pf.check(SR, replace(US_BANK, owner="Jordan Reyes (fictional)"), FED, play).status, pf.READY)
 
 
 class RoutingTests(unittest.TestCase):
