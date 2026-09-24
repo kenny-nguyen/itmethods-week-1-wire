@@ -865,3 +865,41 @@ The ICP filter passes its 11 tests, including 26 spellings of "AI startup" and "
 
 </details>
 
+### [D-008] 23:29 · BUILDER · DECISION
+The applicability preflight is in. For SR 26-2 it applies to a US bank, to a non-US bank only when a US Federal Reserve-regulated entity is on record, and otherwise it says "applicability requires confirmation". Because the caveated-brief reading (A-028) is still only proposed, the default holds such an account for a human (A-025).
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/processing/preflight.py` (READY, HOLD, SKIP, BLOCKED) and `agent/processing/routing.py` (lanes by title, do-not-route list).
+
+**Why:** The preflight is where a wrong "this rule applies to you" is stopped before any text is drafted. It also blocks unimplemented triggers and triggers whose facts cite an unverified source, so the FDA PCCP record (no URL) cannot produce a brief.
+
+**Evidence:** `python3 -m unittest tests.test_preflight`: "Ran 10 tests ... OK", covering a US bank over and under the $30B relevance line, a Canadian bank with the US entity unknown (hold by default, caveat plus OSFI context when the playbook says `brief_with_caveat`), known and absent US entity, the unimplemented FDA trigger, an unverified source, and the outbound-before-briefing gate.
+
+**Assumption:** Proposed rows A-009, A-011, A-025/A-028, A-032 are playbook values, not code branches.
+
+**Reversal trigger:** The operator's answer on A-028 flips one playbook value.
+
+**Links:** A-009, A-011, A-025, A-028, A-032
+
+</details>
+
+### [A-032] 23:29 · PM · AMBIGUITY
+Found while coding routing: the CEO warns against a CISO inbox, so the proposal routes by title and keeps a do-not-route list that starts with the CISO.
+
+<details><summary>Structured fields</summary>
+
+**What:** Who receives the routed brief? Options: (a) every contact; (b) lanes by title plus a do-not-route list.
+
+**Why:** CEO notes: "If we show up in a CISO inbox with a generic 'AI governance' sequence I will kill the motion."
+
+**Evidence:** Register row A-032.
+
+**Assumption:** (b), proposed and awaiting the operator.
+
+**Reversal trigger:** The CEO says a CISO is a valid recipient for a trigger-specific brief.
+
+**Links:** A-011
+
+</details>
+

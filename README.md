@@ -36,6 +36,7 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 - The R-17 audit trail (`agent/governance/audit.py`): every create, update, enrich, score or message action goes through `AuditTrail.perform(...)`, which writes the audit record first and only then completes the action. If the record is invalid or cannot be written, the action does not happen and `AuditBlocked` is raised.
 - Input adapters (`agent/input/`): interfaces in `base.py`, local stand-ins for HubSpot, ZoomInfo, Clay and a regulator feed in `local.py`, reading `fixtures/`. To connect a real tool, write one class against the matching interface.
 - The ICP (ideal customer profile) filter (`agent/processing/icp.py`) reads `icp/icp.json`. Each field the packet did not give names the register row that proposes it. AI startups and mid-market SaaS are excluded by segment and by naming-variant patterns; the variants tested are listed in `tests/test_icp.py`.
+- The applicability preflight (`agent/processing/preflight.py`) decides whether a trigger applies to an account before anything is drafted. For SR 26-2 and a non-US bank without a confirmed US Federal Reserve-regulated entity, it holds the account or writes "applicability requires confirmation", depending on the playbook.
 - The error log (`agent/governance/error_log.py`) is a separate JSON Lines file for anything that goes wrong in any stage.
 
 ## Repo map
