@@ -21,7 +21,7 @@
   // A-025 (decided): hold when applicability cannot be determined. A-044 (decided): for SR 26-2 the brief
   // itself is structured so it never claims the rule applies; each structural condition is marked "confirm".
   "unconfirmed_applicability": "structured_brief",
-  "claims": ["P-FORGE", "P-GATEWAY", "P-ASSURANCE", "P-BRIEFING", "P-BANKING"],   // A-029 (decided)
+  "claims": ["P-GATEWAY", "P-EVIDENCE", "P-ASSURANCE-STATUS", "P-BANKING"],   // A-029 (decided)
   "routing": {                                   // A-011 (decided): lanes by title, never ask the buyer to pick
     "lanes": {
       "risk": ["audit", "risk", "compliance"],

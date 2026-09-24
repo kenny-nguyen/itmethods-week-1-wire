@@ -1,33 +1,31 @@
 # iTmethods product facts (public sources)
 
-The only product statements a generated brief may make. They are loaded from `docs/research/product-claims.json`, which carries the same statements with their source URLs. A brief that states anything about iTmethods outside this list, or breaks one of the content rules below, fails the output gate (`agent/processing/checks.py`).
+The only product statements a brief may make are in `docs/research/product-claims.json`. Each one is a single sentence quoted exactly from the cited page as fetched live on 2026-09-24 at 15:28 UTC (00:28 KST). The output gate (`agent/processing/checks.py`) accepts a product sentence only when it restates one of these word for word.
 
-Source: a researcher report relayed by the supervising agent at 23:20 KST, summarised below. The URLs were re-fetched at 23:22 KST and all returned HTTP 200; the banking, defense and assurance claims were spot-checked against page text (quotes below).
+| ID | Usable in a brief | Exact quote | Page |
+|---|---|---|---|
+| P-GATEWAY | yes | "Reign Gateway gives applications and agents a governed path to approved models and tools." | https://itmethods.com/gateway |
+| P-ASSURANCE-STATUS | yes | "Reign Assurance is in co-design development." | https://itmethods.com/assurance |
+| P-ASSURANCE-BOUNDARY | yes | "iTmethods does not issue an audit opinion or a certification, and nothing here is independent assurance of anyone’s controls." | https://itmethods.com/assurance |
+| P-EVIDENCE | yes | "Reign prepares the evidence; the people who own the risk decide." | https://itmethods.com/assurance |
+| P-RELIANCE | yes | "The assurance and reliance judgments stay with your business, risk, compliance and audit experts, and any audit opinion or certification stays with their auditors." | https://itmethods.com/assurance |
+| P-BANKING | yes | "iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance, so where any of those functions is required, we would work with a firm that holds that mandate." | https://itmethods.com/sectors/banking |
+| P-STATUS | yes | "Reign Ops and Reign Gateway are available today." | https://itmethods.com/status |
+| P-DEFENSE | no (research only) | "iTmethods is not FedRAMP authorized or CMMC certified, does not handle controlled unclassified information and does not claim ITAR compliance, so we confirm the supplier path before scoping begins." | https://itmethods.com/sectors/public-defence |
 
-| ID | Statement | Source |
-|---|---|---|
-| P-FORGE | Forge is iTmethods' managed runtime and infrastructure substrate for DevOps, AI workloads and agent runtimes. Positioning line: "Forge runs; Reign governs". | https://www.itmethods.com/learn/sovereign-ai, https://www.itmethods.com/forge/agent-infrastructure |
-| P-SOLD-SEPARATELY | Reign products are sold independently, not as a bundle. | https://www.itmethods.com/ops |
-| P-STATUS | Reign Ops is available, Reign Gateway is available, Reign Factory is in beta, Reign Assurance is in co-design. | https://www.itmethods.com, https://www.itmethods.com/assurance |
-| P-GATEWAY | Reign Gateway is a governed path for agent and application calls to approved models and tools: identity, policy, spend limits, and records of caller, decision, destination and outcome. | https://www.itmethods.com/gateway |
-| P-ASSURANCE | Reign Assurance is being designed to prepare evidence. It does not issue an audit opinion, a certification or independent assurance. | https://www.itmethods.com/assurance |
-| P-BRIEFING | The Executive Assurance Briefing is stage 1 of Briefing, Runtime Risk and Governance Assessment, Focused Pilot, Platform Rollout, aimed at boards, audit and risk committees. | https://www.itmethods.com/reign/assurance |
-| P-BANKING | The banking page centres on OSFI E-23, SR 26-2 and DORA; iTmethods works as first line, does no independent validation, and makes no compliance or certification claim. | https://www.itmethods.com/sectors/banking |
-| P-DEFENSE | iTmethods holds no FedRAMP authorization and no CMMC certification, does not handle CUI (Controlled Unclassified Information), and claims no ITAR compliance. | https://www.itmethods.com/sectors/public-defence |
+## What changed after the independent fact-check
 
-Not known: what the target bank runs on Forge.
+The fact-check (`docs/qa/factcheck-report.md`, rows F-09, F-10, F-13, F-14, F-17) found claims whose cited pages had changed. Fixed by fetching every page live and keeping only sentences that are on today's page:
 
-Correction (log D-025): the first version of `product-claims.json` phrased P-BANKING as first line on "OSFI E-23, SR 26-2 and DORA readiness". "Readiness" is not in the source summary and was removed.
+- **Removed:** Forge positioning ("Forge runs; Reign governs"), "sold independently, not as a bundle", and the Executive Assurance Briefing four-stage funnel. Their wording is not on the current pages.
+- **Replaced:** "iTmethods works as first line" was our interpretation, not a quote. P-BANKING now quotes the banking page's own boundary, and P-RELIANCE quotes the assurance page: reliance judgments stay with the customer's business, risk, compliance and audit experts.
+- **Kept, re-quoted:** Gateway, Assurance status and boundary, the evidence sentence, product status, and the defense statement (research only).
+
+"Existing Forge customer" in a brief is an account fact from the system of record, cited to the HubSpot record, not a product claim.
 
 ## Content rules (deterministic checks)
 
-1. Never claim compliance, certification, independent assurance or validation.
-2. Never state a briefing duration. Pages disagree (25, 45 and 45-60 minutes), so no single number is true.
-3. Never imply CMMC, FedRAMP or CUI capability.
-4. Product claims only from the table above.
-
-## Spot-check quotes (re-fetched 23:22 KST)
-
-- Assurance page: "iTmethods does not issue an audit opinion or a certification, and nothing here is independent assurance of anyone's controls."
-- Banking page: "iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance".
-- Defense page: "We hold no FedRAMP authorization, no 3PAO-validated package, no Marketplace listing and no readiness designation".
+1. Never claim or imply compliance, certification, attestation, validation or independent assurance. The gate blocks those word families anywhere outside the quoted claims above.
+2. Never state a briefing or meeting duration. The earlier research relayed durations that disagreed across pages (25, 45 and 45-60 minutes), but this repository has no reproducible source note for them (fact-check F-17). The rule stands as a precaution, not a sourced fact: the gate blocks any duration.
+3. Never imply CMMC, FedRAMP, CUI or ITAR capability. The defense page says iTmethods holds none (P-DEFENSE); the gate refuses the terms outright.
+4. Product claims only from the table above, word for word.

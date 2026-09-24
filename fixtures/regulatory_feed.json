@@ -13,7 +13,7 @@
       "relevance_threshold_total_assets_usd": 30000000000,
       "facts": [
         {
-          "text": "Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021).",
+          "text": "The Federal Reserve's SR 26-2 revises model risk management guidance and supersedes SR 11-7 (2011) and SR 21-8 (2021).",
           "source": "src-sr26-2"
         },
         {
@@ -68,17 +68,17 @@
       "structural_conditions": [
         {
           "when": "outside_jurisdiction",
-          "text": "Confirm: SR 26-2 applicability requires confirmation. If {account} operates a US banking entity supervised by the Federal Reserve, SR 26-2 applies to that entity.",
+          "text": "Confirm: SR 26-2 applicability requires confirmation. The letter addresses Federal Reserve-regulated banking organizations and is expected to be most relevant above $30 billion in total assets; confirm whether {account} has one.",
           "source": "src-sr26-2"
         },
         {
           "when": "in_jurisdiction",
-          "text": "Confirm: which {account} banking entities the Federal Reserve regulates; the letter says it is most relevant above $30 billion in total assets.",
+          "text": "Confirm: whether {account}'s banking organizations are regulated by the Federal Reserve, and their total assets; the letter is expected to be most relevant above $30 billion.",
           "source": "src-sr26-2"
         },
         {
           "when": "always",
-          "text": "Confirm: if {account} has an EU financial entity, DORA (Regulation (EU) 2022/2554 on digital operational resilience for the financial sector) applies to that entity.",
+          "text": "Confirm: whether {account} has EU entities of the types DORA (Regulation (EU) 2022/2554) covers; per EIOPA, 20 types of financial entities plus ICT third-party providers, so it depends on entity type, jurisdiction and facts.",
           "source": "src-dora"
         }
       ]

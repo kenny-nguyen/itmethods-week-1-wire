@@ -1,3 +1,4 @@
+import json
 """Campaign Manager playbook: JSONC parsing and the stub's rules."""
 
 import copy
@@ -8,7 +9,9 @@ from agent.input import playbook as P
 
 ROOT = Path(__file__).resolve().parent.parent
 PB = P.load(ROOT / "playbooks/bank-sr26-2.jsonc")
-KW = dict(fs_segments={"dsib_capital_markets"}, claim_ids={"P-FORGE", "P-GATEWAY", "P-ASSURANCE", "P-BRIEFING", "P-BANKING"},
+KW = dict(fs_segments={"dsib_capital_markets"},
+          claim_ids={c["id"] for c in json.loads((ROOT / "docs/research/product-claims.json").read_text())["claims"]
+                     if c["usable_in_briefs"]},
           implemented_triggers={"SR-26-2"})
 
 
