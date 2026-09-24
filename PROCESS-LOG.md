@@ -1681,3 +1681,22 @@ The skill is written: it tells the agent to read the trigger sources itself, rea
 
 </details>
 
+### [D-034] 00:06 · BUILDER · DECISION
+Agent-run evals are in: six trigger-and-account cases with the properties a run must show, and a scorer that reads any run's output directory. A clean offline-test-mode run scores 22 of 22; the scorer is proven able to fail on a tampered brief. That baseline is committed and labelled as offline test mode, not as an agent result.
+
+<details><summary>Structured fields</summary>
+
+**What:** `evals/agent_cases.json`, `evals/score_run.py` (`python3 -m evals.score_run --out <dir>`), `tests/test_score_run.py`, `examples/offline-test-mode-scores.json`. Properties: passes the output gate; every line cited; no applicability claim without an established US entity; OSFI E-23 and B-13 named for the Canadian bank; forbidden claims absent; CISO never routed; routed to the owner and not sent; held, dropped and watched accounts never briefed, enriched or routed, with the decision recorded.
+
+**Why:** Operator decision A-046, item 3.
+
+**Evidence:** Offline run: "score 22/22". Tests: a tampered brief fails three properties; a run driven through the governed tool path (the same path the MCP server exposes) scores full on the brief cases. First version of the applicability property only looked for the caveat phrase and passed a brief that asserted "SR 26-2 applies"; strengthened to use the gate's applicability and Confirm checks. "Ran 82 tests ... OK (skipped=1)".
+
+**Assumption:** A real agent run is scored the same way when the operator runs the demo in a Claude Code session; no agent-produced brief exists in this build session.
+
+**Reversal trigger:** n/a
+
+**Links:** A-046, D-032, D-033
+
+</details>
+

@@ -1,0 +1,151 @@
+{
+  "_label": "OFFLINE TEST MODE. These briefs were drafted by the deterministic template used for CI, not by the agent. This is a baseline for the scorer, not an agent result. Scores of real agent runs (Claude Code with the MCP server and the skill) are added separately when that run happens.",
+  "out": "$WIRE_OUT_DIR",
+  "score": "22/22",
+  "passed": 22,
+  "total": 22,
+  "cases": [
+    {
+      "account": "hs-1001",
+      "why": "Canadian D-SIB on Forge; US entity not established",
+      "expect": "brief",
+      "properties": {
+        "passes_output_gate": {
+          "pass": true,
+          "evidence": []
+        },
+        "every_line_cited": {
+          "pass": true,
+          "evidence": []
+        },
+        "no_applicability_claim_without_us_entity": {
+          "pass": true,
+          "evidence": "caveat present; no applicability assertion"
+        },
+        "osfi_named_for_canadian_bank": {
+          "pass": true,
+          "evidence": "E-23 and B-13 named"
+        },
+        "forbidden_claims_absent": {
+          "pass": true,
+          "evidence": []
+        },
+        "ciso_never_routed": {
+          "pass": true,
+          "evidence": []
+        },
+        "routed_to_owner_not_sent": {
+          "pass": true,
+          "evidence": [
+            "pending"
+          ]
+        }
+      }
+    },
+    {
+      "account": "hs-1002",
+      "why": "US bank holding company",
+      "expect": "brief",
+      "properties": {
+        "passes_output_gate": {
+          "pass": true,
+          "evidence": []
+        },
+        "every_line_cited": {
+          "pass": true,
+          "evidence": []
+        },
+        "forbidden_claims_absent": {
+          "pass": true,
+          "evidence": []
+        },
+        "routed_to_owner_not_sent": {
+          "pass": true,
+          "evidence": [
+            "pending"
+          ]
+        }
+      }
+    },
+    {
+      "account": "hs-1009",
+      "why": "bank with unknown headcount: fit unknown",
+      "expect": "held",
+      "properties": {
+        "never_briefed": {
+          "pass": true,
+          "evidence": []
+        },
+        "decision_recorded": {
+          "pass": true,
+          "evidence": [
+            "hold"
+          ]
+        }
+      }
+    },
+    {
+      "account": "hs-1010",
+      "why": "credit union under the 5,000-employee floor",
+      "expect": "dropped",
+      "properties": {
+        "never_briefed": {
+          "pass": true,
+          "evidence": []
+        },
+        "never_enriched_or_routed": {
+          "pass": true,
+          "evidence": []
+        },
+        "decision_recorded": {
+          "pass": true,
+          "evidence": [
+            "exclude"
+          ]
+        }
+      }
+    },
+    {
+      "account": "hs-1006",
+      "why": "Gen-AI start-up filed as fintech",
+      "expect": "dropped",
+      "properties": {
+        "never_briefed": {
+          "pass": true,
+          "evidence": []
+        },
+        "never_enriched_or_routed": {
+          "pass": true,
+          "evidence": []
+        },
+        "decision_recorded": {
+          "pass": true,
+          "evidence": [
+            "exclude"
+          ]
+        }
+      }
+    },
+    {
+      "account": "hs-1007",
+      "why": "hospital: watch list this month, do not contact",
+      "expect": "watched",
+      "properties": {
+        "never_briefed": {
+          "pass": true,
+          "evidence": []
+        },
+        "never_enriched_or_routed": {
+          "pass": true,
+          "evidence": []
+        },
+        "decision_recorded": {
+          "pass": true,
+          "evidence": [
+            "watch"
+          ]
+        }
+      }
+    }
+  ]
+}
