@@ -1,4 +1,9 @@
-"""Run the first Reign motion end to end: INPUT -> PROCESSING -> OUTPUT -> FEEDBACK.
+"""Batch runner for the first Reign motion: INPUT -> PROCESSING -> OUTPUT -> FEEDBACK.
+
+This is OFFLINE TEST MODE unless a model key is set: without one, briefs come from the deterministic
+template, which exists for CI and tests and is not the agent. The agent is the Claude skill
+(skills/regulatory-trigger-brief) driving the MCP server (agent/mcp_server.py). Both paths share
+the same governed stages and gates.
 
     python3 -m agent.run_playbook                          # motion playbooks/motions/reign-first-motion.jsonc
 
@@ -323,6 +328,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"RUN REFUSED: {exc}", file=sys.stderr)
         return 2
     print(f"run {s['run_id']}  motion {s['motion']['id']}@{s['motion']['version']}  provider {s['provider']}")
+    if s["provider"] == "offline-test-mode":
+        print("  OFFLINE TEST MODE: template drafts for CI, not the agent. The agent path is the skill + MCP server.")
     for aid, a in s["accounts"].items():
         why = "; ".join(a.get("preflight_reasons") or a.get("reasons") or [])
         print(f"  {aid}  {a.get('status', '?'):<30} {a['name']}  {why}")

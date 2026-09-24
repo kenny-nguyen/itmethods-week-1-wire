@@ -1,13 +1,16 @@
-"""Brief generation: build the context, draft with a provider, return text plus allowed ids.
+"""Brief context and the two non-agent drafting paths.
 
-Two providers behind one interface (proposed reading A-015):
-- TemplateProvider: deterministic, no key needed. Used by CI and any clean clone.
-- AnthropicProvider: the Claude Messages API over the Python standard library
-  (no SDK dependency; process log D-009). Used when ANTHROPIC_API_KEY is set
-  and WIRE_PROVIDER is not "template".
+The agent is the Claude skill driving the MCP tools (skills/, agent/mcp_server.py;
+operator decision A-046). This module holds what those tools share (BriefContext)
+and two drafting paths that are NOT the agent:
 
-Both drafts go through the same output gate (`checks.py`). The model never
-gets a way around it.
+- TemplateProvider, "offline test mode": deterministic, no key, for CI and tests
+  only. It must never be presented as the agent.
+- AnthropicProvider, the direct model-API path: the Claude Messages API over the
+  standard library. Documented, and NOT exercised live (no key in the build
+  environment).
+
+Every draft, from any path, goes through the same output gate (`checks.py`).
 """
 
 from __future__ import annotations
@@ -28,8 +31,8 @@ SYSTEM_PROMPT = ROOT / "prompts" / "brief_system.md"
 DEFAULT_MODEL = "claude-opus-5"
 
 
-RECOVERY = ("Recovery: retry the run; or run with no key (unset ANTHROPIC_API_KEY, or set WIRE_PROVIDER=template) "
-            "to use the deterministic template; or check ANTHROPIC_API_KEY, WIRE_MODEL and network access to "
+RECOVERY = ("Recovery: retry the run; or run in offline test mode (unset ANTHROPIC_API_KEY, or set WIRE_PROVIDER=offline) "
+            "to check the pipeline with the deterministic template; or check ANTHROPIC_API_KEY, WIRE_MODEL and network access to "
             "api.anthropic.com.")
 
 
@@ -100,11 +103,12 @@ def cite(text: str, *ids: str) -> str:
 
 
 class TemplateProvider:
-    """Deterministic brief in the structure the operator decided for SR 26-2 (A-044):
+    """OFFLINE TEST MODE, for CI only; not the agent. A deterministic brief in the structure the operator
+    decided for SR 26-2 (A-044):
     what changed -> what is certain for this account -> what depends on its structure
     (each line "Confirm") -> a suggested next step. It never says a rule applies."""
 
-    name = "template"
+    name = "offline-test-mode"
 
     def draft(self, ctx: BriefContext) -> str:
         t, p, a, e = ctx.trigger, ctx.preflight, ctx.account, ctx.enrichment
@@ -195,6 +199,6 @@ class AnthropicProvider:
 def get_provider(env: dict | None = None):
     env = os.environ if env is None else env
     key = env.get("ANTHROPIC_API_KEY", "")
-    if env.get("WIRE_PROVIDER", "").lower() == "template" or not key:
+    if env.get("WIRE_PROVIDER", "").lower() in ("offline", "template") or not key:  # offline test mode
         return TemplateProvider()
     return AnthropicProvider(key, env.get("WIRE_MODEL", DEFAULT_MODEL))

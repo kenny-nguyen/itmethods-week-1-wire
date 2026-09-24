@@ -3,7 +3,7 @@
 | Variable | Default | Meaning |
 |---|---|---|
 | WIRE_OUT_DIR | <repo>/out | Where runs, the audit trail, the error log and kill switches live. Set once per deployment. |
-| WIRE_PROVIDER | (auto) | "template" forces the deterministic template; otherwise the model is used when a key is set. |
+| WIRE_PROVIDER | (auto) | "offline" (or "template") forces offline test mode, the deterministic CI template; otherwise the direct model-API path is used when a key is set. |
 | ANTHROPIC_API_KEY | (unset) | Key for the Claude Messages API. Unset means the template. |
 | WIRE_MODEL | claude-opus-5 | Model id for the Claude Messages API. |
 
