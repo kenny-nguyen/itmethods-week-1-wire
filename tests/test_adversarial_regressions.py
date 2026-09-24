@@ -126,15 +126,17 @@ class F3RecipientsOnlyFromRouting(unittest.TestCase):
                 problems = t.check_claims(BANK, "hs-1001", draft)["problems"]
                 self.assertTrue(any("routing excluded" in p for p in problems), (line, problems))
 
-    def test_extra_recipient_line_is_refused(self):
+    def test_extra_recipient_line_is_replaced_by_the_routed_set(self):
         with tempdir() as d:
             t = GovernedTools(Path(d) / "out", playbooks_dir=blocked_ciso_playbooks(Path(d)))
             self._ready(t)
             draft = offline_draft(t, "hs-1001").replace(
                 "## Suggested recipients in the existing relationship\n",
                 "## Suggested recipients in the existing relationship\n- Security lane: Someone Else, CISO [zoominfo:contact/zi-2005]\n")
-            problems = t.check_claims(BANK, "hs-1001", draft)["problems"]
-            self.assertTrue(any("routing did not return" in p for p in problems))
+            res = t.request_approval(BANK, "hs-1001", draft)
+            written = Path(res["brief"]).read_text()
+            self.assertNotIn("Someone Else", written)
+            self.assertNotIn("zi-2005", written)
 
 
 if __name__ == "__main__":

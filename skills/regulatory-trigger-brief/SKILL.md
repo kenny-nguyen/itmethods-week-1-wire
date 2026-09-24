@@ -36,7 +36,7 @@ You decide; the tools enforce. The `week1-wire` MCP server (see `.mcp.json`) wri
    ## What we know about the account
    ## Where Reign fits
    ## Suggested next step
-   ## Suggested recipients in the existing relationship
+   ## Suggested recipients in the existing relationship   (the tools fill this section from route_contact; leave it empty)
    ## Open questions for the account owner
    ## Lane framings for the account owner
    ## Sources

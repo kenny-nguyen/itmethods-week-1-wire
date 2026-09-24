@@ -53,6 +53,17 @@ ROOT = Path(__file__).resolve().parent.parent
 AGENT_DECISIONS = {"hold": "hold", "drop": "score"}  # what an agent may record with write_audit_record
 
 
+def _render_recipients(brief_markdown: str, ctx: BriefContext) -> str:
+    """Write the recipients section from the audited routed set, whatever the draft had there (adversarial QA F3)."""
+    head = "## Suggested recipients in the existing relationship"
+    if head not in brief_markdown:
+        return brief_markdown
+    before, _, rest = brief_markdown.partition(head)
+    nxt = rest.find("\n## ")
+    tail = rest[nxt:] if nxt >= 0 else "\n"
+    return before + head + "\n" + "\n".join(ctx.recipient_lines()) + "\n" + tail
+
+
 class ToolFailure(Exception):
     """A tool refused or failed. The message always ends with what to do next."""
 
@@ -319,6 +330,7 @@ class GovernedTools:
         pb, _ = self._playbook(playbook_id)
         st = self._step(playbook_id, account_id, "routed")
         ctx = self._context(pb, st)
+        brief_markdown = _render_recipients(brief_markdown, ctx)
         problems = check_brief(brief_markdown, **ctx.gate_kwargs())
         return {"passed": not problems, "problems": problems,
                 "allowed_sources": [{"id": i, "cite_as": d} for i, d in ctx.sources()],
@@ -354,6 +366,7 @@ class GovernedTools:
         st = self._step(playbook_id, account_id, "routed")
         ctx = self._context(pb, st)
         acct, trigger = st["account"], st["trigger"]
+        brief_markdown = _render_recipients(brief_markdown, ctx)
         problems = check_brief(brief_markdown, **ctx.gate_kwargs())
         if problems:  # enforced here, whatever the agent was told
             self.errors.record("tool.request_approval", "brief failed the output gate",
