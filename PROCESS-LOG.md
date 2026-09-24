@@ -785,3 +785,24 @@ Correction of attribution. R-001, R-002, A-028, A-029 and A-030 say the operator
 
 </details>
 
+### [Q-001] 23:25 · BUILDER · PROCESSING-QA
+The R-17 core is in and its tests pass (11 tests). The tests were then checked for teeth: with the blocking line disabled, 14 assertions failed; restored, all pass. This is builder self-QA; the independent QA pass comes later.
+
+<details><summary>Structured fields</summary>
+
+**What:** PASS (self-QA, not independent) on "an R-17 action whose audit record is invalid or cannot be written does not happen, and the failure is logged separately".
+
+**Why:** Tests cover every R-17 verb against a sink that raises, a generic purpose, a placeholder principal, empty sources, and a send without a named approver. The fs_only policy (proposed reading A-007) is tested both ways.
+
+**Evidence:** `python3 -m unittest discover -s tests -t .` printed "Ran 11 tests ... OK". Mutation: replacing `if required:` with `if False:` before `raise AuditBlocked` in `agent/governance/audit.py` gave "FAILED (failures=14)"; restoring it gave "OK".
+
+**Assumption:** Proposed readings A-007 (every segment), A-008 (local file sink) and A-024 (which verbs) are config or data, not hard-coded outcomes.
+
+**Reversal trigger:** Independent QA finds a path that completes an action without a record.
+
+**Links:** A-007, A-008, A-024
+
+**Proof boundary:** Not covered: a crash between the audit write and the commit (the record says the action happened, the action did not). Not covered: concurrent writers to the same file.
+
+</details>
+

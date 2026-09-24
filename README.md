@@ -30,7 +30,11 @@ What the contract sets out:
 
 This section is updated as usable pieces land.
 
-- Nothing is runnable yet. Read `PROCESS-LOG.md` for what has been decided so far.
+Requires Python 3.11 or later. Standard library only; nothing to install.
+
+- Run the tests: `python -m unittest discover -s tests -t . -v`
+- The R-17 audit trail (`agent/governance/audit.py`): every create, update, enrich, score or message action goes through `AuditTrail.perform(...)`, which writes the audit record first and only then completes the action. If the record is invalid or cannot be written, the action does not happen and `AuditBlocked` is raised.
+- The error log (`agent/governance/error_log.py`) is a separate JSON Lines file for anything that goes wrong in any stage.
 
 ## Repo map
 
@@ -41,4 +45,7 @@ This section is updated as usable pieces land.
 | `PROCESS-LOG.md` | Append-only decision log, written during the window. |
 | `AMBIGUITY-REGISTER.md` | Every ambiguity, the reading taken, and what would flip it. |
 | `INTAKE-WORKSHEET.md` | First structured read of the assignment. |
+| `agent/governance/` | R-17 audit trail and the error log, used by every stage. |
+| `tests/` | Unit tests, one file per stage. |
+| `.github/workflows/ci.yml` | CI (continuous integration): runs the tests on every push. |
 | `docs/research/` | Sourced facts the agent is allowed to use (product claims, regulator pages). |
