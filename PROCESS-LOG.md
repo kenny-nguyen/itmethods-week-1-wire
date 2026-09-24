@@ -747,3 +747,22 @@ New operator rule: the agent makes no assumptions of its own. Every reading the 
 
 </details>
 
+### [R-003] 23:23 · PM · REVERSAL
+Correction of fact: the timestamps on D-004, D-005, A-027, R-001, A-028, A-029, R-002, A-030 and D-006 were written as guesses, not read from the clock, and they are later than reality. The real times are below; the entries themselves stand.
+
+<details><summary>Structured fields</summary>
+
+**What:** Corrects the stamps. D-004 was written at about 23:21 (stamped 23:26). D-005, A-027, R-001, A-028, A-029, R-002 and A-030 were written at about 23:22 (stamped 23:28 or 23:29). D-006 was written at 23:23 (stamped 23:31). The supervisor inbox messages arrived at 23:20:41 (product facts), 23:20:58 (trigger decision and layout) and 23:22:29 (no-assumptions rule) KST, not "23:25" and "23:30" as those entries say. The "re-fetched at 23:22" note in D-005 and `docs/research/` is about a minute late; the fetch ran at about 23:21. The register's "Status rule from 23:31 KST" line has the same error.
+
+**Why:** The contract says stamps record when something happened. A guessed stamp is a small fabrication, and the log is append-only, so the fix is this entry, not an edit.
+
+**Evidence:** `date +%H:%M` printed 23:23 immediately after D-006 was committed (`c87f670`). Inbox message headers: at=2026-09-24T14:20:41Z, 14:20:58Z, 14:22:29Z.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-004, D-005, A-027, R-001, A-028, A-029, R-002, A-030, D-006
+
+</details>
+
