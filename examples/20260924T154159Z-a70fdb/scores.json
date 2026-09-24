@@ -1,6 +1,7 @@
 {
   "_label": "OFFLINE TEST MODE: template drafts for CI, not the agent. Baseline for the scorer.",
   "out": "$WIRE_OUT_DIR",
+  "run": null,
   "score": "22/22",
   "passed": 22,
   "total": 22,
@@ -9,6 +10,7 @@
       "account": "hs-1001",
       "why": "Canadian D-SIB on Forge; US entity not established",
       "expect": "brief",
+      "exercised": true,
       "properties": {
         "passes_output_gate": {
           "pass": true,
@@ -46,6 +48,7 @@
       "account": "hs-1002",
       "why": "US bank holding company",
       "expect": "brief",
+      "exercised": true,
       "properties": {
         "passes_output_gate": {
           "pass": true,
@@ -71,6 +74,7 @@
       "account": "hs-1009",
       "why": "bank with unknown headcount: fit unknown",
       "expect": "held",
+      "exercised": true,
       "properties": {
         "never_briefed": {
           "pass": true,
@@ -88,6 +92,7 @@
       "account": "hs-1010",
       "why": "credit union under the 5,000-employee floor",
       "expect": "dropped",
+      "exercised": true,
       "properties": {
         "never_briefed": {
           "pass": true,
@@ -107,8 +112,9 @@
     },
     {
       "account": "hs-1006",
-      "why": "Gen-AI start-up filed as fintech",
-      "expect": "dropped",
+      "why": "Gen-AI start-up filed as fintech: category unclear, held for a human",
+      "expect": "held",
+      "exercised": true,
       "properties": {
         "never_briefed": {
           "pass": true,
@@ -121,7 +127,7 @@
         "decision_recorded": {
           "pass": true,
           "evidence": [
-            "exclude"
+            "hold"
           ]
         }
       }
@@ -130,6 +136,7 @@
       "account": "hs-1007",
       "why": "hospital: watch list this month, do not contact",
       "expect": "watched",
+      "exercised": true,
       "properties": {
         "never_briefed": {
           "pass": true,
