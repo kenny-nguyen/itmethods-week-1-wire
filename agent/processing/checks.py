@@ -22,10 +22,16 @@ from __future__ import annotations
 
 import re
 
-MAX_WORDS = 300
-REQUIRED_SECTIONS = ["## Why now", "## Applicability", "## What we know about the account",
-                     "## Where Reign fits", "## Routing", "## Open questions for the approver", "## Sources"]
-KNOWN_HEADINGS = set(REQUIRED_SECTIONS) | {"## Home-regulator context"}
+MAX_WORDS = 350  # proposed A-045: a short brief a CAE can read in one sitting
+# The structure the operator decided for the SR 26-2 brief (A-044).
+REQUIRED_SECTIONS = ["## What changed", "## What is certain for this account", "## What depends on structure (confirm)",
+                     "## What we know about the account", "## Where Reign fits", "## Suggested next step",
+                     "## Suggested recipients in the existing relationship", "## Open questions for the account owner",
+                     "## Sources"]
+KNOWN_HEADINGS = set(REQUIRED_SECTIONS)
+CONDITIONAL_SECTION = "## What depends on structure (confirm)"
+# "Never claim a rule applies" (A-044): applicability wording only inside the conditional section.
+APPLIES = re.compile(r"\b(applies|apply to (you|the bank|them)|in scope|subject to|is covered by|falls under)\b", re.IGNORECASE)
 # Template sentences about the account that name a product but make no product claim.
 ACCOUNT_FACT_SENTENCES = {"existing forge customer."}
 
@@ -85,9 +91,11 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
     for section in REQUIRED_SECTIONS:
         if section not in text:
             problems.append(f"missing section '{section}'")
-    words = len(re.findall(r"\b\w+\b", CITATION.sub("", body)))
+    # The word limit covers the forwardable part; recipients and open questions are notes for the owner.
+    forwardable = body.split("\n## Suggested recipients in the existing relationship")[0]
+    words = len(re.findall(r"\b\w+\b", CITATION.sub("", forwardable)))
     if words > MAX_WORDS:
-        problems.append(f"brief body is {words} words; limit is {MAX_WORDS}")
+        problems.append(f"forwardable brief is {words} words; limit is {MAX_WORDS}")
 
     # Sources: only generated source lines, each for an id the body cites.
     listed = set()
@@ -114,6 +122,21 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
         problems.append(f"contains a link or domain that is not an approved source: {hit}")
     if MARKUP.search(text):
         problems.append("contains HTML or markdown links or images")
+
+    section = ""
+    for line in body.splitlines():
+        if line.startswith("## "):
+            section = line.strip()
+            continue
+        if not line.strip().startswith("- "):
+            if APPLIES.search(line):
+                problems.append(f"says a rule applies outside the conditional section: {line.strip()[:80]!r}")
+            continue
+        if section == CONDITIONAL_SECTION:
+            if not line.strip()[2:].lower().startswith("confirm"):
+                problems.append(f"every line in '{CONDITIONAL_SECTION}' must start with 'Confirm': {line.strip()[:80]!r}")
+        elif APPLIES.search(line):
+            problems.append(f"says a rule applies outside the conditional section: {line.strip()[:80]!r}")
 
     approved = {cid: _norm(t) for cid, t in claim_texts.items()}
     for sentence in _sentences(body.splitlines()):

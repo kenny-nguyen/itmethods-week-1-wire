@@ -16,7 +16,7 @@ from pathlib import Path
 
 from agent.input.models import Account, Enrichment
 
-INCLUDE, EXCLUDE, HOLD = "include", "exclude", "hold"
+INCLUDE, EXCLUDE, HOLD, WATCH = "include", "exclude", "hold", "watch"  # watch: noticed and logged, never contacted
 
 
 @dataclass
@@ -72,6 +72,8 @@ class Icp:
         hit = self.matched_exclusion(account)
         if hit:
             return IcpDecision(EXCLUDE, fs, [f"matches exclusion pattern '{hit}' (AI startups and mid-market SaaS are out, A-003)"])
+        if seg is not None and seg.get("watch"):
+            return IcpDecision(WATCH, fs, [f"segment '{account.segment}' is on the watch list: {seg.get('reason', '')}".strip()])
         if seg is not None and not seg.get("include", False):
             return IcpDecision(EXCLUDE, fs, [f"segment '{account.segment}' is excluded: {seg.get('reason', '')}".strip()])
         if seg is None:
@@ -95,9 +97,14 @@ class Icp:
         for key, required in seg.get("requires", {}).items():
             actual = getattr(enrichment, key, None)
             if actual != required:
-                return IcpDecision(EXCLUDE, fs, [f"segment requires {key}={required}, enrichment has {actual} (A-019)"], segment=seg)
+                decision = WATCH if seg.get("otherwise") == "watch" else EXCLUDE
+                return IcpDecision(decision, fs, [f"segment target needs {key}={required}, enrichment has {actual}; "
+                                                  f"{'on the watch list, no outreach' if decision == WATCH else 'excluded'} (A-039)"],
+                                   segment=seg)
 
         flags = []
+        if account.industry is None:  # counted as FS so the audit is always written (A-006, operator decision)
+            flags.append("industry unconfirmed: treated as financial services until a human confirms (A-006)")
         adoption = enrichment.agent_adoption  # a signal only, never a reason to exclude (A-036, operator decision)
         if adoption is None:
             flags.append("agent adoption unknown: confirm whether agents are in production or planned (A-036)")

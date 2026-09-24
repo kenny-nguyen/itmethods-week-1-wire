@@ -21,11 +21,14 @@ class BriefTests(unittest.TestCase):
         text, _, _ = golden_brief(caveat=True)
         self.assertIn("SR 26-2 applicability requires confirmation", text)
         self.assertIn("E-23", text)
-        self.assertIn("Nothing has been sent.", text)
+        self.assertIn("Nothing has been sent and the bank has not been contacted.", text)
+        order = [text.index(h) for h in ("## What changed", "## What is certain for this account",
+                                         "## What depends on structure (confirm)", "## Suggested next step")]
+        self.assertEqual(order, sorted(order), "A-044 structure")
 
     def test_every_eval_case_behaves(self):
         results = run()
-        self.assertGreaterEqual(len(results), 18)
+        self.assertGreaterEqual(len(results), 42)
         misses = [(n, p) for n, ok, p in results if not ok]
         self.assertEqual(misses, [])
 

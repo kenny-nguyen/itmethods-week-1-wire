@@ -14,10 +14,16 @@ fails, `commit` is never called and `AuditBlocked` is raised: the action did
 not happen, loudly.
 
 Proposed readings this module depends on (AMBIGUITY-REGISTER.md):
-- A-007: apply the rule to every segment, not only financial services. Set
-  per playbook as `audit.required_for` = "all_segments" | "fs_only".
-- A-008: records go to an append-only JSON Lines file behind `AuditSink`.
-- A-024: the R-17 verbs are score, enrich, create, update, message.
+Operator decisions this module implements (AMBIGUITY-REGISTER.md):
+- A-007 / A-038: the rule applies to every segment. An audit record is a
+  receipt of what our agent did, not a test the prospect must pass: it never
+  disqualifies a prospect; only our own action stops when the receipt cannot
+  be written. (`audit.required_for` = "fs_only" exists for completeness.)
+- A-008: records go to an append-only JSON Lines file behind `AuditSink`;
+  wiring the real audit store is day-one work.
+- A-024: the five R-17 verbs, plus our own decisions about a person or
+  account: routing, exclusion or hold (recorded as a score), approval or
+  rejection, and the kill switch. Plain reads are not audited.
 """
 
 from __future__ import annotations
@@ -35,7 +41,8 @@ from agent.governance.error_log import ErrorLog
 
 R17_ACTIONS = ("create", "update", "enrich", "score", "message")
 # Governance decisions are recorded in the same trail so an auditor sees them in sequence.
-DECISION_ACTIONS = ("approve", "reject", "block", "unblock", "hold")
+# Operator decision A-024: our own decisions about a person or account are audited too.
+DECISION_ACTIONS = ("route", "approve", "reject", "block", "unblock", "hold")
 ALLOWED_ACTIONS = R17_ACTIONS + DECISION_ACTIONS
 
 # "purpose - one sentence, specific, not 'engagement'" (R-17).

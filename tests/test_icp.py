@@ -6,7 +6,7 @@ from pathlib import Path
 
 from agent.input.local import LocalClayEnrichment, LocalHubSpotAccounts
 from agent.input.models import Account, Enrichment
-from agent.processing.icp import EXCLUDE, HOLD, INCLUDE, Icp
+from agent.processing.icp import EXCLUDE, HOLD, INCLUDE, WATCH, Icp
 
 ROOT = Path(__file__).resolve().parent.parent
 ICP = Icp.load(ROOT / "icp" / "icp.json")
@@ -67,9 +67,12 @@ class IcpTests(unittest.TestCase):
                 self.assertEqual(d.decision, INCLUDE, f"{text!r} wrongly -> {d.reasons}")
 
     def test_excluded_segment_labels(self):
-        for seg in ("ai_native_saas", "ai_startup", "mid_market_saas", "hospital"):
+        for seg in ("ai_native_saas", "ai_startup", "mid_market_saas"):
             with self.subTest(seg=seg):
                 self.assertEqual(ICP.evaluate(replace(BANK, segment=seg, description="x"), ENRICHED).decision, EXCLUDE)
+
+    def test_hospitals_are_watched_not_contacted(self):  # A-040
+        self.assertEqual(ICP.evaluate(replace(BANK, segment="hospital", description="x"), ENRICHED).decision, WATCH)
 
     def test_headcount_floor_and_unknown(self):
         self.assertEqual(ICP.evaluate(replace(BANK, employees=4999), ENRICHED).decision, EXCLUDE)
@@ -82,7 +85,7 @@ class IcpTests(unittest.TestCase):
     def test_semiconductor_needs_export_control_exposure(self):
         semi = replace(BANK, segment="semiconductor", industry="Semiconductors", description="Foundry.")
         self.assertEqual(ICP.evaluate(semi, replace(ENRICHED, export_control_exposure=True)).decision, INCLUDE)
-        self.assertEqual(ICP.evaluate(semi, replace(ENRICHED, export_control_exposure=None)).decision, EXCLUDE)
+        self.assertEqual(ICP.evaluate(semi, replace(ENRICHED, export_control_exposure=None)).decision, WATCH)  # A-039
 
     def test_agent_adoption_never_excludes(self):  # A-036, operator decision
         d = ICP.evaluate(BANK, replace(ENRICHED, agent_adoption="none"))
@@ -91,6 +94,8 @@ class IcpTests(unittest.TestCase):
         d = ICP.evaluate(BANK, replace(ENRICHED, agent_adoption=None, risk_committee=None))
         self.assertEqual(d.decision, INCLUDE)
         self.assertEqual(len(d.flags), 2)
+        d = ICP.evaluate(replace(BANK, industry=None), ENRICHED)
+        self.assertTrue(d.fs and any("industry unconfirmed" in f for f in d.flags))  # A-006
 
     def test_unknown_industry_counts_as_fs(self):
         acct = replace(BANK, segment="biopharma_quality", industry=None)
@@ -103,7 +108,7 @@ class IcpTests(unittest.TestCase):
         got = {aid: ICP.evaluate(a, clay.enrich(aid)).decision for aid, a in accounts.items()}
         self.assertEqual(got, {
             "hs-1001": INCLUDE, "hs-1002": INCLUDE, "hs-1003": INCLUDE, "hs-1004": INCLUDE,
-            "hs-1005": EXCLUDE, "hs-1006": EXCLUDE, "hs-1007": EXCLUDE, "hs-1008": EXCLUDE,
+            "hs-1005": EXCLUDE, "hs-1006": EXCLUDE, "hs-1007": WATCH, "hs-1008": WATCH,
             "hs-1009": HOLD, "hs-1010": EXCLUDE, "hs-1011": EXCLUDE,
         })
 

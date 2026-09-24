@@ -12,22 +12,75 @@
       "regulator": "Federal Reserve",
       "relevance_threshold_total_assets_usd": 30000000000,
       "facts": [
-        {"text": "Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021).", "source": "src-sr26-2"},
-        {"text": "The letter says it is expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve.", "source": "src-sr26-2"},
-        {"text": "The guidance emphasises a risk-based approach tailored to a banking organization's model risk profile and the size and complexity of its operations.", "source": "src-sr26-2"}
+        {
+          "text": "Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021).",
+          "source": "src-sr26-2"
+        },
+        {
+          "text": "The letter says it is expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve.",
+          "source": "src-sr26-2"
+        }
       ],
       "sources": [
-        {"id": "src-sr26-2", "title": "Federal Reserve SR 26-2", "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm", "verified": true, "verified_how": "HTTP 200 and page text read, 2026-09-24 23:17 KST"}
+        {
+          "id": "src-sr26-2",
+          "title": "Federal Reserve SR 26-2",
+          "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm",
+          "verified": true,
+          "verified_how": "HTTP 200 and page text read, 2026-09-24 23:17 KST"
+        }
       ],
       "context_by_jurisdiction": {
         "CA": [
-          {"text": "OSFI Guideline E-23 (Model Risk Management) takes effect on May 1, 2027.", "source": "src-osfi-e23"},
-          {"text": "OSFI Guideline B-13 (Technology and Cyber Risk Management) sets expectations for federally regulated financial institutions.", "source": "src-osfi-b13"}
+          {
+            "text": "OSFI Guideline E-23 (Model Risk Management) covers model risk, including AI and machine learning models, and takes effect on May 1, 2027.",
+            "source": "src-osfi-e23"
+          },
+          {
+            "text": "OSFI Guideline B-13 (Technology and Cyber Risk Management) sets expectations for federally regulated financial institutions.",
+            "source": "src-osfi-b13"
+          }
         ]
       },
       "context_sources": [
-        {"id": "src-osfi-e23", "title": "OSFI Guideline E-23 - Model Risk Management (2027)", "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027", "verified": true, "verified_how": "HTTP 200; page shows 'Effective date May 1, 2027'"},
-        {"id": "src-osfi-b13", "title": "OSFI Guideline B-13 - Technology and Cyber Risk Management", "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management", "verified": true, "verified_how": "HTTP 200; effective date (2024-01-01, per the researcher report) not re-read on the page"}
+        {
+          "id": "src-osfi-e23",
+          "title": "OSFI Guideline E-23 - Model Risk Management (2027)",
+          "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+          "verified": true,
+          "verified_how": "HTTP 200; page shows 'Effective date May 1, 2027'; model risk including AI/ML per the researcher report"
+        },
+        {
+          "id": "src-osfi-b13",
+          "title": "OSFI Guideline B-13 - Technology and Cyber Risk Management",
+          "url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+          "verified": true,
+          "verified_how": "HTTP 200; page text read. Effective date not shown on the page in this window, so the brief does not state one"
+        },
+        {
+          "id": "src-dora",
+          "title": "EIOPA - Digital Operational Resilience Act (DORA)",
+          "url": "https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en",
+          "verified": true,
+          "verified_how": "HTTP 200; page names Regulation (EU) 2022/2554 on digital operational resilience for the financial sector. EUR-Lex returned an anti-bot 202 page, so the regulation text itself was not read"
+        }
+      ],
+      "structural_conditions": [
+        {
+          "when": "outside_jurisdiction",
+          "text": "Confirm: SR 26-2 applicability requires confirmation. If {account} operates a US banking entity supervised by the Federal Reserve, SR 26-2 applies to that entity.",
+          "source": "src-sr26-2"
+        },
+        {
+          "when": "in_jurisdiction",
+          "text": "Confirm: which {account} banking entities the Federal Reserve regulates; the letter says it is most relevant above $30 billion in total assets.",
+          "source": "src-sr26-2"
+        },
+        {
+          "when": "always",
+          "text": "Confirm: if {account} has an EU financial entity, DORA (Regulation (EU) 2022/2554 on digital operational resilience for the financial sector) applies to that entity.",
+          "source": "src-dora"
+        }
       ]
     },
     {
@@ -41,7 +94,13 @@
       "jurisdiction": "US",
       "facts": [],
       "sources": [
-        {"id": "src-fda-pccp", "title": "FDA PCCP final guidance", "url": null, "verified": false, "verified_how": "[NEEDS VERIFICATION: guidance page URL]"}
+        {
+          "id": "src-fda-pccp",
+          "title": "FDA PCCP final guidance",
+          "url": null,
+          "verified": false,
+          "verified_how": "[NEEDS VERIFICATION: guidance page URL]"
+        }
       ]
     },
     {

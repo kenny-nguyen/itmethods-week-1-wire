@@ -1,19 +1,19 @@
 {
-  "_about": "The living ICP (ideal customer profile) for the first Reign motion. Every field the packet did not give is marked in _provenance with the register row that proposes it. Rows marked 'proposed' await the operator (log D-006).",
-  "version": "0.1.0",
+  "_about": "The living ICP (ideal customer profile) for the first Reign motion. _provenance names the packet line or register row behind every field.",
+  "version": "0.2.0",
   "_provenance": {
     "min_employees": "packet (CEO notes: '5k+ employees'); what to do when unknown is proposed, A-004",
-    "unknown_employees": "proposed, A-004",
+    "unknown_employees": "operator decision A-004",
     "agent_adoption": "packet (CEO notes: 'already has agents in production or about to'); a signal only, never excludes: operator decision A-036",
-    "risk_committee": "packet, unvetted Slack note from Rob; flag-not-gate is proposed, A-021",
-    "unlisted_segment": "proposed, A-031",
-    "fs_industries": "proposed, A-006",
+    "risk_committee": "packet, unvetted Slack note from Rob; flag, not gate: operator decision A-021",
+    "unlisted_segment": "proposed, A-031 (awaiting operator; hold takes no action on the prospect)",
+    "fs_industries": "operator decision A-006: unknown industry counts as FS and is flagged 'industry unconfirmed'",
     "exclusion_patterns": "operator approved removing AI startups and mid-market SaaS, A-003; the pattern list itself is the agent's",
     "segments.dsib_capital_markets": "packet ICP sketch; lanes proposed A-011",
     "segments.biopharma_quality": "packet ICP sketch",
     "segments.defense_supplier": "packet ICP sketch; lead product proposed A-023",
-    "segments.semiconductor": "packet (CEO notes); requirement proposed A-019",
-    "segments.hospital": "packet Slack note 'do not spray hospitals this month'; exclusion proposed A-020",
+    "segments.semiconductor": "packet (CEO notes); operator decision A-039: a target only with a recorded US export-control problem, otherwise the watch list",
+    "segments.hospital": "packet Slack note; operator decision A-040: watch, don't contact",
     "segments.ai_native_saas": "packet ICP sketch row; removed by operator decision, A-003",
     "segments.mid_market_saas": "packet (CEO notes: 'Do not include mid-market SaaS'), A-003",
     "object_context_regex": "agent's reading after independent QA (Q-005): a match is ignored when the startups are the account's investees, partners, customers or policyholders, not the account itself"
@@ -73,11 +73,13 @@
       ],
       "requires": {
         "export_control_exposure": true
-      }
+      },
+      "otherwise": "watch"
     },
     "hospital": {
       "include": false,
-      "reason": "Do not spray hospitals this month (A-020)."
+      "watch": true,
+      "reason": "Watch, don't contact: noticed and logged, no brief this month (A-040)."
     },
     "ai_native_saas": {
       "include": false,

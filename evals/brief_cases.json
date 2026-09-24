@@ -49,7 +49,7 @@
     {
       "name": "briefing duration range",
       "edit": {
-        "append_to": "## Open questions for the approver",
+        "append_to": "## Open questions for the account owner",
         "text": "- Book a 45-60 min slot."
       },
       "expect": "duration"
@@ -65,7 +65,7 @@
     {
       "name": "FedRAMP mention",
       "edit": {
-        "append_to": "## Open questions for the approver",
+        "append_to": "## Open questions for the account owner",
         "text": "- Ask whether FedRAMP matters to them."
       },
       "expect": "CMMC"
@@ -81,7 +81,7 @@
     {
       "name": "invented URL",
       "edit": {
-        "append_to": "## Why now",
+        "append_to": "## What changed",
         "text": "- See the regulator's summary [src-sr26-2] at https://example.com/sr26-2-summary."
       },
       "expect": "not an approved source"
@@ -89,7 +89,7 @@
     {
       "name": "unknown citation id",
       "edit": {
-        "append_to": "## Why now",
+        "append_to": "## What changed",
         "text": "- The bank's CRO spoke about SR 26-2 last week [linkedin:post/123]."
       },
       "expect": "unknown source id"
@@ -97,7 +97,7 @@
     {
       "name": "filler phrasing",
       "edit": {
-        "append_to": "## Why now",
+        "append_to": "## What changed",
         "text": "- In today's rapidly evolving landscape, banks must act [src-sr26-2]."
       },
       "expect": "filler"
@@ -105,7 +105,7 @@
     {
       "name": "em dash",
       "edit": {
-        "append_to": "## Why now",
+        "append_to": "## What changed",
         "text": "- Model risk guidance changed \u2014 again [src-sr26-2]."
       },
       "expect": "filler"
@@ -113,14 +113,14 @@
     {
       "name": "missing section",
       "edit": {
-        "remove_section": "## Routing"
+        "remove_section": "## Suggested next step"
       },
       "expect": "missing section"
     },
     {
       "name": "over length",
       "edit": {
-        "append_to": "## Open questions for the approver",
+        "append_to": "## Where Reign fits",
         "text_repeat": "- Confirm the owner of model inventory for agent workloads before the call.",
         "times": 30
       },
@@ -314,6 +314,33 @@
         "text": "Reign guarantees SR 26-2 compliance and is certified. The briefing is 45 minutes."
       },
       "expect": "unexpected text in Sources"
+    },
+    {
+      "name": "claims the rule applies",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What is certain for this account",
+        "text": "- SR 26-2 applies to the bank [src-sr26-2]."
+      },
+      "expect": "says a rule applies outside the conditional section"
+    },
+    {
+      "name": "says in scope",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- The bank is in scope for SR 26-2 [src-sr26-2]."
+      },
+      "expect": "says a rule applies outside the conditional section"
+    },
+    {
+      "name": "unmarked structural line",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "- The bank has a US entity supervised by the Federal Reserve [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
     }
   ],
   "caveat_cases": [

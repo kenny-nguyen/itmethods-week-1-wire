@@ -11,9 +11,10 @@ Outcomes:
   source, bank outbound before a briefing).
 
 Proposed readings this depends on, set per play in the playbook:
-- `unconfirmed_applicability`: "hold" (A-025, the standing reading) or
-  "brief_with_caveat" (A-028, proposed reversal awaiting the operator).
-- `outbound_requires_briefing`: A-009.
+- `unconfirmed_applicability`: "hold" (A-025, the general case) or
+  "structured_brief" (A-044, the SR 26-2 bank brief).
+- `handoff` (A-043): no new cold outreach until a briefing is booked; on a
+  regulatory trigger the brief goes to the named account owner.
 """
 
 from __future__ import annotations
@@ -45,10 +46,12 @@ def check(trigger: Trigger, account: Account, enrichment: Enrichment, play: dict
     if not trigger.facts or bad:
         return Preflight(BLOCKED, reasons=[f"trigger {trigger.id} has no verified source for its facts: {bad or 'no facts'}"])
 
-    channel = play.get("channel")
-    if (channel == "sequence" and play.get("outbound_requires_briefing")
-            and not account.briefing_scheduled and trigger.type != "regulatory"):
-        return Preflight(BLOCKED, reasons=["no outbound to this buyer until a briefing is on the calendar (A-009)"])
+    handoff = play.get("handoff") or {}
+    if (play.get("channel") == "sequence" and handoff.get("cold_outreach_until_briefing_booked") is False
+            and not account.briefing_scheduled):
+        return Preflight(BLOCKED, reasons=["no new cold outreach to this buyer until a briefing is booked (A-043)"])
+    if handoff.get("route_to") == "account_owner" and not account.owner:
+        return Preflight(HOLD, reasons=["no named iTmethods account owner on record to route the brief to (A-043)"])
 
     applicability, caveats, reasons = _applicability(trigger, account, enrichment)
     context = trigger.context_by_jurisdiction.get(account.hq_country or "", ())
@@ -58,6 +61,8 @@ def check(trigger: Trigger, account: Account, enrichment: Enrichment, play: dict
     if applicability == REQUIRES_CONFIRMATION and play.get("unconfirmed_applicability", "hold") == "hold":
         return Preflight(HOLD, applicability, reasons + ["held for a human: applicability unconfirmed (A-025)"],
                          caveats, context)
+    # "structured_brief" (A-044): the brief states what changed, what is certain, and what depends on
+    # structure, each marked "confirm". It never says the rule applies.
     return Preflight(READY, applicability, reasons, caveats, context)
 
 

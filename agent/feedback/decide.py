@@ -35,6 +35,15 @@ class DecisionRefused(Exception):
     pass
 
 
+def account_owner(system_id: str) -> str | None:
+    """The account owner from the system of record, never from the request file (A-043, D-018)."""
+    from agent.input.local import LocalHubSpotAccounts
+    for a in LocalHubSpotAccounts(ROOT / "fixtures/hubspot_companies.json").list_accounts():
+        if a.system_id == system_id:
+            return a.owner
+    return None
+
+
 def decide(request_path: str | Path, *, approver: str, approve: bool, reason: str, out_dir: str | Path,
            sink=None, playbooks_dir: Path = trusted.PLAYBOOKS) -> dict:
     out = Path(out_dir).resolve()
@@ -56,6 +65,9 @@ def decide(request_path: str | Path, *, approver: str, approve: bool, reason: st
         refuse(f"request is already {req['status']}")
     if not is_named_human(approver) or approver not in pb["approval"]["approvers"]:
         refuse(f"{approver!r} is not a named approver for {pb['playbook_id']}")
+    owner = account_owner(req["account"]["id"])
+    if pb.get("handoff", {}).get("route_to") == "account_owner" and approver != owner:
+        refuse(f"{approver!r} is not the named account owner ({owner!r}) on record in HubSpot (A-043)")
     killed = kill_switch.engaged(out / "state", pb["playbook_id"])
     if approve and killed:
         refuse(f"kill switch engaged by {killed['by']}: {killed['reason']}")

@@ -28,8 +28,16 @@ SYSTEM_PROMPT = ROOT / "prompts" / "brief_system.md"
 DEFAULT_MODEL = "claude-opus-5"
 
 
+RECOVERY = ("Recovery: retry the run; or run with no key (unset ANTHROPIC_API_KEY, or set WIRE_PROVIDER=template) "
+            "to use the deterministic template; or check ANTHROPIC_API_KEY, WIRE_MODEL and network access to "
+            "api.anthropic.com.")
+
+
 class ProviderError(Exception):
-    pass
+    """A model call failed. Operator decision A-033: fail loudly and name the fix; never fall back silently."""
+
+    def __init__(self, message: str):
+        super().__init__(f"{message}. {RECOVERY}")
 
 
 @dataclass
@@ -92,39 +100,60 @@ def cite(text: str, *ids: str) -> str:
 
 
 class TemplateProvider:
+    """Deterministic brief in the structure the operator decided for SR 26-2 (A-044):
+    what changed -> what is certain for this account -> what depends on its structure
+    (each line "Confirm") -> a suggested next step. It never says a rule applies."""
+
     name = "template"
 
     def draft(self, ctx: BriefContext) -> str:
         t, p, a, e = ctx.trigger, ctx.preflight, ctx.account, ctx.enrichment
-        lines = [f"# {a.name}: {t.title}", "",
-                 f"Prepared for {ctx.approver} to review. Nothing has been sent.", "", "## Why now"]
-        lines += [f"- {cite(f.text, f.source)}" for f in t.facts]
-        lines += ["", "## Applicability"]
-        src = t.facts[0].source
-        reasons = "; ".join(p.reasons)
-        if CAVEAT in p.caveats:
-            short_name = t.title.split(":")[0]
-            lines.append("- " + cite(f"{short_name} {CAVEAT}: {reasons}.", src))
-        else:
-            lines.append("- " + cite(f"In scope on the record we hold: {reasons}.", src, a.system_id))
-        lines += [f"- {cite(f'Caveat: {c}.', src, a.system_id)}" for c in p.caveats if c != CAVEAT]
-        if p.context:
-            lines += ["", "## Home-regulator context"] + [f"- {cite(f.text, f.source)}" for f in p.context]
+        short = t.title.split(":")[0]
+        lines = [f"# {a.name}: {short} brief for the account owner", "",
+                 f"Prepared for {ctx.approver}, the account owner, to decide whether to share it in the "
+                 "existing relationship. Nothing has been sent and the bank has not been contacted.", "",
+                 "## What changed"]
+        lines += ["- " + cite(f.text, f.source) for f in t.facts]
+
+        lines += ["", "## What is certain for this account"]
+        certain = ["- " + cite(f.text, f.source) for f in p.context]
+        if a.hq_country:
+            certain.append("- " + cite(f"Our record shows headquarters in {a.hq_country}.", a.system_id))
+        lines += certain
+
+        lines += ["", "## What depends on structure (confirm)"]
+        in_jurisdiction = a.hq_country == t.jurisdiction
+        for c in t.structural_conditions:
+            if c["when"] == "always" or (c["when"] == "in_jurisdiction") == in_jurisdiction:
+                if t.source(c["source"]) and t.source(c["source"]).verified:
+                    lines.append("- " + cite(c["text"].format(account=a.name), c["source"]))
+        if CAVEAT in p.caveats and not any(CAVEAT in l for l in lines):
+            lines.append("- " + cite(f"Confirm: {short} {CAVEAT}; {'; '.join(p.reasons)}.", t.facts[0].source))
+        lines += ["- " + cite(f"Confirm: {c}.", t.facts[0].source, a.system_id) for c in p.caveats if c != CAVEAT]
+
         lines += ["", "## What we know about the account"]
-        if a.runs_forge:
-            forge = next((c for c in ctx.claims if c["id"] == "P-FORGE"), None)
-            lines.append(f"- {cite('Existing Forge customer.', a.system_id, forge['id'])}" if forge
-                         else f"- {cite('Existing customer of the managed runtime.', a.system_id)}")
+        if a.runs_forge and any(c["id"] == "P-FORGE" for c in ctx.claims):
+            lines.append("- " + cite("Existing Forge customer.", a.system_id, "P-FORGE"))
         if e.agent_adoption in ("production", "planned"):
-            lines.append(f"- {cite(f'Agents: {e.agent_adoption}.', e.source)}")
+            lines.append("- " + cite(f"Agents: {e.agent_adoption}.", e.source))
         if e.risk_committee:
-            lines.append(f"- {cite('Risk committee on record.', e.source)}")
-        lines += ["", "## Where Reign fits"] + [f"- {cite(c['text'], c['id'])}" for c in ctx.claims if c["id"] != "P-FORGE"]
-        lines += ["", "## Routing"]
+            lines.append("- " + cite("Risk committee on record.", e.source))
+
+        lines += ["", "## Where Reign fits"]
+        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims if c["id"] not in ("P-FORGE", "P-BRIEFING")]
+
+        lines += ["", "## Suggested next step"]
+        lines.append("- The account owner offers the audit and risk committee an Executive Assurance Briefing.")
+        brief = next((c for c in ctx.claims if c["id"] == "P-BRIEFING"), None)
+        if brief:
+            lines.append("- " + cite(brief["text"], brief["id"]))
+
+        lines += ["", "## Suggested recipients in the existing relationship"]
         for lane, contacts in ctx.routed.items():
             who = "; ".join(f"{c.name}, {c.title} [{c.system_id}]" for c in contacts) or "no contact on record"
             lines.append(f"- {lane.capitalize()} lane: {who}")
-        lines += ["", "## Open questions for the approver"]
+
+        lines += ["", "## Open questions for the account owner"]
         lines += [f"- {q}" for q in ctx.flags] or ["- None from the record."]
         cited = set(re.findall(r"\[([A-Za-z0-9][A-Za-z0-9:_/.\-]*)\]", "\n".join(lines)))
         lines += ["", "## Sources"] + [f"- [{i}] {d}" for i, d in ctx.sources() if i in cited]

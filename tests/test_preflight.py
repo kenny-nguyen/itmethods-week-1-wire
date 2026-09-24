@@ -33,8 +33,8 @@ class PreflightTests(unittest.TestCase):
         r = pf.check(SR, CA_BANK, UNKNOWN, PLAY)
         self.assertEqual((r.status, r.applicability), (pf.HOLD, pf.REQUIRES_CONFIRMATION))
 
-    def test_canadian_bank_with_caveat_setting_gets_caveat_and_osfi_context(self):
-        r = pf.check(SR, CA_BANK, UNKNOWN, {**PLAY, "unconfirmed_applicability": "brief_with_caveat"})
+    def test_canadian_bank_with_structured_brief_gets_caveat_and_osfi_context(self):
+        r = pf.check(SR, CA_BANK, UNKNOWN, {**PLAY, "unconfirmed_applicability": "structured_brief"})
         self.assertEqual(r.status, pf.READY)
         self.assertIn(pf.CAVEAT, r.caveats)
         self.assertTrue(any("E-23" in f.text for f in r.context))
@@ -56,12 +56,15 @@ class PreflightTests(unittest.TestCase):
         bad = replace(SR, sources=(Source("src-sr26-2", "x", None, False),))
         self.assertEqual(pf.check(bad, US_BANK, UNKNOWN, PLAY).status, pf.BLOCKED)
 
-    def test_sequence_before_briefing_blocked_for_non_regulatory_trigger(self):
-        event = replace(SR, type="event")
-        play = {"channel": "sequence", "outbound_requires_briefing": True}
-        self.assertEqual(pf.check(event, US_BANK, UNKNOWN, play).status, pf.BLOCKED)
-        self.assertEqual(pf.check(event, replace(US_BANK, briefing_scheduled=True), UNKNOWN, play).status, pf.READY)
-        self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.READY)  # regulatory exception
+    def test_no_cold_outreach_until_briefing_booked(self):  # A-043
+        play = {"channel": "sequence", "handoff": {"cold_outreach_until_briefing_booked": False}}
+        self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.BLOCKED)
+        self.assertEqual(pf.check(SR, replace(US_BANK, briefing_scheduled=True), UNKNOWN, play).status, pf.READY)
+
+    def test_brief_needs_a_named_account_owner(self):  # A-043
+        play = {**PLAY, "handoff": {"route_to": "account_owner"}}
+        self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.HOLD)
+        self.assertEqual(pf.check(SR, replace(US_BANK, owner="Kenny Nguyen"), UNKNOWN, play).status, pf.READY)
 
 
 class RoutingTests(unittest.TestCase):

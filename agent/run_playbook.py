@@ -1,17 +1,23 @@
-"""Run a Campaign Manager playbook end to end: INPUT -> PROCESSING -> OUTPUT -> FEEDBACK.
+"""Run the first Reign motion end to end: INPUT -> PROCESSING -> OUTPUT -> FEEDBACK.
 
-    python3 -m agent.run_playbook                      # playbooks/reign-first-motion.jsonc
+    python3 -m agent.run_playbook                          # motion playbooks/motions/reign-first-motion.jsonc
+
+A motion references playbooks, each exactly in the Campaign Manager stub's
+shape: one audience, one trigger, one channel (A-041). The motion runs the ICP
+filter once over the account list, then each playbook whose trigger is
+implemented, with that playbook's own approval, kill criteria and audit.
 
 Every stage has a gate:
-- INPUT: the playbook must validate, the motion must be active, the kill switch
-  must be off. Adapter failures stop the run and go to the error log.
-- PROCESSING: ICP filter (excluded companies are never enriched), then the
-  applicability preflight, then the output gate on every draft.
-- OUTPUT: each brief and approval request is written only after its R-17 audit
-  record (`AuditTrail.perform`). Nothing is sent; an approval request waits for
-  a named human (`python -m agent.feedback.decide`).
-- FEEDBACK: kill criteria are checked against the run's metrics; tripping one
-  engages the kill switch.
+- INPUT: the motion and every playbook must validate; a playbook that is not
+  active, or whose kill switch is engaged, is skipped. Adapter failures go to
+  the error log.
+- PROCESSING: ICP filter (excluded and watch-list companies are never
+  enriched or contacted), the applicability preflight, title routing (an
+  audited decision), then the output gate on every draft.
+- OUTPUT: the brief and its approval request are written together, only after
+  their R-17 record. The request goes to the named iTmethods account owner,
+  never to the prospect (A-043). Nothing is sent.
+- FEEDBACK: each playbook's quality kill criteria are checked after the run.
 """
 
 from __future__ import annotations
@@ -20,7 +26,6 @@ import argparse
 import json
 import sys
 import uuid
-from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,14 +41,14 @@ from agent.output.writer import RunPaths, approval_path, brief_path, write_json,
 from agent.processing import preflight as pf
 from agent.processing.brief import BriefContext, ProviderError, get_provider
 from agent.processing.checks import check_brief
-from agent.processing.icp import HOLD, INCLUDE, Icp, IcpDecision
+from agent.processing.icp import HOLD, INCLUDE, WATCH, Icp, IcpDecision
 from agent.processing.routing import route
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class RunRefused(Exception):
-    """The run did not start: invalid playbook, inactive motion, or kill switch engaged."""
+    """The run did not start: invalid motion or playbook, or unreadable inputs."""
 
 
 def _load_inputs(root: Path) -> dict:
@@ -58,73 +63,82 @@ def _load_inputs(root: Path) -> dict:
     }
 
 
-def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, provider=None,
-        inputs: dict | None = None, sink=None) -> dict:
+def _trail(sink, gov: dict, run_id: str, errors: ErrorLog, *, pid: str, version: str) -> AuditTrail:
+    return AuditTrail(sink, AGENT_ID, __version__, gov["principal"], pid, version, run_id, errors,
+                      gov.get("required_for", "all_segments"))
+
+
+def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | None = None, root: Path = ROOT,
+        provider=None, inputs: dict | None = None, sink=None) -> dict:
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
     paths = RunPaths(Path(out_dir), run_id)
     errors = ErrorLog(paths.errors, run_id)
+    playbooks_dir = Path(playbooks_dir) if playbooks_dir else Path(motion_path).resolve().parent.parent
 
     # ---- INPUT gate -------------------------------------------------------
     try:
         io = inputs or _load_inputs(root)
-        pb = pbmod.load(playbook_path)
         icp: Icp = io["icp"]
-        problems = pbmod.validate(
-            pb, fs_segments={k for k, v in icp.raw["segments"].items() if v.get("fs")},
-            claim_ids={c["id"] for c in io["claims"]}, implemented_triggers=io["feed"].implemented_ids())
-    except (InputError, pbmod.PlaybookError, OSError, KeyError, json.JSONDecodeError) as exc:
-        errors.record("input", exc, context={"playbook": str(playbook_path)})
+        motion = pbmod.load(motion_path)
+        problems = pbmod.validate_motion(motion)
+        playbooks = []
+        if not problems:
+            kw = dict(fs_segments={k for k, v in icp.raw["segments"].items() if v.get("fs")},
+                      claim_ids={c["id"] for c in io["claims"]}, implemented_triggers=io["feed"].implemented_ids())
+            for pid in motion["playbooks"]:
+                path = trusted.playbook_file(pid, playbooks_dir)
+                pb = pbmod.load(path)
+                problems += [f"{pid}: {p}" for p in pbmod.validate(pb, **kw)]
+                if pb.get("playbook_id") != pid:
+                    problems.append(f"{path.name} declares playbook_id {pb.get('playbook_id')!r}")
+                playbooks.append((pb, trusted.sha256(path)))
+    except (InputError, pbmod.PlaybookError, trusted.Untrusted, OSError, KeyError, json.JSONDecodeError) as exc:
+        errors.record("input", exc, context={"motion": str(motion_path)})
         raise RunRefused(f"inputs could not be loaded: {exc}") from exc
     if problems:
-        errors.record("input.playbook", "playbook invalid: " + "; ".join(problems), context={"playbook": str(playbook_path)})
-        raise RunRefused("playbook invalid:\n  - " + "\n  - ".join(problems))
-    if pb.get("status", "active") != "active":
-        raise RunRefused(f"playbook {pb['playbook_id']} is {pb['status']}, not active")
-    killed = kill_switch.engaged(paths.state, pb["playbook_id"])
-    if killed:
-        errors.record("input.kill_switch", f"run refused: kill switch engaged by {killed['by']}: {killed['reason']}")
-        raise RunRefused(f"kill switch engaged by {killed['by']} at {killed['at']}: {killed['reason']}")
+        errors.record("input.playbook", "invalid: " + "; ".join(problems), context={"motion": str(motion_path)})
+        raise RunRefused("motion or playbook invalid:\n  - " + "\n  - ".join(problems))
 
-    principal = pb["approval"]["principal"]
-    approver = pb["approval"]["approvers"][0]
-    trail = AuditTrail(sink or JsonlAuditSink(paths.audit), AGENT_ID, __version__, principal, pb["playbook_id"],
-                       pb["version"], run_id, errors, pb["audit"]["required_for"])
+    sink = sink or JsonlAuditSink(paths.audit)
+    motion_trail = _trail(sink, motion, run_id, errors, pid=motion["motion_id"], version=motion["version"])
     provider = provider or get_provider()
-    summary = {"run_id": run_id, "playbook": {"id": pb["playbook_id"], "version": pb["version"]},
-               "playbook_sha256": trusted.sha256(Path(playbook_path)),
-               "provider": provider.name, "accounts": {}, "plays": [], "outputs": [], "kill_switch": None}
-    counts = {"audit_blocked": 0, "drafted": 0, "gate_failed": 0, "draft_failed": 0, "held": 0}
+    summary = {"run_id": run_id, "motion": {"id": motion["motion_id"], "version": motion["version"]},
+               "provider": provider.name, "accounts": {}, "playbooks": {}, "outputs": [], "watch_list": []}
+    live = {pb["audience"]["segment"]: (pb, sha) for pb, sha in playbooks
+            if pb["trigger_status"] == "implemented" and pb.get("status", "active") == "active"
+            and not kill_switch.engaged(paths.state, pb["playbook_id"])}
 
-    # ---- PROCESSING 1: ICP filter over the motion's account list ------------------------------
+    # ---- PROCESSING 1: ICP filter over the motion's account list --------------------------------
     try:
         accounts = io["accounts"].list_accounts()
     except InputError as exc:
         errors.record("input.accounts", exc)
         raise RunRefused(f"account source failed: {exc}") from exc
-    live_segments = {p["audience"]["segment"] for p in pb["plays"] if p["status"] == "implemented"}
     included: list[tuple] = []
+    motion_blocked = 0
     for acct in accounts:
         fs = icp.is_fs(acct)
         entry = summary["accounts"].setdefault(acct.id, {"name": acct.name, "segment": acct.segment, "fs": fs})
         try:
             decision = icp.prescreen(acct)
             enrichment = Enrichment.empty(acct.id)
-            if decision is None and acct.segment not in live_segments:
-                # In profile on firmographics, but its play is not implemented: no enrichment, no brief.
-                decision = IcpDecision("no_implemented_play", fs, [f"no implemented play for segment '{acct.segment}'"])
-            if decision is None:  # only in-profile companies with a live play are enriched
+            if decision is None and acct.segment not in live:
+                # In profile on firmographics, but no live playbook for it: no enrichment, no brief.
+                decision = IcpDecision("no_live_playbook", fs, [f"no active playbook with an implemented trigger for '{acct.segment}'"])
+            if decision is None:  # only in-profile companies with a live playbook are enriched
                 fetched = io["enrichment"].enrich(acct.id)
-                enrichment = trail.perform(
+                enrichment = motion_trail.perform(
                     action="enrich", object_id=acct.system_id, fs=fs, commit=lambda f=fetched: f,
                     purpose=f"Attach enrichment to {acct.name} to test the first Reign motion ICP criteria.",
                     sources=[fetched.source or f"clay:row/{acct.id}"])
                 decision = icp.evaluate(acct, enrichment)
-            trail.perform(action="score", object_id=acct.system_id, fs=fs, commit=lambda: None,
-                          purpose=f"Record the ICP decision '{decision.decision}' for {acct.name} in the first Reign motion.",
-                          sources=[acct.system_id] + ([enrichment.source] if enrichment.source else []),
-                          detail={"decision": decision.decision, "reasons": decision.reasons, "flags": decision.flags})
+            # Exclusion, hold and watch are our decisions about the account: audited as a score (A-024).
+            motion_trail.perform(action="score", object_id=acct.system_id, fs=fs, commit=lambda: None,
+                                 purpose=f"Record the ICP decision '{decision.decision}' for {acct.name} in the first Reign motion.",
+                                 sources=[acct.system_id] + ([enrichment.source] if enrichment.source else []),
+                                 detail={"decision": decision.decision, "reasons": decision.reasons, "flags": decision.flags})
         except AuditBlocked as exc:
-            counts["audit_blocked"] += 1
+            motion_blocked += 1
             entry.update(status="audit_blocked", reasons=[str(exc)])
             continue
         except InputError as exc:
@@ -134,53 +148,58 @@ def run(playbook_path: str | Path, out_dir: str | Path, *, root: Path = ROOT, pr
         entry.update(status=decision.decision, reasons=decision.reasons, flags=decision.flags)
         if decision.decision == INCLUDE:
             included.append((acct, enrichment, decision))
-        elif decision.decision == HOLD:
-            counts["held"] += 1
+        elif decision.decision == WATCH:  # noticed and logged, never contacted (A-039, A-040)
+            summary["watch_list"].append({"account": acct.id, "name": acct.name, "reasons": decision.reasons})
 
-    # ---- PROCESSING 2 + OUTPUT: each play ------------------------------------------------------
+    # ---- PROCESSING 2 + OUTPUT: each playbook -----------------------------------------------------
     claims_by_id = {c["id"]: c for c in io["claims"]}
-    for play in pb["plays"]:
-        record = {"play_id": play["play_id"], "status": play["status"], "trigger": play["trigger"]["id"]}
-        summary["plays"].append(record)
-        if play["status"] != "implemented":
-            record["reason"] = play.get("not_implemented_reason")
+    for pb, sha in playbooks:
+        pid = pb["playbook_id"]
+        rec = summary["playbooks"][pid] = {"version": pb["version"], "trigger": pb["trigger"]["id"],
+                                           "channel": pb["channel"], "trigger_status": pb["trigger_status"]}
+        if pb["trigger_status"] != "implemented":
+            rec["reason"] = pb.get("trigger_not_implemented_reason")
             continue
-        trigger = io["feed"].get(play["trigger"]["id"])
-        targets = [t for t in included if t[0].segment == play["audience"]["segment"]]  # no volume cap (A-037)
-        record["targets"] = [a.id for a, _, _ in targets]
-        for acct, enrichment, decision in targets:
-            _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, provider, trail,
-                       errors, paths, approver, summary, counts)
+        killed = kill_switch.engaged(paths.state, pid)
+        if killed or pb.get("status", "active") != "active":
+            rec["skipped"] = f"kill switch engaged by {killed['by']}: {killed['reason']}" if killed else f"status {pb['status']}"
+            errors.record("input.kill_switch", f"{pid} skipped: {rec['skipped']}", severity="warning")
+            continue
+        trail = _trail(sink, {**pb["approval"], **pb["audit"]}, run_id, errors, pid=pid, version=pb["version"])
+        counts = {"audit_blocked": 0, "drafted": 0, "gate_failed": 0, "draft_failed": 0, "held": 0}
+        trigger = io["feed"].get(pb["trigger"]["id"])
+        for acct, enrichment, decision in [t for t in included if t[0].segment == pb["audience"]["segment"]]:
+            _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, provider, trail,
+                       errors, paths, summary, counts)
 
-    # ---- FEEDBACK: kill criteria ---------------------------------------------------------------
-    attempted = counts["drafted"] + counts["gate_failed"]
-    metrics = {"audit_blocked": counts["audit_blocked"], "drafted": counts["drafted"],
-               "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
-               "held_ratio": counts["held"] / len(accounts) if accounts else 0.0,
-               **reports.metrics(paths.state, pb["playbook_id"])}
-    summary["metrics"] = {**counts, **metrics}
-    hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
-    if hits:
-        reason = "; ".join(f"{h['id']} ({h['metric']}={h['value']} {h['op']} {h['threshold']})" for h in hits)
-        summary["kill_switch"] = kill_switch.engage(paths.state, pb["playbook_id"], by=pb["owner"],
-                                                    reason=f"kill criteria tripped: {reason}")
-        errors.record("feedback.kill_criteria", f"kill switch engaged: {reason}", severity="warning")
-        try:
-            trail.perform(action="block", object_id=f"playbook:{pb['playbook_id']}", fs=True, commit=lambda: None,
-                          purpose=f"Pause the {pb['playbook_id']} motion because its kill criteria tripped.",
-                          sources=[f"run:{run_id}"], detail={"tripped": hits})
-        except AuditBlocked:
-            pass  # the switch is already engaged; the failure is in the error log
+        # ---- FEEDBACK: quality kill criteria (A-037) --------------------------------------------
+        attempted = counts["drafted"] + counts["gate_failed"]
+        metrics = {**counts, "audit_blocked": counts["audit_blocked"] + motion_blocked,
+                   "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
+                   **reports.metrics(paths.state, pid)}
+        rec["metrics"] = metrics
+        hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
+        if hits:
+            reason = "kill criteria tripped: " + "; ".join(f"{h['id']} ({h['metric']}={h['value']})" for h in hits)
+            rec["kill_switch"] = kill_switch.engage(paths.state, pid, by=pb["owner"], reason=reason)
+            errors.record("feedback.kill_criteria", f"{pid}: {reason}", severity="warning")
+            try:
+                trail.perform(action="block", object_id=f"playbook:{pid}", fs=True, commit=lambda: None,
+                              purpose=f"Pause the {pid} playbook because its quality kill criteria tripped.",
+                              sources=[f"run:{run_id}"], detail={"tripped": hits})
+            except AuditBlocked:
+                pass  # the switch is engaged; the failure is in the error log
 
     write_json(paths.run_dir / "summary.json", summary)
     return summary
 
 
-def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, provider, trail, errors, paths,
-               approver, summary, counts) -> None:
+def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, provider, trail, errors, paths,
+               summary, counts) -> None:
     entry = summary["accounts"][acct.id]
-    result = pf.check(trigger, acct, enrichment, play)
-    entry.update(preflight=result.status, applicability=result.applicability, preflight_reasons=result.reasons)
+    result = pf.check(trigger, acct, enrichment, pb)
+    entry.update(playbook=pb["playbook_id"], preflight=result.status, applicability=result.applicability,
+                 preflight_reasons=result.reasons)
     if result.status != pf.READY:
         try:
             trail.perform(action="hold", object_id=acct.system_id, fs=decision.fs, commit=lambda: None,
@@ -201,16 +220,26 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
         errors.record("input.contacts", exc, context={"account": acct.id})
         entry["status"] = "input_error"
         return
-    routing = play.get("routing", {})
+    routing = pb.get("routing", {})
     lanes = routing.get("lanes", {})
     routed, skipped = route(contacts, lanes, routing.get("do_not_route", []), list(lanes))
+    try:  # routing into lanes is our decision about people at the account (A-024)
+        trail.perform(action="route", object_id=acct.system_id, fs=decision.fs, commit=lambda: None,
+                      purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
+                      sources=[c.system_id for c in contacts] or [acct.system_id],
+                      detail={"lanes": {l: [c.system_id for c in cs] for l, cs in routed.items()},
+                              "not_routed": [{"contact": c.system_id, "why": why} for c, why in skipped]})
+    except AuditBlocked as exc:
+        counts["audit_blocked"] += 1
+        entry.update(status="audit_blocked", reasons=[str(exc)])
+        return
     flags = list(decision.flags) + [f"{c.name} ({c.title}) not routed: {why}" for c, why in skipped]
-    claims = [claims_by_id[cid] for cid in play.get("claims", [])]
-    ctx = BriefContext(trigger, result, acct, enrichment, routed, claims, approver, flags)
+    claims = [claims_by_id[cid] for cid in pb.get("claims", [])]
+    ctx = BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, flags)
 
     try:
         text = provider.draft(ctx)
-    except ProviderError as exc:  # A-033 (proposed): fail the account, do not fall back silently
+    except ProviderError as exc:  # A-033 (proposed): the account fails; no silent fallback
         errors.record("processing.draft", exc, context={"account": acct.id, "provider": provider.name})
         counts["draft_failed"] += 1
         entry["status"] = "draft_failed"
@@ -223,16 +252,17 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
         entry.update(status="gate_failed", gate_problems=problems)
         return
 
-    sources = sorted(ctx.allowed_urls() | {acct.system_id})
     bpath, apath = brief_path(paths, acct.system_id), approval_path(paths, acct.system_id)
     request = {
         "request_id": uuid.uuid4().hex, "run_id": summary["run_id"], "status": "pending",
-        "playbook": summary["playbook"], "playbook_sha256": summary["playbook_sha256"], "play_id": play["play_id"],
-        "account": {"id": acct.system_id, "name": acct.name}, "trigger": trigger.id, "channel": play["channel"],
+        "playbook": {"id": pb["playbook_id"], "version": pb["version"]}, "playbook_sha256": sha,
+        "account": {"id": acct.system_id, "name": acct.name}, "trigger": trigger.id, "channel": pb["channel"],
+        "route_to": {"account_owner": acct.owner},
         "brief": str(bpath), "send": False, "blockable": True, "sender": pb["approval"].get("sender", "none"),
-        "recipients": {lane: [c.system_id for c in cs] for lane, cs in routed.items()},
-        "note": "Nothing has been sent. A named approver decides with python3 -m agent.feedback.decide; "
-                "approvers come from the playbook, never from this file.",
+        "suggested_recipients_in_existing_relationship": {l: [c.system_id for c in cs] for l, cs in routed.items()},
+        "note": ("Nothing has been sent and the bank has not been contacted. The named account owner decides "
+                 "whether to share this brief in the existing relationship (A-043), with "
+                 "python3 -m agent.feedback.decide. Approvers come from the playbook and HubSpot, never from this file."),
     }
 
     def commit():
@@ -245,9 +275,10 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
             raise
 
     try:
-        trail.perform(action="create", object_id=acct.system_id, fs=decision.fs, sources=sources,
-                      purpose=(f"Draft the {trigger.title.split(':')[0]} brief for {acct.name} and open an approval "
-                               f"request so {approver} decides before any send."),
+        trail.perform(action="create", object_id=acct.system_id, fs=decision.fs,
+                      sources=sorted(ctx.allowed_urls() | {acct.system_id}),
+                      purpose=(f"Draft the {trigger.title.split(':')[0]} brief for {acct.name} and route it to the "
+                               f"account owner {acct.owner}, who decides before anything is shared."),
                       commit=commit, detail={"brief": str(bpath), "approval_request": str(apath),
                                              "request_id": request["request_id"], "provider": provider.name})
     except AuditBlocked as exc:
@@ -259,31 +290,32 @@ def _brief_one(acct, enrichment, decision, play, trigger, pb, io, claims_by_id, 
         entry.update(status="write_failed", reasons=[str(exc)])
         return
     counts["drafted"] += 1
-    entry.update(status="brief_pending_approval", brief=str(bpath), approval_request=str(apath))
+    entry.update(status="brief_pending_owner_decision", brief=str(bpath), approval_request=str(apath))
     summary["outputs"].append({"account": acct.id, "brief": str(bpath), "approval_request": str(apath)})
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Run a Campaign Manager playbook (nothing is ever sent).")
-    ap.add_argument("--playbook-id", default="reign-first-motion", help="a playbook in playbooks/")
+    ap = argparse.ArgumentParser(description="Run a motion of Campaign Manager playbooks (nothing is ever sent).")
+    ap.add_argument("--motion", default="reign-first-motion", help="a motion in playbooks/motions/")
     args = ap.parse_args(argv)
     try:
-        # Output root is fixed so the audit trail and kill switch cannot be redirected (D-020, S-2).
-        s = run(trusted.playbook_file(args.playbook_id), ROOT / "out")
+        # Output root is fixed so the audit trail and kill switches cannot be redirected (D-019).
+        s = run(trusted.motion_file(args.motion), ROOT / "out")
     except (RunRefused, trusted.Untrusted) as exc:
         print(f"RUN REFUSED: {exc}", file=sys.stderr)
         return 2
-    print(f"run {s['run_id']}  playbook {s['playbook']['id']}@{s['playbook']['version']}  provider {s['provider']}")
+    print(f"run {s['run_id']}  motion {s['motion']['id']}@{s['motion']['version']}  provider {s['provider']}")
     for aid, a in s["accounts"].items():
         why = "; ".join(a.get("preflight_reasons") or a.get("reasons") or [])
-        print(f"  {aid}  {a.get('status', '?'):<24} {a['name']}  {why}")
-    for p in s["plays"]:
-        print(f"  play {p['play_id']}: {p['status']}" + (f" ({p['reason']})" if p.get("reason") else ""))
+        print(f"  {aid}  {a.get('status', '?'):<30} {a['name']}  {why}")
+    for pid, p in s["playbooks"].items():
+        extra = p.get("reason") or p.get("skipped") or json.dumps(p.get("metrics", {}))
+        print(f"  playbook {pid}: trigger {p['trigger']} {p['trigger_status']}  {extra}")
     for o in s["outputs"]:
         print(f"  brief {o['brief']}\n  approval request {o['approval_request']}")
-    print(f"  metrics {json.dumps(s['metrics'])}")
-    if s["kill_switch"]:
-        print(f"  KILL SWITCH ENGAGED: {s['kill_switch']['reason']}")
+    engaged = [pid for pid, p in s["playbooks"].items() if p.get("kill_switch")]
+    if engaged:
+        print(f"  KILL SWITCH ENGAGED: {', '.join(engaged)}")
         return 3
     return 0
 

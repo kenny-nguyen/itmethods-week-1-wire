@@ -13,7 +13,8 @@ from agent.run_playbook import RunRefused, run
 from tests.helpers import tempdir
 
 ROOT = Path(__file__).resolve().parent.parent
-PLAYBOOK = ROOT / "playbooks/reign-first-motion.jsonc"
+MOTION = ROOT / "playbooks/motions/reign-first-motion.jsonc"
+BANK = "bank-sr26-2"
 
 
 def jsonl(path: Path) -> list[dict]:
@@ -21,15 +22,18 @@ def jsonl(path: Path) -> list[dict]:
 
 
 def variant(tmp: Path, **changes) -> Path:
-    pb = pbmod.load(PLAYBOOK)
+    """Copy playbooks/ into tmp, edit the bank playbook, return the copied motion path."""
+    import shutil
+    shutil.copytree(ROOT / "playbooks", tmp / "playbooks")
+    path = tmp / "playbooks" / f"{BANK}.jsonc"
+    pb = pbmod.load(path)
     for dotted, value in changes.items():
         target, *keys = pb, *dotted.split("__")
         for k in keys[:-1]:
             target = target[int(k)] if isinstance(target, list) else target[k]
         target[keys[-1]] = value
-    path = tmp / "playbook.jsonc"
     path.write_text(json.dumps(pb))
-    return path
+    return tmp / "playbooks/motions/reign-first-motion.jsonc"
 
 
 class FailingSink:
@@ -41,7 +45,7 @@ class SloppyProvider(TemplateProvider):
     name = "sloppy"
 
     def draft(self, ctx):
-        return super().draft(ctx).replace("## Why now\n", "## Why now\n- Reign makes you compliant [P-GATEWAY].\n")
+        return super().draft(ctx).replace("## What changed\n", "## What changed\n- Reign makes you compliant [P-GATEWAY].\n")
 
 
 class BrokenProvider:
@@ -55,14 +59,21 @@ class PipelineTests(unittest.TestCase):
     def test_end_to_end_default_playbook(self):
         with tempdir() as d:
             out = Path(d)
-            s = run(PLAYBOOK, out, provider=TemplateProvider())
-            self.assertEqual(s["metrics"]["drafted"], 1)
-            self.assertEqual(s["accounts"]["hs-1002"]["status"], "brief_pending_approval")
-            self.assertEqual(s["accounts"]["hs-1001"]["status"], "preflight_hold")  # A-025 standing reading
+            s = run(MOTION, out, provider=TemplateProvider())
+            bank = s["playbooks"][BANK]
+            self.assertEqual(bank["metrics"]["drafted"], 2)
+            self.assertIsNone(bank.get("kill_switch"))
+            for aid in ("hs-1001", "hs-1002"):  # A-044: both banks get the structured brief
+                self.assertEqual(s["accounts"][aid]["status"], "brief_pending_owner_decision")
             self.assertEqual(s["accounts"]["hs-1006"]["status"], "exclude")          # AI start-up filed as fintech
-            self.assertIsNone(s["kill_switch"])
+            self.assertEqual(s["accounts"]["hs-1007"]["status"], "watch")            # A-040
+            self.assertEqual([w["account"] for w in s["watch_list"]], ["hs-1007"])
+            for pid in ("biopharma-fda-pccp", "defense-forge-first"):
+                self.assertEqual(s["playbooks"][pid]["trigger_status"], "not_implemented")
+                self.assertTrue(s["playbooks"][pid]["reason"])
             req = json.loads(Path(s["outputs"][0]["approval_request"]).read_text())
             self.assertEqual((req["status"], req["send"], req["sender"]), ("pending", False, "none"))
+            self.assertEqual(req["route_to"], {"account_owner": "Kenny Nguyen"})  # A-043
             audit = jsonl(out / "audit.jsonl")
             self.assertTrue(audit)
             self.assertEqual([r for r in audit if validate_record(r)], [], "every audit record satisfies R-17")
@@ -70,29 +81,33 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(enriched, {"hubspot:company/hs-1001", "hubspot:company/hs-1002"},
                              "only in-profile accounts with a live play are enriched")
             creates = [r for r in audit if r["action"] == "create"]
-            self.assertEqual(len(creates), 1)  # brief and approval request land together (Q-005, C1-a)
-            self.assertIn("approval_request", creates[0]["detail"])
+            self.assertEqual(len(creates), 2)  # one per bank: brief and request land together (Q-005, C1-a)
+            self.assertTrue(all("approval_request" in r["detail"] for r in creates))
+            self.assertEqual(len([r for r in audit if r["action"] == "route"]), 2)  # A-024
+            self.assertEqual({r["playbook"]["id"] for r in audit if r["action"] == "create"}, {BANK})
             self.assertTrue(all(r["send"] is False for r in audit if r["action"] != "approve"))
 
     def test_audit_store_down_blocks_everything_and_trips_kill_switch(self):
         with tempdir() as d:
             out = Path(d)
-            s = run(PLAYBOOK, out, provider=TemplateProvider(), sink=FailingSink())
-            self.assertEqual(s["metrics"]["drafted"], 0)
-            self.assertGreater(s["metrics"]["audit_blocked"], 0)
+            s = run(MOTION, out, provider=TemplateProvider(), sink=FailingSink())
+            self.assertEqual(s["playbooks"][BANK]["metrics"]["drafted"], 0)
+            self.assertGreater(s["playbooks"][BANK]["metrics"]["audit_blocked"], 0)
             self.assertFalse((out / "runs" / s["run_id"] / "briefs").exists(), "no brief without an audit record")
-            self.assertIsNotNone(s["kill_switch"])
+            self.assertIsNotNone(s["playbooks"][BANK]["kill_switch"])
             self.assertTrue(any(e["stage"] == "governance.audit" for e in jsonl(out / "errors.jsonl")))
-            with self.assertRaises(RunRefused):
-                run(PLAYBOOK, out, provider=TemplateProvider())
+            again = run(MOTION, out, provider=TemplateProvider())
+            self.assertIn("kill switch", again["playbooks"][BANK]["skipped"])
 
-    def test_manual_kill_switch_refuses_run(self):
+    def test_manual_kill_switch_skips_the_playbook(self):
         with tempdir() as d:
             out = Path(d)
-            kill_switch.engage(out / "state", "reign-first-motion", by="Kenny Nguyen", reason="drafts read generic")
-            with self.assertRaises(RunRefused):
-                run(PLAYBOOK, out, provider=TemplateProvider())
-            self.assertFalse((out / "audit.jsonl").exists(), "a refused run touches no account")
+            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="drafts read generic")
+            s = run(MOTION, out, provider=TemplateProvider())
+            self.assertIn("kill switch", s["playbooks"][BANK]["skipped"])
+            self.assertEqual(s["outputs"], [])
+            self.assertFalse([r for r in jsonl(out / "audit.jsonl") if r["action"] == "enrich"],
+                             "no account is enriched for a stopped playbook")
 
     def test_sending_channel_without_named_approver_is_refused(self):
         with tempdir() as d:
@@ -102,29 +117,51 @@ class PipelineTests(unittest.TestCase):
             self.assertIn("named humans", str(cm.exception))
             self.assertEqual(jsonl(tmp / "out/errors.jsonl")[0]["stage"], "input.playbook")
 
-    def test_caveat_setting_briefs_the_canadian_bank(self):
+    def test_canadian_bank_gets_the_structured_brief(self):  # A-044
         with tempdir() as d:
-            tmp = Path(d)
-            s = run(variant(tmp, plays__0__unconfirmed_applicability="brief_with_caveat"), tmp / "out",
-                    provider=TemplateProvider())
+            s = run(MOTION, Path(d), provider=TemplateProvider())
             text = Path(s["accounts"]["hs-1001"]["brief"]).read_text()
             self.assertIn("SR 26-2 applicability requires confirmation", text)
             self.assertIn("OSFI Guideline E-23", text)
+            self.assertIn("## What depends on structure (confirm)", text)
+            self.assertIn("DORA", text)
             self.assertNotIn("Chief Information Security Officer [", text, "CISO is on the do-not-route list")
+
+    def test_hold_setting_holds_the_canadian_bank(self):  # A-025 general case
+        with tempdir() as d:
+            tmp = Path(d)
+            s = run(variant(tmp, unconfirmed_applicability="hold"), tmp / "out", provider=TemplateProvider())
+            self.assertEqual(s["accounts"]["hs-1001"]["status"], "preflight_hold")
+
+    def test_account_without_owner_is_held(self):  # A-043
+        import agent.run_playbook as rp
+        from dataclasses import replace as dc_replace
+        io = rp._load_inputs(ROOT)
+
+        class NoOwner:
+            def list_accounts(self):
+                return [dc_replace(a, owner=None) for a in io["accounts"].list_accounts()]
+
+        with tempdir() as d:
+            s = run(MOTION, Path(d), provider=TemplateProvider(), inputs={**io, "accounts": NoOwner()})
+            self.assertEqual(s["accounts"]["hs-1002"]["status"], "preflight_hold")
+            self.assertEqual(s["outputs"], [])
 
     def test_sloppy_drafts_fail_the_gate_and_trip_the_kill_switch(self):
         with tempdir() as d:
             out = Path(d)
-            s = run(PLAYBOOK, out, provider=SloppyProvider())
+            s = run(MOTION, out, provider=SloppyProvider())
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "gate_failed")
-            self.assertEqual(s["metrics"]["drafted"], 0)
-            self.assertIn("gate-failures", s["kill_switch"]["reason"])
+            self.assertEqual(s["playbooks"][BANK]["metrics"]["drafted"], 0)
+            self.assertIn("gate-failures", s["playbooks"][BANK]["kill_switch"]["reason"])
 
     def test_provider_outage_fails_the_account(self):
         with tempdir() as d:
-            s = run(PLAYBOOK, Path(d), provider=BrokenProvider())
+            s = run(MOTION, Path(d), provider=BrokenProvider())
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "draft_failed")
-            self.assertTrue(any(e["stage"] == "processing.draft" for e in jsonl(Path(d) / "errors.jsonl")))
+            err = [e for e in jsonl(Path(d) / "errors.jsonl") if e["stage"] == "processing.draft"]
+            self.assertTrue(err)
+            self.assertIn("Recovery:", err[0]["message"], "A-033: failures name the fix")
 
     def test_no_volume_cap_allowed(self):  # operator decision A-037
         with tempdir() as d:
@@ -140,19 +177,19 @@ class PipelineTests(unittest.TestCase):
         try:
             with tempdir() as d:
                 out = Path(d)
-                s = run(PLAYBOOK, out, provider=TemplateProvider())
+                s = run(MOTION, out, provider=TemplateProvider())
                 self.assertEqual(s["accounts"]["hs-1002"]["status"], "write_failed")
                 self.assertEqual(list((out / "runs" / s["run_id"]).glob("briefs/*.md")), [])
                 failed = [r for r in jsonl(out / "audit.jsonl") if r["detail"].get("outcome") == "failed"]
-                self.assertEqual(len(failed), 1, "the audit trail says the create did not complete")
+                self.assertEqual(len(failed), 2, "the audit trail says each create did not complete")
         finally:
             rp.write_json = original
 
 
 class DecisionTests(unittest.TestCase):
     def _run(self, out):
-        s = run(PLAYBOOK, out, provider=TemplateProvider())
-        return Path(s["outputs"][0]["approval_request"])
+        s = run(MOTION, out, provider=TemplateProvider())
+        return Path(next(o["approval_request"] for o in s["outputs"] if o["account"] == "hs-1002"))
 
     def test_only_a_named_approver_can_approve(self):
         with tempdir() as d:
@@ -172,7 +209,7 @@ class DecisionTests(unittest.TestCase):
         with tempdir() as d:
             out = Path(d)
             req = self._run(out)
-            kill_switch.engage(out / "state", "reign-first-motion", by="Kenny Nguyen", reason="stop the motion")
+            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="stop the motion")
             with self.assertRaises(DecisionRefused):
                 decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.", out_dir=out)
             self.assertEqual(json.loads(req.read_text())["status"], "pending")
@@ -182,7 +219,7 @@ class DecisionTests(unittest.TestCase):
             out = Path(d)
             req = self._run(out)
             decide(req, approver="Kenny Nguyen", approve=False, reason="Reads too generic for a CAE.", out_dir=out)
-            self.assertIsNotNone(kill_switch.engaged(out / "state", "reign-first-motion"))
+            self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
 
     def test_audit_failure_blocks_approval(self):
         with tempdir() as d:

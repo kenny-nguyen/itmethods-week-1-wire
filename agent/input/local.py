@@ -41,7 +41,7 @@ class LocalHubSpotAccounts:
                 description=row.get("description", ""), employees=row.get("employees"),
                 hq_country=row.get("hq_country"), total_assets_usd=row.get("total_assets_usd"),
                 runs_forge=row.get("runs_forge"), briefing_scheduled=bool(row.get("briefing_scheduled")),
-                system="hubspot",
+                system="hubspot", owner=row.get("owner"),
             ))
         return accounts
 
@@ -110,8 +110,10 @@ class LocalRegulatoryFeed:
                 relevance_threshold_total_assets_usd=row.get("relevance_threshold_total_assets_usd"),
                 context_by_jurisdiction={k: _facts(v) for k, v in row.get("context_by_jurisdiction", {}).items()},
                 context_sources=_sources(row.get("context_sources", [])),
+                structural_conditions=tuple(row.get("structural_conditions", [])),
             )
-            for fact in trigger.facts + tuple(f for fs in trigger.context_by_jurisdiction.values() for f in fs):
+            cond = tuple(Fact(c["text"], c["source"]) for c in trigger.structural_conditions)
+            for fact in trigger.facts + cond + tuple(f for fs in trigger.context_by_jurisdiction.values() for f in fs):
                 if trigger.source(fact.source) is None:
                     raise InputError(f"trigger {trigger_id}: fact cites unknown source {fact.source!r}")
             return trigger

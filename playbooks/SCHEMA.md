@@ -1,64 +1,69 @@
 # Campaign Manager playbook schema
 
-The Campaign Manager stub gave eight fields and said "Infer the rest. Mark guesses." This page lists every field: where it came from, why it is useful, and the register row that proposes it when it is a guess. Guessed rows are `Proposed - awaiting operator` in `AMBIGUITY-REGISTER.md`. The loader and validator are in `agent/input/playbook.py`; the first-motion playbook is `reign-first-motion.jsonc`.
+The Campaign Manager stub gave eight fields and said "Infer the rest. Mark guesses." Operator decision A-041: each playbook file keeps the stub's shape exactly, with one audience, one trigger and one channel. A play is one buyer, one trigger and one channel. A small motion file lists the playbooks that make up a motion.
 
-Files are JSONC (JSON with `//` comments) so each guess can be marked where it sits.
+Every field below says where it came from (the stub, an operator decision, or a proposal still awaiting the operator), why it is useful, and its register row in `AMBIGUITY-REGISTER.md`. Files are JSONC (JSON with `//` comments), so each guess is marked where it sits. The loader and validator are in `agent/input/playbook.py`.
 
-## Top level
+| File | What it is |
+|---|---|
+| `motions/reign-first-motion.jsonc` | The first Reign motion: owner, principal, and the three playbooks below. |
+| `bank-sr26-2.jsonc` | Bank buyer, SR 26-2 trigger, channel `briefing`. Implemented. |
+| `biopharma-fda-pccp.jsonc` | Biopharma quality buyer, FDA PCCP trigger. Trigger not implemented yet, with the reason. |
+| `defense-forge-first.jsonc` | Defense supplier, Forge first. Trigger not implemented yet, with the reason. |
+
+## Playbook fields
 
 | Field | Origin | Why it is useful | Row |
 |---|---|---|---|
-| `playbook_id` | stub | Names the motion in every audit record. | - |
-| `version`, `supersedes` | guess | The stub says versioning is unknown. An auditor needs to know which rules were in force for a given touch, so every audit record carries id and version. | A-016 |
-| `status` | guess | `active`, `paused` or `retired`. Lets the CRO (chief revenue officer) stop a motion without deleting its history. | A-034 |
-| `owner` | guess | One accountable human for the motion. | A-026 |
+| `playbook_id` | stub | Names the playbook in every audit record and kill switch. Lowercase letters, digits and hyphens only. | D-020 |
 | `product` | stub | `reign` or `forge`. | - |
-| `plays[]` | guess | The stub has one `audience`, `trigger`, `channel`. One playbook covering several buyers needs a list; each play keeps the stub's shapes unchanged, so one trigger per play and every audit record is tied to one reason. A playbook with one play is the stub's shape. | A-030 (A-017 stands until answered) |
+| `audience.icp_id`, `audience.segment` | stub | Which ICP version and segment the playbook targets. | - |
+| `trigger.type`, `trigger.id` | stub | `regulatory`, `event` or `manual`, and the trigger record in the regulator feed. | - |
+| `channel` | stub | `briefing`, `sequence`, `slack` or `unknown`. `briefing` is the booked Executive Assurance Briefing meeting; the forwardable brief is the document that earns it. | A-042 (operator) |
 | `approval` | stub (empty object) | See below. | - |
 | `kill_criteria[]` | stub (empty list) | See below. | - |
-| (no volume cap) | operator decision | There is no per-run account cap; the validator rejects a `limits` block. Precision comes from the ICP, the preflight and the gate, and the stop button is quality-based. | A-037 (reversed A-010) |
 | `audit` | stub (empty object) | See below. | - |
-
-## Each play
-
-| Field | Origin | Why it is useful | Row |
-|---|---|---|---|
-| `play_id` | guess | Names the play in run summaries and approval requests. | A-030 |
-| `status`, `not_implemented_reason` | guess | Buyers can be encoded before their trigger is ready, with the reason visible, instead of silently missing. | A-030 |
-| `audience.icp_id`, `audience.segment` | stub | Which ICP version and segment the play targets. | - |
-| `trigger.type`, `trigger.id` | stub | `regulatory`, `event` or `manual`, and the trigger record in the feed. | - |
-| `channel` | stub | `briefing`, `sequence`, `slack` or `unknown`. | A-018 (briefing) |
-| `lead_product` | guess | Lets the defense play lead with Forge while the motion is Reign. | A-023 |
-| `unconfirmed_applicability` | guess | `hold` or `brief_with_caveat`: what happens when the preflight cannot confirm the rule applies. | A-025, A-028 |
-| `outbound_requires_briefing` | guess | Enforces the CEO's "no bank outbound until a briefing is booked, except on a regulatory trigger". | A-009 |
-| `claims[]` | guess | The approved product claim ids this play may use (`docs/research/product-claims.json`). | A-029 |
-| `routing.lanes`, `routing.do_not_route` | guess | Routes one brief to risk and engineering by title without asking the buyer to pick; keeps it out of a CISO inbox. | A-011, A-032 |
+| `version`, `supersedes` | operator | Which rules were in force for a given touch; every audit record carries id and version. | A-016 |
+| `status` | operator | `active`, `paused` or `retired`, so the CRO (chief revenue officer) can stop a playbook without deleting its history. | A-034 |
+| `owner` | operator | The accountable human; in the demo, the candidate. | A-026 |
+| `trigger_status`, `trigger_not_implemented_reason` | operator | A buyer can be encoded before its trigger is ready, with the reason visible. | A-041 |
+| `lead_product` | operator | Lets the defense playbook lead with Forge while the motion is Reign ("a natural ascension": one solution creates the next problem the second solves). | A-023 |
+| `handoff.route_to` | operator | `account_owner`: on a regulatory trigger the brief goes to the named iTmethods account owner, never to the bank. | A-043 |
+| `handoff.cold_outreach_until_briefing_booked` | operator | `false`: no new cold outreach to the buyer until a briefing is booked. | A-043 |
+| `unconfirmed_applicability` | operator | `hold` (general case) or `structured_brief` (the SR 26-2 brief: what changed, what is certain, what depends on structure marked "Confirm", next step; never says a rule applies). | A-025, A-044 |
+| `claims[]` | operator | Approved product claim ids (`docs/research/product-claims.json`); sentences about products must quote them word for word. | A-029 |
+| `routing.lanes` | operator | Suggests risk and engineering contacts by title, without asking the buyer to pick. | A-011 |
+| `routing.do_not_route` | operator | Titles never suggested, starting with the CISO. | A-032 |
 
 ## `approval`
 
 | Field | Origin | Why it is useful | Row |
 |---|---|---|---|
-| (rule) | stub | "`approval` must name a human if `channel` can send." The validator enforces it. | - |
-| `principal` | guess | R-17's "named human who authorized this class of action". Goes on every audit record. | A-026 |
-| `approvers[]` | guess | Who may approve a send. A decision by anyone else is refused. | A-026 |
-| `channels_that_send[]` | guess | Which channels count as sending. `unknown` counts as sending (the strict reading); `slack` is treated as an internal notification. | A-018, A-035 |
-| `sender` | guess | `none`: no transport is wired, so an approved request is ready to send, not sent. | A-035 |
+| (rule) | stub | "`approval` must name a human if `channel` can send." Enforced by the validator. | - |
+| `principal` | operator | R-17's "named human who authorized this class of action". On every audit record. | A-026 |
+| `approvers[]` | operator | Who may approve. For a playbook routed to the account owner, the approver must also be that account's owner in HubSpot. | A-026, A-043 |
+| `channels_that_send[]` | operator | `briefing` (booking reaches a person), `sequence` and `unknown` count as sending; `slack` is internal. | A-035, A-042 |
+| `sender` | operator | `none`: nothing is wired to send; approved means ready to send. | A-035 |
 
 ## `kill_criteria[]`
 
-The stub: "how CRO stops a motion that goes sloppy". Each entry has `id`, `metric`, `op`, `threshold` and `why`. Operator decision A-037: criteria are quality-based only, never a count ceiling. Metrics are computed after every run, every approval decision and every feedback report; if any criterion trips, the kill switch engages and every later run and approval is refused until the playbook owner or an approver clears it (`python3 -m agent.feedback.kill --clear`).
+The stub: "how CRO stops a motion that goes sloppy". Operator decision A-037: quality-based only, never a count ceiling, and no volume cap (a `limits` block is rejected). Each entry has `id`, `metric`, `op`, `threshold` and `why`. Metrics are computed after every run, approval decision and feedback report; if any criterion trips, that playbook's kill switch engages until its owner or an approver clears it.
 
-Metrics available: `audit_blocked` (R-17 blocks in the run), `gate_failed_ratio` (drafts failing the output gate), `rejected_ratio` (rejected over decided approval requests), `complaints` and `wrong_account_reports` (from `python3 -m agent.feedback.report`).
+Metrics: `audit_blocked`, `gate_failed_ratio`, `rejected_ratio` (over decided requests), `complaints`, `wrong_account_reports` (from `python3 -m agent.feedback.report`).
 
 ## `audit`
 
 | Field | Origin | Why it is useful | Row |
 |---|---|---|---|
-| `rule` | stub | "`audit` should satisfy Reign rule R-17 when the audience is FS". Must be `R-17` when any play targets a financial-services segment. | - |
-| `required_for` | guess | `all_segments` (a failed audit write blocks the action everywhere) or `fs_only` (outside financial services a failure is logged as a warning and the action proceeds). | A-007 |
-| `sink` | guess | `jsonl`: an append-only local file standing in for a Reign or HubSpot audit store. | A-008 |
+| `rule` | stub | Must be `R-17` when the audience is financial services. | - |
+| `required_for` | operator | `all_segments`. An audit record is a receipt of what our agent did, not a test the prospect must pass: it never disqualifies a prospect; only our own action stops when the receipt cannot be written. | A-007, A-038 |
+| `sink` | operator | `jsonl`: a local append-only file behind a swappable interface; wiring the real audit store is day-one work. | A-008 |
 
-## Still unknown
+## Motion file
 
-- How Campaign Manager itself stores and serves playbooks.
-- Whether "briefing" also means a calendar booking (A-018 leaves booking out).
+| Field | Why it is useful |
+|---|---|
+| `motion_id`, `version` | Stamped on the audit records of the motion-level ICP pass. |
+| `owner`, `principal` | Named humans for the ICP pass. |
+| `icp` | The ICP file the motion filters with. |
+| `playbooks[]` | Playbook ids, loaded only from this directory. |

@@ -1445,3 +1445,100 @@ Reverses A-028. The Canadian bank brief is structured: what changed, what is cer
 
 </details>
 
+### [D-025] 23:49 · PM · DECISION
+A-012 is decided: the fixture adapters behind swappable interfaces are the operator's own instruction ("meet them where they are"). A-031 to A-035 stay with the operator, and nothing new is built on them. Where code already existed for them, it keeps the reading that takes no action on a prospect, and each stays marked proposed.
+
+<details><summary>Structured fields</summary>
+
+**What:** Pending, not extended: A-031 (unlisted segment held: nobody is contacted), A-032 (CISO on the do-not-route list: nobody is contacted), A-033 (model outage fails the account: no brief), A-034 (playbook `status` field: metadata only), A-035 (no sender: nothing is sent). Also corrected here: product claim P-BANKING had the word "readiness", which the source does not say; removed (see `docs/research/itmethods-product-facts.md`).
+
+**Why:** Supervisor instruction at 23:48 KST under the zero-assumption rule. Removing the existing code would need its own behaviour choice, for example contacting the CISO or falling back silently, which is a bigger assumption than keeping the no-action reading until the operator answers.
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:48:58Z. Register row A-012 now "Decided by operator".
+
+**Assumption:** The no-action reading is the least assumptive placeholder for a pending item.
+
+**Reversal trigger:** The operator answers any of A-031 to A-035; each is one config or playbook value.
+
+**Links:** D-024, A-012, A-031 to A-035
+
+</details>
+
+### [D-026] 23:53 · PM · DECISION
+The operator decided the last five proposals as recommended. The principle behind A-033 is recorded in the operator's words: nothing is worse than a silent failure. Every model failure now says what to do next.
+
+<details><summary>Structured fields</summary>
+
+**What:** Decided: A-031 (an account clearly outside the ICP, or matching an explicit exclude, is dropped from outreach with the reason in the audit log, never silently; an account whose fit is unclear or unknown is held for a human), A-032 (do-not-route list starting with the CISO), A-033 (fail loudly, never fall back silently; every failure names the recovery: retry, run with no key for the template, or check the key and provider), A-034 (playbook status active, paused or retired), A-035 (approved means ready to send; nothing is wired to send; "unknown" counts as able to send; "slack" is internal). New proposed row A-045: the brief word limit (350 words on the forwardable part), which was the agent's own number and had not been registered.
+
+**Why:** Zero-assumption rule. For "what we would do next": wire the real send path behind the blockable approval (A-035). For "do differently": confirm with the CEO and CRO how ICP edge cases should be handled (A-031).
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:52:36Z (23:52 KST). `ProviderError` now appends the recovery options to every message.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-031 to A-035, A-045, D-025
+
+</details>
+
+### [D-027] 23:55 · BUILDER · DECISION
+The playbook is now three files, each exactly in the Campaign Manager stub's shape, plus a small motion file that lists them (A-041). The motion runs the ICP filter once, then each playbook with its own approval, kill criteria and audit. Hospitals go on a watch list, routing is an audited decision, and the brief goes to the named account owner, never to the bank.
+
+<details><summary>Structured fields</summary>
+
+**What:** `playbooks/bank-sr26-2.jsonc`, `biopharma-fda-pccp.jsonc`, `defense-forge-first.jsonc`, `motions/reign-first-motion.jsonc`; `agent/run_playbook.py` rewritten as a motion runner; the validator checks one playbook and the motion; `playbooks/SCHEMA.md` rewritten. ICP: a `watch` outcome (A-039, A-040), "industry unconfirmed" flag (A-006). Audit: `route` added to our audited decisions (A-024). Preflight: no account owner means hold; no cold outreach until a briefing is booked (A-043). Approval: the approver must be the account's owner in HubSpot, read from the fixture adapter, not from the request.
+
+**Why:** Operator decisions D-024 and D-026.
+
+**Evidence:** `python3 -m agent.run_playbook` exit 0: hs-1001 and hs-1002 "brief_pending_owner_decision"; hs-1007 "watch"; hs-1005, hs-1006, hs-1010, hs-1011 "exclude"; hs-1009 "hold"; hs-1003, hs-1004, hs-1008 "no_live_playbook"; biopharma and defense playbooks "not_implemented" with reasons.
+
+**Assumption:** A chipmaker without a recorded export-control problem "may still qualify through the main ICP" (A-039); this build has no semiconductor playbook, so such an account is recorded as `no_live_playbook` and is not enriched to find out.
+
+**Reversal trigger:** A semiconductor playbook is added.
+
+**Links:** A-006, A-024, A-039, A-040, A-041, A-043, D-024, D-026
+
+</details>
+
+### [D-028] 23:55 · BUILDER · DECISION
+The SR 26-2 bank brief is now the structure the operator set (A-044): what changed, what is certain for this account, what depends on its structure with every line marked "Confirm", and a suggested next step. The gate enforces it: applicability wording outside the conditional section fails, and so does an unmarked line inside it.
+
+<details><summary>Structured fields</summary>
+
+**What:** `TemplateProvider` rewritten; the regulator feed gains `structural_conditions` (US Federal Reserve entity, EU entity and DORA) and a DORA source; the gate's required sections, an `APPLIES` check, and a "Confirm" check; three new eval cases ("claims the rule applies", "says in scope", "unmarked structural line").
+
+**Why:** "Never claim a rule applies. Every line sourced." (operator, A-044).
+
+**Evidence:** Sources re-read for this: EUR-Lex returned HTTP 202 twice (an anti-bot page with no regulation text), so DORA is cited from the EIOPA page, which returned 200 and names "Regulation (EU) 2022/2554 ... on digital operational resilience for the financial sector". The OSFI B-13 page does not show an effective date, so the brief does not call B-13 "in force". `python3 -m evals.run_evals`: 42/42. First run of the new template failed my own gate twice: "the iTmethods account owner" named the company without a claim (reworded), and the brief ran 374 words (cut the generic third SR 26-2 fact and folded the caveat into the first "Confirm" line; limit set to 350 on the forwardable part, proposed row A-045).
+
+**Assumption:** Proposed A-045 (word limit).
+
+**Reversal trigger:** The operator sets a different length, or legal wants no conditional "applies to that entity" wording at all.
+
+**Links:** A-044, A-045, D-003
+
+</details>
+
+### [Q-006] 23:55 · BUILDER · PROCESSING-QA
+After the restructure: 74 unit tests and 42 eval cases pass, and the command-line run behaves as the README describes. This is builder self-QA; the restructured code has not yet had an independent pass.
+
+<details><summary>Structured fields</summary>
+
+**What:** PASS (self-QA, not independent) on "the motion, the three playbooks, the watch list, the owner handoff and the structured brief behave as the operator decided, and the earlier QA and security fixes still hold".
+
+**Why:** Every test that the restructure broke was rewritten against the new behaviour rather than deleted; the security regression tests now target `bank-sr26-2`.
+
+**Evidence:** `python3 -m unittest discover -s tests -t .`: "Ran 74 tests ... OK". `python3 -m evals.run_evals`: "42/42". `python3 -m agent.run_playbook`: exit 0.
+
+**Assumption:** none
+
+**Reversal trigger:** An independent pass finds a regression.
+
+**Links:** D-027, D-028
+
+**Proof boundary:** Not independent. No live model draft.
+
+</details>
+

@@ -37,6 +37,15 @@ def playbook_file(playbook_id: str, playbooks_dir: Path = PLAYBOOKS) -> Path:
     return path
 
 
+def motion_file(motion_id: str, playbooks_dir: Path = PLAYBOOKS) -> Path:
+    if not isinstance(motion_id, str) or not PLAYBOOK_ID.match(motion_id):
+        raise Untrusted(f"invalid motion id {motion_id!r}")
+    path = Path(playbooks_dir) / "motions" / f"{motion_id}.jsonc"
+    if not path.is_file():
+        raise Untrusted(f"no motion {motion_id!r} in {Path(playbooks_dir) / 'motions'}")
+    return path
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 

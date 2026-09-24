@@ -1,0 +1,48 @@
+// Campaign Manager playbook: defense supplier, Forge first (trigger not implemented yet).
+// One audience, one trigger, one channel, exactly the stub's shape (A-041, operator decision).
+// Fields beyond the stub are marked with the register row that decided or proposes them.
+// Field reference: playbooks/SCHEMA.md. Referenced by playbooks/motions/reign-first-motion.jsonc.
+{
+  "playbook_id": "defense-forge-first",                 // stub
+  "version": "0.2.0",                     // A-016 (decided): stamped on every audit record
+  "supersedes": "reign-first-motion@0.1.0 (single-file plays list, withdrawn in R-008)",  // A-016
+  "status": "active",                     // A-034 (proposed): active | paused | retired
+  "owner": "Kenny Nguyen",                // A-026 (decided)
+  "product": "reign",                     // stub: reign | forge
+  "audience": { "icp_id": "icp/icp.json@0.2.0", "segment": "defense_supplier" },   // stub
+  "trigger": { "type": "regulatory", "id": "DEFENSE-TBD" },     // stub
+  "channel": "briefing",   // stub. A-042 (decided): "briefing" is the booked Executive Assurance Briefing meeting; the brief is the document that earns it
+  "trigger_status": "not_implemented",           // A-041 (decided)
+  "trigger_not_implemented_reason": "The packet leaves the defense trigger open (CMMC?), and iTmethods holds no CMMC certification. Decided approach (A-023): lead with Forge; Reign is the reason agents can be let near the estate, a natural ascension where one solution creates the next problem the second solves.",
+  "lead_product": "forge",            // A-023 (decided)
+
+  // stub: "approval must name a human if channel can send".
+  "approval": {
+    "principal": "Kenny Nguyen",             // A-026 (decided): R-17 "named human who authorized this class of action"
+    "approvers": ["Kenny Nguyen"],           // A-026 (decided): the named iTmethods account owner in the demo (A-043)
+    "channels_that_send": ["briefing", "sequence", "unknown"],  // A-042 (decided): booking a briefing reaches a person; A-035 (proposed): unknown counts as sending
+    "sender": "none"                         // A-035 (proposed): nothing is wired to send; approved = ready to send
+  },
+
+  // stub: "kill_criteria is how CRO stops a motion that goes sloppy".
+  // A-037 (decided): quality-based only, never a count ceiling, no volume cap.
+  "kill_criteria": [
+    { "id": "audit-write-failure", "metric": "audit_blocked", "op": ">", "threshold": 0,
+      "why": "Any R-17 block means the motion cannot prove what it did." },
+    { "id": "gate-failures", "metric": "gate_failed_ratio", "op": ">", "threshold": 0.2,
+      "why": "More than one draft in five failing the content gate means the drafts are sloppy." },
+    { "id": "approver-rejections", "metric": "rejected_ratio", "op": ">", "threshold": 0.5,
+      "why": "If the account owner rejects most decided briefs, stop drafting more." },
+    { "id": "complaint", "metric": "complaints", "op": ">=", "threshold": 1,
+      "why": "One complaint from a prospect stops the play for review." },
+    { "id": "wrong-account", "metric": "wrong_account_reports", "op": ">=", "threshold": 1,
+      "why": "A brief about the wrong account is the embarrassment the CEO warned about." }
+  ],
+
+  // stub: "audit should satisfy Reign rule R-17 when the audience is FS".
+  "audit": {
+    "rule": "R-17",
+    "required_for": "all_segments",   // A-007 (decided): a receipt of what our agent did, on every segment (A-038)
+    "sink": "jsonl"                    // A-008 (decided): local append-only file; wire the real sink on day one
+  }
+}

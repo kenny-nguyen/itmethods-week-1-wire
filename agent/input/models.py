@@ -35,6 +35,7 @@ class Trigger:
     relevance_threshold_total_assets_usd: int | None = None
     context_by_jurisdiction: dict = field(default_factory=dict)  # jurisdiction -> tuple[Fact, ...]
     context_sources: tuple[Source, ...] = ()
+    structural_conditions: tuple[dict, ...] = ()  # {"when", "text", "source"}: lines marked "Confirm" (A-044)
 
     def source(self, source_id: str) -> Source | None:
         return next((s for s in self.sources + self.context_sources if s.id == source_id), None)
@@ -53,6 +54,7 @@ class Account:
     runs_forge: bool | None
     briefing_scheduled: bool
     system: str  # where the record came from, e.g. "hubspot"
+    owner: str | None = None  # the named iTmethods account owner (A-043)
 
     @property
     def system_id(self) -> str:

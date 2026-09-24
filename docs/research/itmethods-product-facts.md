@@ -17,6 +17,8 @@ Source: a researcher report relayed by the supervising agent at 23:20 KST, summa
 
 Not known: what the target bank runs on Forge.
 
+Correction (log D-025): the first version of `product-claims.json` phrased P-BANKING as first line on "OSFI E-23, SR 26-2 and DORA readiness". "Readiness" is not in the source summary and was removed.
+
 ## Content rules (deterministic checks)
 
 1. Never claim compliance, certification, independent assurance or validation.
