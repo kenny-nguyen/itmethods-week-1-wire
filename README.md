@@ -39,6 +39,7 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 - The applicability preflight (`agent/processing/preflight.py`) decides whether a trigger applies to an account before anything is drafted. For SR 26-2 and a non-US bank without a confirmed US Federal Reserve-regulated entity, it holds the account or writes "applicability requires confirmation", depending on the playbook.
 - Brief generation (`agent/processing/brief.py`): a deterministic template when no API key is set, the Claude Messages API when `ANTHROPIC_API_KEY` is set (`WIRE_PROVIDER=template` forces the template, `WIRE_MODEL` picks the model). The model's instructions are in `prompts/brief_system.md`.
 - The output gate (`agent/processing/checks.py`) runs on every draft: sections, a word limit, citations only to known sources, no invented URLs, every product sentence tied to an approved claim in `docs/research/product-claims.json`, and no claim of compliance, certification, independent assurance or validation, no briefing duration, no CMMC, FedRAMP, CUI or ITAR. Run the gate's evals with `python -m evals.run_evals`.
+- The Campaign Manager playbook (`playbooks/reign-first-motion.jsonc`) drives the run. `playbooks/SCHEMA.md` lists every field, marks which ones are guesses, and says why each is useful.
 - The error log (`agent/governance/error_log.py`) is a separate JSON Lines file for anything that goes wrong in any stage.
 
 ## Repo map
@@ -55,6 +56,7 @@ Requires Python 3.11 or later. Standard library only; nothing to install.
 | `agent/processing/` | PROCESSING stage: ICP filter, applicability preflight, brief generation, output checks. |
 | `prompts/` | The system prompt the model drafts briefs with. |
 | `evals/` | Deterministic eval cases for the brief output gate (`python -m evals.run_evals`). |
+| `playbooks/` | The Campaign Manager playbook for the first Reign motion, and `SCHEMA.md` explaining every field. |
 | `icp/` | The living ICP, with the source or register row of every field. |
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |
 | `tests/` | Unit tests, one file per stage. |

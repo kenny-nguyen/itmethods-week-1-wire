@@ -943,3 +943,60 @@ The output gate catches every forbidden-content case in the eval set (18 of 18),
 
 </details>
 
+### [D-010] 23:36 · BUILDER · DECISION
+The Campaign Manager playbook for the first Reign motion is written, with the missing half of the schema filled in and every guess marked in place. `playbooks/SCHEMA.md` says, for every field, whether it came from the stub or is a guess, why it is useful, and which register row proposes it.
+
+<details><summary>Structured fields</summary>
+
+**What:** `playbooks/reign-first-motion.jsonc`, `playbooks/SCHEMA.md`, loader and validator `agent/input/playbook.py`. The stub's three "we know" rules are enforced: a sending channel needs named approvers, kill criteria must exist, and an FS (financial-services) audience needs `audit.rule = R-17`.
+
+**Why:** A playbook that validates is the INPUT gate for a run: an invalid one stops the run before any account is touched. JSONC keeps the guess markers next to the values they explain.
+
+**Evidence:** `python3 -m unittest tests.test_playbook`: 4 tests OK. The bank play is implemented; the biopharma and defense plays are `not_implemented` with the reason.
+
+**Assumption:** New proposed rows A-034 (playbook status) and A-035 (which channels send; no sender wired). The `plays[]` shape is proposed row A-030; if the operator keeps A-017 instead, the three plays split into three files with no code change.
+
+**Reversal trigger:** Campaign Manager's real schema.
+
+**Links:** A-009, A-010, A-016, A-018, A-026, A-030, A-034, A-035
+
+</details>
+
+### [A-034] 23:36 · PM · AMBIGUITY
+Proposed while writing the schema: a playbook gets a status (active, paused, retired) so the CRO can stop a motion without deleting its history.
+
+<details><summary>Structured fields</summary>
+
+**What:** Can a playbook be paused? Options: (a) delete to stop; (b) a status field.
+
+**Why:** Stopping should not erase the record.
+
+**Evidence:** Register row A-034.
+
+**Assumption:** (b), proposed and awaiting the operator.
+
+**Reversal trigger:** Campaign Manager already has a status concept.
+
+**Links:** D-010
+
+</details>
+
+### [A-035] 23:36 · PM · AMBIGUITY
+Proposed: `briefing`, `sequence` and `unknown` count as sending, `slack` counts as an internal notification, and no sender is wired, so an approved brief is ready to send but never sent by this build.
+
+<details><summary>Structured fields</summary>
+
+**What:** Which channels can send, and does anything send? Options: (a) wire a sender; (b) no sender, strict channel list.
+
+**Why:** "If you cannot leave an audit trail, it does not send" (CEO notes). With no approved sender, not sending is the only safe state.
+
+**Evidence:** Register row A-035.
+
+**Assumption:** (b), proposed and awaiting the operator.
+
+**Reversal trigger:** The operator names a sender and approves wiring it behind the approval gate.
+
+**Links:** D-010
+
+</details>
+

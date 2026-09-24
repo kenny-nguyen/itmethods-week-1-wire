@@ -1,0 +1,88 @@
+// Campaign Manager playbook: first Reign motion.
+//
+// The stub gave eight fields: playbook_id, product, audience, trigger, channel,
+// approval, kill_criteria, audit. Everything else here is inferred. Each
+// inferred field says why it is useful and names the register row that
+// proposes it (AMBIGUITY-REGISTER.md). Rows marked "proposed" await the
+// operator; changing this file is how an answer takes effect.
+// Field reference: playbooks/SCHEMA.md.
+{
+  "playbook_id": "reign-first-motion",                                   // stub
+  "version": "0.1.0",                // GUESS (A-016): which rules were in force for a given touch; every audit record carries it
+  "supersedes": null,                // GUESS (A-016): the version this one replaces
+  "status": "active",                // GUESS (A-034): active | paused | retired, so the CRO can stop a motion without deleting it
+  "owner": "Kenny Nguyen",           // GUESS (A-026): the accountable human for the motion; also the R-17 principal below
+  "product": "reign",                // stub: reign | forge
+
+  // GUESS (A-030, proposed; A-017 stands until answered): one playbook, several plays,
+  // each play keeping the stub's audience / trigger / channel shapes. Only the bank play is implemented.
+  "plays": [
+    {
+      "play_id": "bank-sr26-2",
+      "status": "implemented",
+      "audience": { "icp_id": "icp/icp.json@0.1.0", "segment": "dsib_capital_markets" },  // stub shape
+      "trigger": { "type": "regulatory", "id": "SR-26-2" },                              // stub shape
+      "channel": "briefing",          // stub enum. GUESS (A-018): a forwardable brief pack; treated as able to send
+      "lead_product": "reign",
+      // GUESS (A-028 proposed vs A-025 standing): "hold" until the operator answers; "brief_with_caveat" writes
+      // "applicability requires confirmation" plus OSFI E-23 / B-13 context for a Canadian bank.
+      "unconfirmed_applicability": "hold",
+      "outbound_requires_briefing": true,   // GUESS (A-009): CEO notes, no bank outbound before a briefing unless a regulatory trigger
+      "claims": ["P-FORGE", "P-GATEWAY", "P-ASSURANCE", "P-BRIEFING"],   // GUESS (A-029): approved claim ids only
+      "routing": {                          // GUESS (A-011, A-032): lanes by title, never ask the buyer to pick
+        "lanes": {
+          "risk": ["audit", "risk", "compliance"],
+          "engineering": ["engineering", "platform", "technology", "architecture"]
+        },
+        "do_not_route": ["information security", "ciso"]
+      }
+    },
+    {
+      "play_id": "biopharma-fda-pccp",
+      "status": "not_implemented",
+      "not_implemented_reason": "One trigger is implemented in this window. The FDA PCCP guidance page has no verified URL yet (A-014), so a brief could not cite it.",
+      "audience": { "icp_id": "icp/icp.json@0.1.0", "segment": "biopharma_quality" },
+      "trigger": { "type": "regulatory", "id": "FDA-PCCP-2025" },
+      "channel": "briefing",
+      "lead_product": "reign"
+    },
+    {
+      "play_id": "defense-forge-first",
+      "status": "not_implemented",
+      "not_implemented_reason": "The packet leaves the defense trigger open ('CMMC?'), and iTmethods holds no CMMC certification. Proposed approach (A-023): lead with Forge, mention assurance as the reason agents can touch the estate.",
+      "audience": { "icp_id": "icp/icp.json@0.1.0", "segment": "defense_supplier" },
+      "trigger": { "type": "regulatory", "id": "DEFENSE-TBD" },
+      "channel": "briefing",
+      "lead_product": "forge"
+    }
+  ],
+
+  // stub: "approval must name a human if channel can send".
+  "approval": {
+    "principal": "Kenny Nguyen",                 // GUESS (A-026): R-17 "named human who authorized this class of action"
+    "approvers": ["Kenny Nguyen"],               // GUESS (A-026): who may approve a send; a decision by anyone else is refused
+    "channels_that_send": ["briefing", "sequence", "unknown"],  // GUESS (A-018, A-035): unknown counts as sending, the strict reading
+    "sender": "none"                             // GUESS (A-035): no transport is wired; an approved request is ready, not sent
+  },
+
+  // stub: "kill_criteria is how CRO stops a motion that goes sloppy".
+  // GUESS (A-010): each criterion is checked after every run; tripping one pauses the playbook (kill switch)
+  // until a named human clears it. Metrics come from the run summary.
+  "kill_criteria": [
+    { "id": "audit-write-failure", "metric": "audit_blocked", "op": ">", "threshold": 0,
+      "why": "Any R-17 block means the motion cannot prove what it did." },
+    { "id": "gate-failures", "metric": "gate_failed_ratio", "op": ">", "threshold": 0.2,
+      "why": "More than one draft in five failing the content gate means the drafts are sloppy." },
+    { "id": "approver-rejections", "metric": "rejected_ratio", "op": ">", "threshold": 0.5,
+      "why": "If the approver rejects most briefs, stop drafting more." }
+  ],
+
+  "limits": { "max_accounts_per_run": 5 },   // GUESS (A-010): precision over volume; caps briefs drafted per run
+
+  // stub: "audit should satisfy Reign rule R-17 when the audience is FS".
+  "audit": {
+    "rule": "R-17",
+    "required_for": "all_segments",   // GUESS (A-007): the rule requires FS only; "fs_only" is the other setting
+    "sink": "jsonl"                    // GUESS (A-008): local append-only file standing in for a Reign or HubSpot audit store
+  }
+}
