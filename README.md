@@ -8,7 +8,7 @@ The assignment packet itself is private and is not in this repository. Where a d
 
 ## About the working contract (the first commit)
 
-The first commit in this history (`Install working contract and kit`) contains no product code. It is an operating contract for the AI agents that do the work in this repository, committed before the timer-driven work began so that the rules were fixed before any decision was made. A reviewer can check any later commit against rules that could not have been written to fit it.
+The first commit in this history (`Install working contract and kit`) contains no product code. The supporting kit files were later moved under `contract/` so the repository root holds only what a reviewer reads first; `AGENTS.md` stays at the root because agents load it from there. It is an operating contract for the AI agents that do the work in this repository, committed before the timer-driven work began so that the rules were fixed before any decision was made. A reviewer can check any later commit against rules that could not have been written to fit it.
 
 What the contract sets out:
 
@@ -21,9 +21,9 @@ What the contract sets out:
 | Kit file | What it is |
 |---|---|
 | `AGENTS.md` | The contract. Every agent reads it first. `CLAUDE.md` only imports it. |
-| `RUNBOOK.md` | The operating sequence for the window (intake, ambiguity, skeleton, build, freeze, submission). |
-| `QA-AT-EVERY-IPOF-STAGE.md`, `QA-AGENT-SOP.md` | How QA runs at each stage and how an independent reviewer works. |
-| `templates/` | Starting shapes for the intake worksheet, process log, ambiguity register and QA verdicts. |
+| `contract/RUNBOOK.md` | The operating sequence for the window (intake, ambiguity, skeleton, build, freeze, submission). |
+| `contract/QA-AT-EVERY-IPOF-STAGE.md`, `contract/QA-AGENT-SOP.md` | How QA runs at each stage and how an independent reviewer works. |
+| `contract/templates/` | Starting shapes for the intake worksheet, process log, ambiguity register and QA verdicts. |
 | `.claude/agents/` | The role roster as dispatchable agent definitions. |
 
 ## How to use
@@ -37,4 +37,7 @@ This section is updated as usable pieces land.
 | Path | Purpose |
 |---|---|
 | `README.md` | This file. |
-| `AGENTS.md`, `RUNBOOK.md`, `QA-*.md`, `templates/`, `.claude/agents/` | The working contract and kit (see above). |
+| `AGENTS.md`, `CLAUDE.md`, `contract/`, `.claude/agents/` | The working contract and kit (see above). |
+| `PROCESS-LOG.md` | Append-only decision log, written during the window. |
+| `AMBIGUITY-REGISTER.md` | Every ambiguity, the reading taken, and what would flip it. |
+| `INTAKE-WORKSHEET.md` | First structured read of the assignment. |

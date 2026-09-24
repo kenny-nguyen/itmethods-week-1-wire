@@ -576,3 +576,22 @@ Regulator pages were fetched rather than recalled. SR 26-2 and both OSFI (Office
 
 </details>
 
+### [D-004] 23:26 · PM · DECISION
+The operator approved a repository layout. The kit's supporting files move under `contract/`, code goes under `agent/` split by IPOF stage, and each folder is created only when its first real file lands.
+
+<details><summary>Structured fields</summary>
+
+**What:** Move `RUNBOOK.md`, `QA-AT-EVERY-IPOF-STAGE.md`, `QA-AGENT-SOP.md` and `templates/` into `contract/`; update every reference in `AGENTS.md`, `.claude/agents/` and the README. Code lives in `agent/` (`input/`, `processing/`, `output/`, `feedback/`, `governance/`, `run_playbook.py`).
+
+**Why:** A reviewer opening the repository sees the deliverables at the root, not eight kit files. No empty placeholder folders, so the tree never claims work that does not exist.
+
+**Evidence:** Operator instruction received 23:25 KST through the supervisor inbox. `git mv` preserves history; references rewritten with one `perl` substitution and checked with `git diff`.
+
+**Assumption:** Moving files is not editing the contract's rules; only paths changed in `AGENTS.md`.
+
+**Reversal trigger:** A tool that loads kit files from fixed root paths.
+
+**Links:** G-001
+
+</details>
+

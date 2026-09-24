@@ -1,6 +1,6 @@
 # Intake Worksheet
 
-First structured read of the assignment, filled from `templates/intake-worksheet.md` before any code was written. It feeds the opening GRAA (Goal, Reality, Analysis, Action) checkpoint `G-001` in `PROCESS-LOG.md` and the rows of `AMBIGUITY-REGISTER.md`.
+First structured read of the assignment, filled from `contract/templates/intake-worksheet.md` before any code was written. It feeds the opening GRAA (Goal, Reality, Analysis, Action) checkpoint `G-001` in `PROCESS-LOG.md` and the rows of `AMBIGUITY-REGISTER.md`.
 
 The assignment packet is private and is not copied here. Only the short lines a decision depends on are quoted.
 
@@ -75,7 +75,7 @@ Four things in a public GitHub repository: a working artifact, a one-page proces
 - **One case:** one fictional FS account, one trigger, one brief.
 - **Layers:** input adapters, ICP filter, applicability preflight, brief generator, audit, approval request.
 - **Not in it:** live connectors, a real send.
-- **Green means:** `python -m wire run` writes a brief, an approval request marked pending, and audit records for every action, and exits 0; the test suite passes.
+- **Green means:** the pipeline entry point (named `python -m agent.run_playbook` from D-004 on) writes a brief, an approval request marked pending, and audit records for every action, and exits 0; the test suite passes.
 
 ## 8. Substrate check
 
