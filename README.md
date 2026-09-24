@@ -8,7 +8,7 @@ The assignment packet is private and not in this repository; short lines are quo
 
 ## The four deliverables
 
-1. **The artifact:** the [skill](skills/regulatory-trigger-brief/SKILL.md), the [MCP server](agent/mcp_server.py) over its [governed tools](agent/tools.py), and the [evals](evals/). A labelled example run is in [`examples/`](examples/).
+1. **The artifact:** the [skill](skills/regulatory-trigger-brief/SKILL.md), the [MCP server](agent/mcp_server.py) over its [governed tools](agent/tools.py), and the [evals](evals/). Sample output: [`examples/README.md`](examples/README.md).
 2. **The process log:** [`PROCESS-LOG.md`](PROCESS-LOG.md), one page.
 3. **[One thing I did not know](#one-thing-i-did-not-know)**, below.
 4. **[What I would not ship](#what-i-would-not-ship)**, below.
