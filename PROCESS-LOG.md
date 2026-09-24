@@ -1700,3 +1700,22 @@ Agent-run evals are in: six trigger-and-account cases with the properties a run 
 
 </details>
 
+### [R-012] 00:06 · PM · REVERSAL
+Reverses A-014. The FDA PCCP source was wrongly recorded as unverified: my two guessed URLs were wrong, and the operator's researcher found and verified the real ones. The biopharma trigger stays not implemented, now for the true reason: only the bank trigger is built deeply in this window.
+
+<details><summary>Structured fields</summary>
+
+**What:** New position A-048. Sources: the FDA guidance page (`.../marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence`) and the PDF (`https://www.fda.gov/media/166704/download`), final guidance, August 2025, nonbinding.
+
+**Why:** Operator decision relayed at 00:04 KST. The reason given for not implementing the trigger must be the real one.
+
+**Evidence:** Re-fetch from this build environment: both URLs HTTP 404 to curl (the same response the guessed URLs got at 23:17, which suggests bot blocking rather than a missing page). The feed says exactly that in `verified_how`, so nobody reads "re-verified here" into it.
+
+**Assumption:** none of the agent's own.
+
+**Reversal trigger:** Either URL is withdrawn or superseded.
+
+**Links:** A-014, A-048, D-003
+
+</details>
+
