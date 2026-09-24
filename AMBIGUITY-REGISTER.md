@@ -82,6 +82,8 @@ Correction: the two reversal rows above first said I had decided A-028 and A-030
 
 Correction to A-044's wording: an independent fact-check found that "SR 26-2 applies to it" and "an EU entity -> DORA" overstate the sources. SR 26-2 says it is "expected to be most relevant" to Federal Reserve-regulated banking organizations over $30 billion in total assets, and DORA covers listed financial-entity types only ([`docs/qa/factcheck-report.md`](docs/qa/factcheck-report.md), F-02 and F-07). The structure of A-044 stands; its "Confirm" lines keep the regulator's own scope words.
 
+Correction to A-042's rationale: the claim that iTmethods' site makes the briefing "stage 1 of its funnel" (P-BRIEFING) could not be verified on the current page and was removed from the claims list (fact-check F-13). The decision rests on the CEO's line alone.
+
 ## Deferred readings
 
 | From ID | The reading not taken | Why deferred rather than dropped |
