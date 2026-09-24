@@ -1,3 +1,5 @@
+> Moved here unchanged from `PROCESS-LOG.md` at 00:40 KST, because the packet asks for a one-page process log and this full record ran to about 14,700 words. `PROCESS-LOG.md` is now that one page. Every entry ID cited elsewhere in the repository (D-, A-, Q-, G-, R-, S-) is in this file.
+
 # Process Log
 
 Append-only record of decisions, written as they were made. Each entry opens with one or two plain sentences. The structured fields the working contract requires (`AGENTS.md` section 5) sit in the collapsed block under it (see A-001 for why).
