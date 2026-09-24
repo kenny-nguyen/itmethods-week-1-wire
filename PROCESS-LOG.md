@@ -1582,3 +1582,22 @@ Every command in `docs/production.md` was run from a clean clone of commit `acba
 
 </details>
 
+### [R-011] 00:00 · PM · REVERSAL
+The operator redefined the artifact. It is a Claude skill plus an MCP server with evals: the skill tells the agent how to read the trigger, reason about the account and draft; the server's tools enforce the audit rule, exclusions, the do-not-route list and the claim limits, so no agent can skip them. The template path is now "offline test mode" for CI only and must never be presented as the agent.
+
+<details><summary>Structured fields</summary>
+
+**What:** Reverses the framing that the Python pipeline with an optional model call is the artifact (D-009, D-011). New position A-046; dependency decision A-047.
+
+**Why:** Operator decision: "A Python script filling a template is NOT an agentic artifact and must never be presented as one." The packet asks for "a Claude skill / MCP / small agent" and tests "AI depth (agents, skills, MCP, evals)". The governed stages already built (ICP, preflight, routing, output gate, R-17 audit, approval, kill switch) become the tools' enforcement layer, so little is thrown away.
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:58:38Z (23:58 KST). `mcp==2.2.0` installed into a git-ignored `.venv`; its API read from the installed package: `mcp.server.mcpserver.MCPServer`, `mcp.server.mcpserver.exceptions.ToolError`, `mcp.Client` accepting a server instance in-process. Importing the 1.x path `mcp.server.fastmcp` fails in 2.x with a message pointing to the rename.
+
+**Assumption:** The live agent run for the demo happens in a Claude Code session with this server attached, and its output is scored by the evals; it is not run in this build session.
+
+**Reversal trigger:** n/a (operator decision)
+
+**Links:** D-009, D-011, A-046, A-047
+
+</details>
+
