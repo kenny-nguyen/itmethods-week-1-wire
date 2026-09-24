@@ -54,9 +54,10 @@ class ScoreRunTests(unittest.TestCase):
             r1 = score(Path(d), run_dir=runs / first["run_id"])
             self.assertEqual(r1["passed"], r1["total"])
             r2 = score(Path(d), run_dir=runs / second["run_id"])
-            self.assertTrue(all(c["exercised"] for c in r2["cases"]))  # the batch screens every account
             rerun = next(c for c in r2["cases"] if c["account"] == "hs-1001")
-            self.assertFalse(rerun["properties"]["passes_output_gate"]["pass"])  # this run wrote no brief
+            # A correctly skipped, already-briefed account is not a failure: it is "not exercised this run".
+            self.assertEqual((rerun["exercised"], rerun.get("note")), (False, "already briefed"))
+            self.assertTrue(all(c["exercised"] for c in r2["cases"] if c["expect"] != "brief"))
 
     def test_expected_brief_dropped_by_the_agent_fails(self):
         with tempdir() as d:
@@ -94,3 +95,15 @@ class ScoreRunTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RerunScoring(unittest.TestCase):
+    def test_already_briefed_accounts_are_not_failures_on_rerun(self):
+        with tempdir() as d:
+            out = Path(d)
+            run(MOTION, out, provider=TemplateProvider())
+            second = run(MOTION, out, provider=TemplateProvider())
+            r = score(out, run_dir=out / "runs" / second["run_id"])
+            case = next(c for c in r["cases"] if c["account"] == "hs-1001")
+            self.assertEqual((case["exercised"], case.get("note")), (False, "already briefed"))
+            self.assertEqual(r["passed"], r["total"])

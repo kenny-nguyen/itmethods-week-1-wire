@@ -42,6 +42,19 @@ def _run_order(brief: Path) -> str:
     return brief.parent.parent.name.removeprefix("mcp-")
 
 
+def _briefed_in_earlier_run(out: Path, run_dir: Path, system_id: str) -> bool:
+    for p in out.glob("runs/*/approvals/*.json"):
+        if p.parent.parent.name == run_dir.name:
+            continue
+        try:
+            r = json.loads(p.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if r.get("account", {}).get("id") == system_id and r.get("status") != "rejected":
+            return True
+    return False
+
+
 def score(out: Path, run_dir: Path | None = None) -> dict:
     """Score every run under `out`, or only the run in `run_dir` (what that run's review view shows).
 
@@ -65,6 +78,11 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
         if run_dir and not recs:
             results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                             "exercised": False, "properties": {}})
+            continue
+        if run_dir and not briefs and _briefed_in_earlier_run(out, run_dir, sid):
+            # Correctly skipped on a rerun: the account already has a live request from an earlier run.
+            results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
+                            "exercised": False, "note": "already briefed", "properties": {}})
             continue
         props = {}
         for prop in case["properties"]:
@@ -125,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     result = score(Path(args.out) if args.out else config.out_dir())
     for c in result["cases"]:
         if not c["exercised"]:
-            print(f"SKIP  {c['account']}  {c['why']}  not exercised in this run")
+            print(f"SKIP  {c['account']}  {c['why']}  not exercised in this run" + (f" ({c['note']})" if c.get("note") else ""))
             continue
         fails = [k for k, v in c["properties"].items() if not v["pass"]]
         print(f"{'PASS' if not fails else 'FAIL'}  {c['account']}  {c['why']}" + (f"  failed: {fails}" if fails else ""))
