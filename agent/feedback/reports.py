@@ -1,7 +1,7 @@
 """Quality feedback on a sent-or-approved brief: complaints and wrong-account reports.
 
     python3 -m agent.feedback.report --request out/runs/<run>/approvals/<account>.json \
-        --by "Kenny Nguyen" --kind wrong_account --detail "Brief names the wrong parent company."
+        --by "Casey Morgan (fictional)" --kind wrong_account --detail "Brief names the wrong parent company."
 
 Operator decision A-037: the kill criteria are quality-based, and these reports
 feed them. A report is an R-17 "update" on the account (it records feedback

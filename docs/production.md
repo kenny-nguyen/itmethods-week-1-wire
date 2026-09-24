@@ -89,9 +89,9 @@ The agent never contacts a bank. On a regulatory trigger, it writes the brief an
 
 ```
 python3 -m agent.feedback.decide --request "$WIRE_OUT_DIR/runs/<run>/approvals/<account>.json" \
-  --approver "Kenny Nguyen" --approve --reason "Sources and routing checked."
+  --approver "Jordan Reyes (fictional)" --approve --reason "Sources and routing checked."
 python3 -m agent.feedback.decide --request "$WIRE_OUT_DIR/runs/<run>/approvals/<account>.json" \
-  --approver "Kenny Nguyen" --reject --reason "Reads too generic for a CAE."
+  --approver "Jordan Reyes (fictional)" --reject --reason "Reads too generic for a CAE."
 ```
 
 A decision is refused unless the request is under `WIRE_OUT_DIR/runs`, the playbook (loaded by id from `playbooks/`) is unchanged since the request was created, the approver is listed in it and is the account's owner in HubSpot, the request is still pending, and, for an approval, the playbook's kill switch is off. The decision's audit record is written before the request file changes. Approved means ready to send: no send path is wired.
@@ -100,9 +100,9 @@ Quality feedback and the kill switch:
 
 ```
 python3 -m agent.feedback.report --request "$WIRE_OUT_DIR/runs/<run>/approvals/<account>.json" \
-  --by "Kenny Nguyen" --kind complaint --detail "Prospect said the brief misread their structure."
-python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --reason "Drafts read generic."
-python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --reason "Reviewed the drafts." --clear
+  --by "Casey Morgan (fictional)" --kind complaint --detail "Prospect said the brief misread their structure."
+python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Casey Morgan (fictional)" --reason "Drafts read generic."
+python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Casey Morgan (fictional)" --reason "Reviewed the drafts." --clear
 ```
 
 Exit codes for `decide`, `report` and `kill`: `0` done; `2` refused; `report` returns `3` when the report trips a kill criterion and engages the switch. Clearing the switch restarts the complaint and wrong-account counts from that moment, so reports a human has already reviewed do not re-trip it on the next run.

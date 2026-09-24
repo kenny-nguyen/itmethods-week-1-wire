@@ -1,7 +1,7 @@
 """A named human approves or rejects a pending brief.
 
     python3 -m agent.feedback.decide --request out/runs/<run>/approvals/<account>.json \
-        --approver "Kenny Nguyen" --approve --reason "Checked sources and routing."
+        --approver "Jordan Reyes (fictional)" --approve --reason "Checked sources and routing."
 
 Refused unless: the request sits under the fixed output root; the playbook,
 loaded by id from playbooks/ (never from a path in the request), is unchanged
@@ -92,6 +92,8 @@ def decide(request_path: str | Path, *, approver: str, approve: bool, reason: st
         refuse(f"request is already {req['status']}")
     if not is_named_human(approver) or approver not in pb["approval"]["approvers"]:
         refuse(f"{approver!r} is not a named approver for {pb['playbook_id']}")
+    if approver == pb["approval"]["principal"]:  # separation of duties: nobody approves their own class of action
+        refuse(f"{approver!r} is the principal who authorized this class of action and cannot also approve it")
     owner = account_owner(created["object"])
     if pb.get("handoff", {}).get("route_to") == "account_owner" and approver != owner:
         refuse(f"{approver!r} is not the named account owner ({owner!r}) on record in HubSpot (A-043)")

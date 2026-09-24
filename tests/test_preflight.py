@@ -64,7 +64,7 @@ class PreflightTests(unittest.TestCase):
     def test_brief_needs_a_named_account_owner(self):  # A-043
         play = {**PLAY, "handoff": {"route_to": "account_owner"}}
         self.assertEqual(pf.check(SR, US_BANK, UNKNOWN, play).status, pf.HOLD)
-        self.assertEqual(pf.check(SR, replace(US_BANK, owner="Kenny Nguyen"), UNKNOWN, play).status, pf.READY)
+        self.assertEqual(pf.check(SR, replace(US_BANK, owner="Jordan Reyes (fictional)"), UNKNOWN, play).status, pf.READY)
 
 
 class RoutingTests(unittest.TestCase):
