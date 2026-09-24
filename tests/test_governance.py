@@ -115,7 +115,9 @@ class R17Tests(unittest.TestCase):
     def test_named_human(self):
         self.assertTrue(is_named_human("Kenny Nguyen"))
         self.assertTrue(is_named_human("Abbot Smith"))
-        for bad in ("", "TBD", "agent", "Kenny", "brief-agent service", None, 42):
+        for bad in ("", "TBD", "agent", "Kenny", "brief-agent service", None, 42,
+                    "The CRO", "Account Owner", "Risk Committee", "Chief Officer", "the account owner",
+                    "Head of Risk", "VP Sales"):
             with self.subTest(bad=bad):
                 self.assertFalse(is_named_human(bad))
 
