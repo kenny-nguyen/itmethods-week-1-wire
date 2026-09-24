@@ -766,3 +766,22 @@ Correction of fact: the timestamps on D-004, D-005, A-027, R-001, A-028, A-029, 
 
 </details>
 
+### [R-004] 23:25 · PM · REVERSAL
+Correction of attribution. R-001, R-002, A-028, A-029 and A-030 say the operator decided the caveated SR 26-2 brief, the claims list with forbidden-claim checks, and the three-buyer playbook. The operator did not. Those came from the supervising agent's proposals and are now awaiting the operator.
+
+<details><summary>Structured fields</summary>
+
+**What:** A-028, A-029 and A-030 are `Proposed - awaiting operator`. The reversals R-001 (A-025 to A-028) and R-002 (A-017 to A-030) are proposed reversals only; A-025 and A-017 stand until the operator answers. What the operator did approve: option 3, the bank with SR 26-2 as the deep trigger (A-027, first half only), the repository layout (D-004), removing AI startups and mid-market SaaS (A-003), and error logging.
+
+**Why:** The zero-assumption rule (D-006) only works if the log says truthfully who decided what. The supervisor's message relayed the proposals alongside operator decisions, and the earlier entries merged the two.
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:24:34Z (23:24 KST) stating the attribution. Register statuses changed in the same commit as this entry.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** R-001, R-002, A-027, A-028, A-029, A-030, D-006
+
+</details>
+
