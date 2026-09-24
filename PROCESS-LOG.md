@@ -728,3 +728,22 @@ The first-motion playbook is one file with a list of plays: the bank play implem
 
 </details>
 
+### [D-006] 23:31 · PM · DECISION
+New operator rule: the agent makes no assumptions of its own. Every reading the agent chose is now a proposal awaiting the operator, and the proposals go to the operator as one batch while building continues on the parts that do not depend on them.
+
+<details><summary>Structured fields</summary>
+
+**What:** Every `Assumed` row in `AMBIGUITY-REGISTER.md` becomes `Proposed - awaiting operator`, except rows the operator approved: A-003 (remove AI startups and mid-market SaaS), A-027 (bank and SR 26-2 as the deep trigger), A-028 (the applicability caveat that came with that decision). Batch `assumptions-1` sent to the operator with the 24 proposed rows.
+
+**Why:** Operator instruction received 23:30 KST, overriding the earlier latitude. The operator also listed as not yet approved: R-17 on non-financial segments (A-007), the risk and engineering routing (A-011), the bank outbound rule (A-009), the defense approach (A-023), excluding "Canada federal" (A-022), the three-buyer playbook (A-030) and the product content rules as eval checks (A-029). A-030 and A-029 had been recorded as operator decisions at 23:28 and 23:29; they are proposals again from here.
+
+**Evidence:** Register status counts after the change: 24 proposed, 4 confirmed, 2 reversed.
+
+**Assumption:** none. How the build continues: each proposed reading that code depends on is a value in the playbook or a config file, set to the recommendation and named by row ID, so an operator answer changes data, not code.
+
+**Reversal trigger:** The operator answers batch `assumptions-1`.
+
+**Links:** A-001 to A-030
+
+</details>
+
