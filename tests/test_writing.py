@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DASHES = re.compile("[–—]")
+DASHES = re.compile("[" + chr(0x2013) + chr(0x2014) + "]")
 BANNED = re.compile(
     r"\b(delve\w*|robust\w*|seamless\w*|leverag\w*|comprehensive\w*|cutting-edge|game-changer\w*|unlock\w*|empower\w*)\b"
     r"|in today's landscape|it's worth noting",
