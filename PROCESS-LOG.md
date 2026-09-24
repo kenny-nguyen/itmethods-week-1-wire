@@ -1719,3 +1719,24 @@ Reverses A-014. The FDA PCCP source was wrongly recorded as unverified: my two g
 
 </details>
 
+### [D-035] 00:09 · QA · OUTPUT-QA
+From a fresh clone at `e48acd7`: the MCP server started exactly as `.mcp.json` says, listed its eight tools, walked a bank account through screen, applicability and routing, and refused a bad brief with its recovery text. The offline batch scored 22 of 22, and every test and eval passed with and without the MCP package. The README now carries the operator's Cut, Sequenced and Refused section and the architecture principle; the skill was made buyer-agnostic to keep that principle true.
+
+<details><summary>Structured fields</summary>
+
+**What:** Verified from `git clone` into a scratch directory with a fresh venv (`pip install -r requirements.txt`): stdio client via `.mcp.json` -> "8 tools"; `screen_account` hs-1001 -> include; `check_applicability` -> ready, must include "applicability requires confirmation"; `route_contact` -> risk 3, engineering 1 (no CISO); `request_approval` with a one-line draft -> tool error listing every gate problem and "Recovery:". `python3 -m agent.run_playbook` printed the OFFLINE TEST MODE banner; `python3 -m evals.score_run` -> "score 22/22"; unit tests OK in both interpreters; evals 63/63.
+
+**Why:** The operator asked for every production command to be verified from a clean clone. The skill had bank-specific steps; the operator's principle says the skill and tools are buyer-agnostic and banking lives in data, so the bank details became examples and the steps now read from the tools' output.
+
+**Evidence:** Commands and outputs above; README sections "Cut, sequenced, refused", "What we went looking for vs what we assumed", "Reconciling the CEO notes", "Day-one wiring", "What I would not ship", "Stuck, and the next experiment"; `docs/production.md` sections 1 (MCP clients) and 5a (next product, no code).
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-030, D-032, D-033, D-034
+
+**Proof boundary:** No live agent session (Claude drafting through the skill) was run here; that is the demo. Claude Desktop configuration is documented, not tried.
+
+</details>
+
