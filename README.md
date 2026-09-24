@@ -72,7 +72,7 @@ I made the calls; AI agents did most of the building under the working contract 
 
 ## About the working contract
 
-The first commit (`Install working contract and kit`) has no product code. It is the contract I set for the agents, committed first so every later commit can be checked against rules written before it. [`AGENTS.md`](AGENTS.md) sets two loops (GRAA: Goal, Reality, Analysis, Action; IPOF: Input, Processing, Output, Feedback), QA (quality assurance) at every stage with independent adversarial review, and a no-silent-guess ambiguity rule. The rest of the kit is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/).
+The kit is part of my own agentic workflow: the method layer of the system I use for agent work, which I call the DBK Agentic OS. I prepared it before the window, and it contains nothing specific to this assignment. I committed it first (`Install working contract and kit`) so the rules the agents followed were in place before any work began: goal and reality checkpoints, QA (quality assurance) at every stage, the ambiguity register and the writer handoff. I used it throughout. The contract is [`AGENTS.md`](AGENTS.md); the rest is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/). The repo runs without the rest of that system; the tools that ran the method are named under [How it was built](#how-it-was-built).
 
 ## Repo map
 

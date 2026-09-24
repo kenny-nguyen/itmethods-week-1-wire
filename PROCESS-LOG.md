@@ -1,17 +1,17 @@
 # Process log
 
-One page, as the packet asks. Times are KST (Korea Standard Time). The reasoning behind each judgment call: [`AMBIGUITY-REGISTER.md`](AMBIGUITY-REGISTER.md).
+One page, as the packet asks. Times are KST (Korea Standard Time). Every judgment call: [`AMBIGUITY-REGISTER.md`](AMBIGUITY-REGISTER.md).
 
 ## What I tried
 
-Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, with evals. The skill tells the agent how to read SR 26-2 and reason about one bank; the server's tools enforce R-17, the exclusions, routing and claim limits, so the agent cannot skip them. Rules and tests came before the agent. HubSpot, Clay and ZoomInfo are fixtures ([day-one wiring](docs/day-one-wiring.md)); tools used: [README](README.md#how-it-was-built).
+Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, with evals. The skill tells the agent how to read SR 26-2 and reason about one bank; the server's tools enforce R-17, the exclusions, routing and claim limits, so the agent cannot skip them. HubSpot, Clay and ZoomInfo are fixtures ([day-one wiring](docs/day-one-wiring.md)); tools used: [README](README.md#how-it-was-built).
 
 ## What failed
 
 - **Guessed sources.** Two FDA PCCP URLs an agent guessed returned 404; a research agent found the real guidance.
-- **My cross-border lines overstated scope.** The independent fact-check returned FAIL: my brief said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA to any EU financial entity; the sources support neither. Four product claims cited changed pages ([report](docs/qa/factcheck-report.md)).
-- **Four defects my tests missed.** With 92 tests green, an adversarial reviewer on a different model found enrichment running before its R-17 audit record, a "C.I.S.O." title routed to engineering, a brief that could re-add an excluded CISO, and paraphrases like "compliance-ready" passing the claim gate ([report](docs/qa/adversarial-report.md)).
-- **Two usage-limit stops.** The validation review agent hit its session limit at 00:12, then reset; a second stop cleared at 00:36 after a plan upgrade.
+- **My cross-border lines overstated scope.** The independent fact-check failed my brief: it said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA to any EU financial entity; the sources support neither. Four product claims cited changed pages. Fixed with the regulators' scope words, claims re-quoted from live pages, and new eval cases ([report](docs/qa/factcheck-report.md)).
+- **Four defects my tests missed.** With 92 tests green, an adversarial reviewer on a different model found enrichment running before its R-17 audit record, a "C.I.S.O." title routed to engineering, a brief that could re-add an excluded CISO, and paraphrases like "compliance-ready" passing the claim gate. All four fixed, each with a regression test ([report](docs/qa/adversarial-report.md)).
+- **Two usage-limit stops.** The review agent hit its session limit at 00:12; a second stop cleared at 00:36 after a plan upgrade.
 - **This log** first ran to about 14,700 words.
 
 ## What I learned
@@ -26,11 +26,11 @@ Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, wit
 2. Confirm with the CEO and CRO Rob's intent for defense, and how to classify companies blurring "AI startup" and "uses AI".
 3. Wire the real blockable send path and a durable audit sink.
 4. Run and score the direct model-API path with a key.
-5. A drift check that fails when a quoted product claim leaves its page.
+5. A drift check on the quoted product claims.
 
 ## Real snippets
 
-<details><summary><code>.mcp.json</code>: Claude Code starts the governed tools</summary>
+<details><summary><code>.mcp.json</code>: how the client starts the governed tools</summary>
 
 ```json
 {
