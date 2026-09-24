@@ -11,12 +11,14 @@ so "C.I.S.O.", "Chief Information-Security Officer" and "CISO/VP Engineering" al
 from __future__ import annotations
 
 import re
+import unicodedata
 
 from agent.input.models import Contact
 
 
 def normalise(title: str) -> str:
-    t = re.sub(r"[-_/|,;:&+]", " ", title.lower())
+    t = unicodedata.normalize("NFKC", title)  # full-width and other compatibility forms (re-test F5)
+    t = re.sub(r"[-_/|,;:&+]", " ", t.lower())
     t = re.sub(r"[^a-z0-9 ]", "", t)
     return re.sub(r"\s+", " ", t).strip()
 
