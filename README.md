@@ -2,7 +2,7 @@
 
 Take-home for iTmethods (Growth Engineer, AI-Native). Timed window: 2026-09-24 22:50 to 2026-09-25 01:50 KST (Korea Standard Time).
 
-A Claude skill drives an MCP (Model Context Protocol) server to turn a regulatory trigger, SR 26-2 (the Federal Reserve's revised model risk guidance), into a short brief on a specific bank, with a source on every line. The agent decides what to write; the server's tools enforce R-17 (an audit record before any touch on a financial-services account), the ICP (ideal customer profile) exclusions, the do-not-route list and the claim limits. Nothing is sent: each brief goes to the bank's named iTmethods account owner, who decides whether to share it.
+A Claude skill drives an MCP (Model Context Protocol) server to turn a regulatory trigger, SR 26-2 (the Federal Reserve's revised model risk guidance), into a short brief on a specific bank, in which every factual claim cites its source. The agent decides what to write; the server's tools enforce R-17 (an audit record before any touch on a financial-services account), the ICP (ideal customer profile) exclusions, the do-not-route list and the claim limits. Nothing is sent: each brief goes to the bank's named iTmethods account owner, who decides whether to share it.
 
 The assignment packet is private and not in this repository; short lines are quoted where a decision depends on them.
 

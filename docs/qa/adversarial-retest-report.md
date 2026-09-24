@@ -1,3 +1,6 @@
+> Historical report of commit `beee183`, kept verbatim below. Its F5 (full-width CISO) and F6 (compliance and applicability paraphrases) were fixed in later commits (`8c8a94c`, `b1d72ed`).
+> A Greek-letter look-alike variant of the CISO title is still not caught; it remains a known limitation.
+
 # Independent adversarial QA verdict
 
 ## Claim under test

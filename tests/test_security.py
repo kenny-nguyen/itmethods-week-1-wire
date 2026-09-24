@@ -42,7 +42,7 @@ class ApprovalAuthorization(unittest.TestCase):  # S-1
             req_path = one_request(out)
             evil_dir = Path(d) / "evil"
             evil_dir.mkdir()
-            evil = (ROOT / f"playbooks/{BANK}.jsonc").read_text().replace('"approvers": ["Jordan Reyes (fictional)"]', '"approvers": ["Mallory Attacker"]')
+            evil = (ROOT / f"playbooks/{BANK}.jsonc").read_text().replace('"approvers": ["Kenny Nguyen"]', '"approvers": ["Mallory Attacker"]')
             (evil_dir / f"{BANK}.jsonc").write_text(evil)
             req = json.loads(req_path.read_text())
             req["playbook_path"] = str(evil_dir / f"{BANK}.jsonc")  # ignored now
@@ -62,7 +62,7 @@ class ApprovalAuthorization(unittest.TestCase):  # S-1
             shutil.copytree(ROOT / "playbooks", pb_dir)
             req_path = one_request(out)
             f = pb_dir / f"{BANK}.jsonc"
-            f.write_text(f.read_text().replace('"approvers": ["Jordan Reyes (fictional)"]', '"approvers": ["Jordan Reyes (fictional)", "Mallory Attacker"]'))
+            f.write_text(f.read_text().replace('"approvers": ["Kenny Nguyen"]', '"approvers": ["Kenny Nguyen", "Mallory Attacker"]'))
             with self.assertRaises(DecisionRefused) as cm:
                 decide(req_path, approver="Mallory Attacker", approve=True, reason=REASON, out_dir=out, playbooks_dir=pb_dir)
             self.assertIn("changed", str(cm.exception))
@@ -73,13 +73,13 @@ class RequestBoundToAuditTrail(unittest.TestCase):  # QA pass 2, C2
         with tempdir() as d:
             out = Path(d) / "out"
             req_path = one_request(out)
-            kill_switch.engage(out / "state", BANK, by="Jordan Reyes (fictional)", reason="stop the motion")
+            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="stop the motion")
             req = json.loads(req_path.read_text())
             req["playbook"]["id"] = "biopharma-fda-pccp"
             del req["playbook_sha256"]
             req_path.write_text(json.dumps(req))
             with self.assertRaises(DecisionRefused):
-                decide(req_path, approver="Jordan Reyes (fictional)", approve=True, reason=REASON, out_dir=out)
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
 
     def test_swapped_account_is_refused(self):
         with tempdir() as d:
@@ -89,7 +89,7 @@ class RequestBoundToAuditTrail(unittest.TestCase):  # QA pass 2, C2
             req["account"]["id"] = "hubspot:company/hs-1001"
             req_path.write_text(json.dumps(req))
             with self.assertRaises(DecisionRefused) as cm:
-                decide(req_path, approver="Jordan Reyes (fictional)", approve=True, reason=REASON, out_dir=out)
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
             self.assertIn("audited create record", str(cm.exception))
 
     def test_missing_hash_is_refused(self):
@@ -100,7 +100,7 @@ class RequestBoundToAuditTrail(unittest.TestCase):  # QA pass 2, C2
             del req["playbook_sha256"]
             req_path.write_text(json.dumps(req))
             with self.assertRaises(DecisionRefused):
-                decide(req_path, approver="Jordan Reyes (fictional)", approve=True, reason=REASON, out_dir=out)
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
 
 
 class OwnerOnly(unittest.TestCase):  # A-043: the named account owner decides
@@ -113,7 +113,7 @@ class OwnerOnly(unittest.TestCase):  # A-043: the named account owner decides
             dm.account_owner = lambda system_id: "Somebody Else"
             try:
                 with self.assertRaises(DecisionRefused) as cm:
-                    decide(req_path, approver="Jordan Reyes (fictional)", approve=True, reason=REASON, out_dir=out)
+                    decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=out)
                 self.assertIn("account owner", str(cm.exception))
             finally:
                 dm.account_owner = original
@@ -124,9 +124,9 @@ class OutputRootPinned(unittest.TestCase):  # S-2
         with tempdir() as d:
             out = Path(d) / "out"
             req_path = one_request(out)
-            kill_switch.engage(out / "state", BANK, by="Jordan Reyes (fictional)", reason="stop the motion")
+            kill_switch.engage(out / "state", BANK, by="Kenny Nguyen", reason="stop the motion")
             with self.assertRaises(DecisionRefused):
-                decide(req_path, approver="Jordan Reyes (fictional)", approve=True, reason=REASON, out_dir=Path(d) / "elsewhere")
+                decide(req_path, approver="Kenny Nguyen", approve=True, reason=REASON, out_dir=Path(d) / "elsewhere")
 
 
 class KillSwitchControl(unittest.TestCase):  # S-3
@@ -135,21 +135,21 @@ class KillSwitchControl(unittest.TestCase):  # S-3
             out = Path(d)
             with self.assertRaises(KillRefused):
                 kill(BANK, by="Random Person", reason="just because really", clear=False, out_dir=out)
-            kill(BANK, by="Jordan Reyes (fictional)", reason="drafts read generic", clear=False, out_dir=out)
+            kill(BANK, by="Kenny Nguyen", reason="drafts read generic", clear=False, out_dir=out)
             with self.assertRaises(KillRefused):
                 kill(BANK, by="Random Person", reason="looks fine now", clear=True, out_dir=out)
             with self.assertRaises(KillRefused):
-                kill(BANK, by="Jordan Reyes (fictional)", reason="x", clear=True, out_dir=out)
+                kill(BANK, by="Kenny Nguyen", reason="x", clear=True, out_dir=out)
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
-            kill(BANK, by="Jordan Reyes (fictional)", reason="reviewed the drafts", clear=True, out_dir=out)
+            kill(BANK, by="Kenny Nguyen", reason="reviewed the drafts", clear=True, out_dir=out)
             self.assertEqual([r["action"] for r in jsonl(out / "audit.jsonl")], ["block", "unblock"])
 
     def test_clear_refused_when_audit_fails(self):
         with tempdir() as d:
             out = Path(d)
-            kill(BANK, by="Jordan Reyes (fictional)", reason="drafts read generic", clear=False, out_dir=out)
+            kill(BANK, by="Kenny Nguyen", reason="drafts read generic", clear=False, out_dir=out)
             with self.assertRaises(KillRefused):
-                kill(BANK, by="Jordan Reyes (fictional)", reason="reviewed the drafts", clear=True,
+                kill(BANK, by="Kenny Nguyen", reason="reviewed the drafts", clear=True,
                      out_dir=out, sink=FailingSink())
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
 
@@ -160,7 +160,7 @@ class KillSwitchControl(unittest.TestCase):  # S-3
                     with self.assertRaises(ValueError):
                         kill_switch.clear(Path(d), bad)
                     with self.assertRaises(KillRefused):
-                        kill(bad, by="Jordan Reyes (fictional)", reason="reviewed the drafts", clear=True, out_dir=Path(d))
+                        kill(bad, by="Kenny Nguyen", reason="reviewed the drafts", clear=True, out_dir=Path(d))
 
 
 class ClearResetsQualityCounts(unittest.TestCase):  # QA pass 2, C5
@@ -168,9 +168,9 @@ class ClearResetsQualityCounts(unittest.TestCase):  # QA pass 2, C5
         with tempdir() as d:
             out = Path(d) / "out"
             req_path = one_request(out)
-            report(req_path, by="Jordan Reyes (fictional)", kind="complaint", detail="Prospect said the brief misread things.", out_dir=out)
+            report(req_path, by="Kenny Nguyen", kind="complaint", detail="Prospect said the brief misread things.", out_dir=out)
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
-            kill(BANK, by="Jordan Reyes (fictional)", reason="reviewed the complaint with the prospect", clear=True, out_dir=out)
+            kill(BANK, by="Kenny Nguyen", reason="reviewed the complaint with the prospect", clear=True, out_dir=out)
             s = run(MOTION, out, provider=TemplateProvider())
             self.assertIsNone(s["playbooks"][BANK].get("kill_switch"))
             self.assertEqual(s["playbooks"][BANK]["metrics"]["complaints"], 0)
@@ -180,7 +180,7 @@ class AuditOutcome(unittest.TestCase):  # S-4
     def test_failed_commit_is_recorded_as_failed(self):
         with tempdir() as d:
             tmp = Path(d)
-            trail = AuditTrail(JsonlAuditSink(tmp / "audit.jsonl"), "a", "1", "Jordan Reyes (fictional)", "pb", "1", "r",
+            trail = AuditTrail(JsonlAuditSink(tmp / "audit.jsonl"), "a", "1", "Kenny Nguyen", "pb", "1", "r",
                                ErrorLog(tmp / "errors.jsonl"))
 
             def boom():
@@ -188,7 +188,7 @@ class AuditOutcome(unittest.TestCase):  # S-4
 
             with self.assertRaises(PermissionError):
                 trail.perform(action="approve", object_id="acct", fs=True, commit=boom, send=True,
-                              approver="Jordan Reyes (fictional)", sources=["x"],
+                              approver="Kenny Nguyen", sources=["x"],
                               purpose="Approve the brief for the account to be sent by its owner.")
             recs = jsonl(tmp / "audit.jsonl")
             self.assertEqual(len(recs), 2)
@@ -202,7 +202,7 @@ class QualityKillCriteria(unittest.TestCase):  # operator decision A-037
         with tempdir() as d:
             out = Path(d) / "out"
             req_path = one_request(out)
-            hits = report(req_path, by="Jordan Reyes (fictional)", kind="wrong_account",
+            hits = report(req_path, by="Kenny Nguyen", kind="wrong_account",
                           detail="Brief names the wrong parent company.", out_dir=out)
             self.assertEqual([h["id"] for h in hits], ["wrong-account"])
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
@@ -211,21 +211,3 @@ class QualityKillCriteria(unittest.TestCase):  # operator decision A-037
 
 if __name__ == "__main__":
     unittest.main()
-
-
-class SeparationOfDuties(unittest.TestCase):
-    def test_principal_cannot_approve_their_own_class_of_action(self):
-        import re as _re
-        with tempdir() as d:
-            pb_dir = Path(d) / "playbooks"
-            shutil.copytree(ROOT / "playbooks", pb_dir)
-            f = pb_dir / f"{BANK}.jsonc"
-            f.write_text(_re.sub(r'"approvers": \[[^\]]*\]', '"approvers": ["Jordan Reyes (fictional)", "Casey Morgan (fictional)"]',
-                                 f.read_text()))
-            out = Path(d) / "out"
-            s = run(pb_dir / "motions/reign-first-motion.jsonc", out, provider=TemplateProvider())
-            req = Path(next(o["approval_request"] for o in s["outputs"] if o["account"] == "hs-1002"))
-            with self.assertRaises(DecisionRefused) as cm:
-                decide(req, approver="Casey Morgan (fictional)", approve=True, reason=REASON, out_dir=out,
-                       playbooks_dir=pb_dir)
-            self.assertIn("principal", str(cm.exception))

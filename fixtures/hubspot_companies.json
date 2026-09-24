@@ -1,5 +1,5 @@
 {
-  "_fixture": "Fictional companies standing in for HubSpot company records. Register rows A-012, A-013. 'owner' is the named iTmethods account owner (A-043); in the demo a fictional account executive, separate from the principal.",
+  "_fixture": "Fictional companies standing in for HubSpot company records. Register rows A-012, A-013. 'owner' is the named iTmethods account owner (A-043); in the demo it is the candidate (A-026).",
   "companies": [
     {
       "id": "hs-1001",
@@ -12,7 +12,7 @@
       "total_assets_usd": 900000000000,
       "runs_forge": true,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1002",
@@ -25,7 +25,7 @@
       "total_assets_usd": 85000000000,
       "runs_forge": false,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1003",
@@ -38,7 +38,7 @@
       "total_assets_usd": null,
       "runs_forge": false,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1004",
@@ -51,7 +51,7 @@
       "total_assets_usd": null,
       "runs_forge": true,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1005",
@@ -116,7 +116,7 @@
       "total_assets_usd": null,
       "runs_forge": false,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1010",
@@ -129,7 +129,7 @@
       "total_assets_usd": 4000000000,
       "runs_forge": false,
       "briefing_scheduled": false,
-      "owner": "Jordan Reyes (fictional)"
+      "owner": "Kenny Nguyen"
     },
     {
       "id": "hs-1011",

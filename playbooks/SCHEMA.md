@@ -27,7 +27,7 @@ Every field below says where it came from (the stub, an operator decision, or a 
 | `status` | operator | `active`, `paused` or `retired`, so the CRO (chief revenue officer) can stop a playbook without deleting its history. | A-034 |
 | `owner` | operator | The accountable human; in the demo, the candidate. | A-026 |
 | `trigger_status`, `trigger_not_implemented_reason` | operator | A buyer can be encoded before its trigger is ready, with the reason visible. | A-041 |
-| `lead_product` | operator | Lets the defense playbook lead with Forge while the motion is Reign. Lead with Forge; Reign's assurance is what makes letting agents into the estate possible. | A-023 |
+| `lead_product` | operator | Lets the defense playbook lead with Forge while the motion is Reign ("a natural ascension": one solution creates the next problem the second solves). | A-023 |
 | `handoff.route_to` | operator | `account_owner`: on a regulatory trigger the brief goes to the named iTmethods account owner, never to the bank. | A-043 |
 | `handoff.cold_outreach_until_briefing_booked` | operator | `false`: no new cold outreach to the buyer until a briefing is booked. | A-043 |
 | `unconfirmed_applicability` | operator | `hold` (general case) or `structured_brief` (the SR 26-2 brief: what changed, what is certain, what depends on structure marked "Confirm", next step; never says a rule applies). | A-025, A-044 |

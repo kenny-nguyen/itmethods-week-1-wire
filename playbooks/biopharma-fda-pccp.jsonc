@@ -7,7 +7,7 @@
   "version": "0.2.0",                     // A-016 (decided): stamped on every audit record
   "supersedes": "reign-first-motion@0.1.0 (single-file plays list, withdrawn in R-008)",  // A-016
   "status": "active",                     // A-034 (proposed): active | paused | retired
-  "owner": "Casey Morgan (fictional)",                // A-026 (decided)
+  "owner": "Kenny Nguyen",                // A-026 (decided)
   "product": "reign",                     // stub: reign | forge
   "audience": { "icp_id": "icp/icp.json@0.2.0", "segment": "biopharma_quality" },   // stub
   "trigger": { "type": "regulatory", "id": "FDA-PCCP-2025" },     // stub
@@ -18,8 +18,8 @@
 
   // stub: "approval must name a human if channel can send".
   "approval": {
-    "principal": "Casey Morgan (fictional)",             // R-17 "named human who authorized this class of action": a fictional CRO, separate from any approver
-    "approvers": ["Jordan Reyes (fictional)"],           // the named iTmethods account owner (A-043), a fictional account executive; never the principal
+    "principal": "Kenny Nguyen",             // A-026 (decided): R-17 "named human who authorized this class of action"
+    "approvers": ["Kenny Nguyen"],           // A-026 (decided): the named iTmethods account owner in the demo (A-043)
     "channels_that_send": ["briefing", "sequence", "unknown"],  // A-042 (decided): booking a briefing reaches a person; A-035 (proposed): unknown counts as sending
     "sender": "none"                         // A-035 (proposed): nothing is wired to send; approved = ready to send
   },

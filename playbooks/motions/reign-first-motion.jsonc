@@ -4,8 +4,8 @@
 {
   "motion_id": "reign-first-motion",
   "version": "0.2.0",
-  "owner": "Casey Morgan (fictional)",       // A-026 (decided)
-  "principal": "Casey Morgan (fictional)",   // R-17 principal for the motion-level ICP pass
+  "owner": "Kenny Nguyen",       // A-026 (decided)
+  "principal": "Kenny Nguyen",   // R-17 principal for the motion-level ICP pass
   "icp": "icp/icp.json",
   "playbooks": ["bank-sr26-2", "biopharma-fda-pccp", "defense-forge-first"]
 }
