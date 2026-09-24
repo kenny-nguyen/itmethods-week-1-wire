@@ -43,7 +43,7 @@ from agent.input.base import InputError
 from agent.input.models import Enrichment
 from agent.output.writer import RunPaths, approval_path, brief_path, write_json, write_text
 from agent.processing import preflight as pf
-from agent.processing.brief import BriefContext
+from agent.processing.brief import BriefContext, split_brief
 from agent.processing.checks import check_brief
 from agent.processing.icp import INCLUDE
 from agent.processing.routing import route
@@ -381,11 +381,17 @@ class GovernedTools:
         }
 
         def commit():
-            write_text(bpath, brief_markdown if brief_markdown.endswith("\n") else brief_markdown + "\n")
+            full = brief_markdown if brief_markdown.endswith("\n") else brief_markdown + "\n"
+            write_text(bpath, full)
+            forwardable, owner_notes = split_brief(full)  # public-only part and the owner's internal notes
+            write_text(bpath.with_name(bpath.stem + ".brief-forwardable.md"), forwardable)
+            write_text(bpath.with_name(bpath.stem + ".owner-notes.md"), owner_notes)
             try:
                 write_json(apath, request)
             except Exception:
-                bpath.unlink(missing_ok=True)
+                for f in (bpath, bpath.with_name(bpath.stem + ".brief-forwardable.md"),
+                          bpath.with_name(bpath.stem + ".owner-notes.md")):
+                    f.unlink(missing_ok=True)
                 raise
             self._count(pb, "drafted")
 

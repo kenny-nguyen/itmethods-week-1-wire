@@ -216,3 +216,44 @@ def get_provider(env: dict | None = None):
     if env.get("WIRE_PROVIDER", "").lower() in ("offline", "template") or not key:  # offline test mode
         return TemplateProvider()
     return AnthropicProvider(key, env.get("WIRE_MODEL", DEFAULT_MODEL))
+
+
+INTERNAL = re.compile(r"hubspot:|clay:|zoominfo:|do-not-route|\blanes?\b", re.IGNORECASE)
+FORWARDABLE_SECTIONS = ("## What changed", "## What is certain for this account", "## What depends on structure (confirm)",
+                        "## Where Reign fits", "## Suggested next step")
+
+
+def split_brief(text: str) -> tuple[str, str]:
+    """Split a gated brief into the part the account owner may forward (public sources only) and the owner's notes.
+
+    The forwardable part never carries system ids (HubSpot, Clay, ZoomInfo), recipients, lanes or do-not-route
+    mentions; any such line moves to the owner's notes, which keep everything internal.
+    """
+    lines = text.splitlines()
+    title = lines[0].replace(" for the account owner", "") if lines and lines[0].startswith("# ") else "# Brief"
+    fwd, notes, section = [title, ""], [title.replace("# ", "# Owner notes: ", 1), ""], ""
+    body_sources: dict[str, str] = {}
+    for line in lines[1:]:
+        if line.startswith("## "):
+            section = line.strip()
+            if section == "## Sources":
+                continue
+            (fwd if section in FORWARDABLE_SECTIONS else notes).extend(["", line])
+            continue
+        if section == "## Sources":
+            m = re.match(r"- \[([^\]]+)\]", line.strip())
+            if m:
+                body_sources[m.group(1)] = line
+            continue
+        if not line.strip():
+            continue
+        if section in FORWARDABLE_SECTIONS and not INTERNAL.search(line):
+            fwd.append(line)
+        else:
+            notes.append(line)
+    cite = re.compile(r"\[([A-Za-z0-9][A-Za-z0-9:_/.\-]*)\]")
+    fwd_ids = set(cite.findall("\n".join(fwd)))
+    fwd += ["", "## Sources"] + [l for i, l in body_sources.items() if i in fwd_ids and not INTERNAL.search(l)]
+    note_ids = set(cite.findall("\n".join(notes))) - fwd_ids
+    notes += ["", "## Sources for these notes"] + [l for i, l in body_sources.items() if i in note_ids]
+    return "\n".join(fwd).strip() + "\n", "\n".join(notes).strip() + "\n"

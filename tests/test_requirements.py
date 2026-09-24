@@ -58,7 +58,8 @@ class SubmissionRequirements(unittest.TestCase):
     def test_example_briefs_pass_the_gate(self):
         io = _load_inputs(ROOT)
         pb = load(ROOT / "playbooks/bank-sr26-2.jsonc")
-        briefs = list(ROOT.glob("examples/*/briefs/*.md"))
+        briefs = [b for b in ROOT.glob("examples/*/briefs/*.md")
+                  if not b.name.endswith((".brief-forwardable.md", ".owner-notes.md"))]
         self.assertTrue(briefs)
         for b in briefs:
             account = b.stem.rsplit("_", 1)[-1]
@@ -66,6 +67,12 @@ class SubmissionRequirements(unittest.TestCase):
             with self.subTest(brief=b.name):
                 kwargs = {**ctx.gate_kwargs(), "recipient_lines": None, "excluded_names": ()}
                 self.assertEqual(check_brief(b.read_text(), **kwargs), [])
+
+    def test_forwardable_briefs_carry_no_internal_data(self):
+        leaks = [f"{p.relative_to(ROOT)}: {l[:60]}" for p in ROOT.glob("examples/*/briefs/*.brief-forwardable.md")
+                 for l in p.read_text().splitlines()
+                 if re.search(r"hubspot:|clay:|zoominfo:|do-not-route|\blanes?\b", l, re.IGNORECASE)]
+        self.assertEqual(leaks, [])
 
     def test_no_packet_text_in_repo(self):
         """No 80+ character packet sentence appears in any repository text file (hash match, no packet text stored)."""

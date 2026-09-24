@@ -45,7 +45,7 @@ from agent.input.local import LocalClayEnrichment, LocalHubSpotAccounts, LocalRe
 from agent.input.models import Enrichment
 from agent.output.writer import RunPaths, approval_path, brief_path, write_json, write_text
 from agent.processing import preflight as pf
-from agent.processing.brief import BriefContext, ProviderError, get_provider
+from agent.processing.brief import BriefContext, ProviderError, get_provider, split_brief
 from agent.processing.checks import check_brief
 from agent.processing.icp import HOLD, INCLUDE, WATCH, Icp, IcpDecision
 from agent.processing.routing import route
@@ -298,10 +298,15 @@ def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, p
     def commit():
         # Brief and approval request land together or not at all (independent QA).
         write_text(bpath, text)
+        forwardable, owner_notes = split_brief(text)  # public-only part and the owner's internal notes
+        write_text(bpath.with_name(bpath.stem + ".brief-forwardable.md"), forwardable)
+        write_text(bpath.with_name(bpath.stem + ".owner-notes.md"), owner_notes)
         try:
             write_json(apath, request)
         except Exception:
-            bpath.unlink(missing_ok=True)
+            for f in (bpath, bpath.with_name(bpath.stem + ".brief-forwardable.md"),
+                      bpath.with_name(bpath.stem + ".owner-notes.md")):
+                f.unlink(missing_ok=True)
             raise
 
     try:
