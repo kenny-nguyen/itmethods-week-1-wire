@@ -114,7 +114,12 @@ RECIPIENTS_SECTION = "## Suggested recipients in the existing relationship"
 FAMILIES = re.compile(
     r"\bcompli\w*|\bcertif\w*|\baccredit\w*|\battest\w*|\bassured\b|\bvalidat\w*|\bconformit\w*|"
     r"\b(independent\w*|third[\s-]*party|external\w*|outside)\b[^.]{0,40}\b(assur\w*|review\w*|audit\w*|vouch\w*)|"
-    r"\biso\s*-?\s*\d{4,5}|\bsoc\s*-?\s*(2|ii)\b|\baudit\s+opinion", re.IGNORECASE)
+    r"\biso\s*-?\s*\d{4,5}|\bsoc\s*-?\s*(2|ii)\b|\baudit\s+opinion|"
+    # Adherence paraphrases (adversarial re-test F6), when they point at a regulation or requirements.
+    r"\b(adher\w*|conform\w*)\b|"
+    r"\b(align\w*|follow\w*|observ\w*|meet\w*|satisf\w*|in\s+line)\s+(with\s+|to\s+)?([\w()-]+\s+){0,3}"
+    r"(sr\s*\d|dora|osfi|e-23|b-13|requirement|standard|control|regulation|regulatory|rule|guidance|expectation)s?|"
+    r"\bsuitable\s+for\s+([\w-]+\s+){0,2}reliance", re.IGNORECASE)
 DURATION_WORDS = re.compile(r"\b(minutes?|mins?|hours?|hrs?)\b", re.IGNORECASE)
 # A conditional line may not widen a rule's scope (independent fact-check F-02, F-07).
 OVERSTATE = re.compile(

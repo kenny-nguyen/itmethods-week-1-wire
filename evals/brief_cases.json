@@ -638,6 +638,60 @@
         "text": "- iTmethods works as first line on model risk [P-BANKING]."
       },
       "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "F6: The bank adheres to SR 26-2",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank adheres to SR 26-2 [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It aligns with DORA",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It aligns with DORA [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It is in conformance with applicable requirements",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It is in conformance with applicable requirements [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It follows applicable regulatory standards",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It follows applicable regulatory standards [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It observes the required controls",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It observes the required controls [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It is suitable for regulatory reliance",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It is suitable for regulatory reliance [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
     }
   ],
   "caveat_cases": [
