@@ -68,7 +68,7 @@ def _validation_inputs() -> dict:
     icp = json.loads((ROOT / "icp/icp.json").read_text(encoding="utf-8"))
     claims = json.loads((ROOT / "docs/research/product-claims.json").read_text(encoding="utf-8"))["claims"]
     return {"fs_segments": {k for k, v in icp["segments"].items() if v.get("fs")},
-            "claim_ids": {c["id"] for c in claims},
+            "claim_ids": {c["id"] for c in claims if c.get("usable_in_briefs", True)},
             "implemented_triggers": LocalRegulatoryFeed(ROOT / "fixtures/regulatory_feed.json").implemented_ids()}
 
 

@@ -224,14 +224,15 @@ class GovernedTools:
         decision = icp.prescreen(acct)
         enrichment = Enrichment.empty(acct.id)
         if decision is None:
+            # R-17 order (adversarial QA F1): audit record first, then the enrichment adapter, inside the commit.
             try:
-                fetched = self.io["enrichment"].enrich(acct.id)
+                enrichment = self._guard(pb, lambda: motion_trail.perform(
+                    action="enrich", object_id=acct.system_id, fs=fs,
+                    commit=lambda: self.io["enrichment"].enrich(acct.id),
+                    purpose=f"Attach enrichment to {acct.name} to test the first Reign motion ICP criteria.",
+                    sources=[f"clay:company/{acct.id}"]), "screen")
             except InputError as exc:
                 self._fail("screen", f"enrichment source failed for {acct.id}: {exc}", "check the Clay adapter and retry.")
-            enrichment = self._guard(pb, lambda: motion_trail.perform(
-                action="enrich", object_id=acct.system_id, fs=fs, commit=lambda: fetched,
-                purpose=f"Attach enrichment to {acct.name} to test the first Reign motion ICP criteria.",
-                sources=[fetched.source or f"clay:row/{acct.id}"]), "screen")
             decision = icp.evaluate(acct, enrichment)
         self._guard(pb, lambda: motion_trail.perform(
             action="score", object_id=acct.system_id, fs=fs, commit=lambda: None,
@@ -299,8 +300,8 @@ class GovernedTools:
             detail={"lanes": {l: [c.system_id for c in cs] for l, cs in routed.items()},
                     "not_routed": [{"contact": c.system_id, "why": why} for c, why in skipped], "via": "mcp"}),
             "route")
-        st.update(stage="routed", routed=routed,
-                  flags=list(st["decision"].flags) + [f"{c.name} ({c.title}) not routed: {why}" for c, why in skipped])
+        st.update(stage="routed", routed=routed, not_routed=[c for c, _ in skipped],
+                  flags=list(st["decision"].flags) + [f"A contact was not routed: {why}." for c, why in skipped])
         return {"lanes": {l: [{"id": c.system_id, "name": c.name, "title": c.title} for c in cs]
                           for l, cs in routed.items()},
                 "not_routed": [{"id": c.system_id, "title": c.title, "why": why} for c, why in skipped],
@@ -309,15 +310,14 @@ class GovernedTools:
     def _context(self, pb: dict, st: dict) -> BriefContext:
         claims = {c["id"]: c for c in self.io["claims"]}
         return BriefContext(st["trigger"], st["preflight"], st["account"], st["enrichment"], st["routed"],
-                            [claims[i] for i in pb.get("claims", [])], st["account"].owner, st["flags"])
+                            [claims[i] for i in pb.get("claims", [])], st["account"].owner, st["flags"], not_routed=st.get("not_routed", []))
 
     def check_claims(self, playbook_id: str, account_id: str, brief_markdown: str) -> dict:
         """Run the output gate on a draft. Returns every problem, the allowed sources and the approved claims."""
         pb, _ = self._playbook(playbook_id)
         st = self._step(playbook_id, account_id, "routed")
         ctx = self._context(pb, st)
-        problems = check_brief(brief_markdown, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                               claim_texts=ctx.claim_texts(), caveat_required=pf.CAVEAT in st["preflight"].caveats)
+        problems = check_brief(brief_markdown, **ctx.gate_kwargs())
         return {"passed": not problems, "problems": problems,
                 "allowed_sources": [{"id": i, "cite_as": d} for i, d in ctx.sources()],
                 "approved_claims": [{"id": c["id"], "text": c["text"]} for c in ctx.claims],
@@ -352,8 +352,7 @@ class GovernedTools:
         st = self._step(playbook_id, account_id, "routed")
         ctx = self._context(pb, st)
         acct, trigger = st["account"], st["trigger"]
-        problems = check_brief(brief_markdown, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                               claim_texts=ctx.claim_texts(), caveat_required=pf.CAVEAT in st["preflight"].caveats)
+        problems = check_brief(brief_markdown, **ctx.gate_kwargs())
         if problems:  # enforced here, whatever the agent was told
             self.errors.record("tool.request_approval", "brief failed the output gate",
                                context={"account": acct.id, "problems": problems})

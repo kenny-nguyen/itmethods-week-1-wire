@@ -90,7 +90,7 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
         playbooks = []
         if not problems:
             kw = dict(fs_segments={k for k, v in icp.raw["segments"].items() if v.get("fs")},
-                      claim_ids={c["id"] for c in io["claims"]}, implemented_triggers=io["feed"].implemented_ids())
+                      claim_ids={c["id"] for c in io["claims"] if c.get("usable_in_briefs", True)}, implemented_triggers=io["feed"].implemented_ids())
             for pid in motion["playbooks"]:
                 path = trusted.playbook_file(pid, playbooks_dir)
                 pb = pbmod.load(path)
@@ -132,11 +132,13 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
                 # In profile on firmographics, but no live playbook for it: no enrichment, no brief.
                 decision = IcpDecision("no_live_playbook", fs, [f"no active playbook with an implemented trigger for '{acct.segment}'"])
             if decision is None:  # only in-profile companies with a live playbook are enriched
-                fetched = io["enrichment"].enrich(acct.id)
+                # R-17 order (adversarial QA F1): the audit record is written first, and only then is the
+                # enrichment adapter called, inside the commit.
                 enrichment = motion_trail.perform(
-                    action="enrich", object_id=acct.system_id, fs=fs, commit=lambda f=fetched: f,
+                    action="enrich", object_id=acct.system_id, fs=fs,
+                    commit=lambda a=acct: io["enrichment"].enrich(a.id),
                     purpose=f"Attach enrichment to {acct.name} to test the first Reign motion ICP criteria.",
-                    sources=[fetched.source or f"clay:row/{acct.id}"])
+                    sources=[f"clay:company/{acct.id}"])
                 decision = icp.evaluate(acct, enrichment)
             # Exclusion, hold and watch are our decisions about the account: audited as a score (A-024).
             motion_trail.perform(action="score", object_id=acct.system_id, fs=fs, commit=lambda: None,
@@ -262,9 +264,10 @@ def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, p
         counts["audit_blocked"] += 1
         entry.update(status="audit_blocked", reasons=[str(exc)])
         return
-    flags = list(decision.flags) + [f"{c.name} ({c.title}) not routed: {why}" for c, why in skipped]
+    flags = list(decision.flags) + [f"A contact was not routed: {why}." for c, why in skipped]
     claims = [claims_by_id[cid] for cid in pb.get("claims", [])]
-    ctx = BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, flags)
+    ctx = BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, flags,
+                       not_routed=[c for c, _ in skipped])
 
     try:
         text = provider.draft(ctx)
@@ -273,8 +276,7 @@ def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, p
         counts["draft_failed"] += 1
         entry["status"] = "draft_failed"
         return
-    problems = check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                           claim_texts=ctx.claim_texts(), caveat_required=pf.CAVEAT in result.caveats)
+    problems = check_brief(text, **ctx.gate_kwargs())
     if problems:
         errors.record("processing.gate", "brief failed the output gate", context={"account": acct.id, "problems": problems})
         counts["gate_failed"] += 1

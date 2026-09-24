@@ -63,7 +63,7 @@ CLAIMS = re.compile(
 NUMBER_WORDS = (r"(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|"
                 r"forty[\s-]*five|fifty|sixty|ninety|a\s+couple\s+of|a\s+few|several)")
 DURATION = re.compile(
-    r"\b\d+\s*(?:-|to|–)?\s*\d*\s*(?:m|min|mins|minute|minutes|h|hr|hrs|hour|hours)\b|"
+    r"\b\d+\s*(?:-|to|\u2013)?\s*\d*\s*(?:m|min|mins|minute|minutes|h|hr|hrs|hour|hours)\b|"
     rf"\b(half|quarter)[\s-]+(an|of\s+an)[\s-]+hour\b|\ban\s+hour\b|\b{NUMBER_WORDS}[\s-]+(min|mins|minute|minutes|hour|hours|hrs?)\b",
     re.IGNORECASE)
 # Rule 3: never imply CMMC, FedRAMP or CUI capability, and no ITAR claim.
@@ -99,8 +99,24 @@ def _sentences(lines: list[str]) -> list[str]:
     return out
 
 
+RECIPIENTS_SECTION = "## Suggested recipients in the existing relationship"
+# Conservative word families (adversarial QA F4): blocked anywhere outside the quoted approved claims and the
+# rendered recipient lines, however they are phrased.
+FAMILIES = re.compile(
+    r"\bcompli\w*|\bcertif\w*|\baccredit\w*|\battest\w*|\bassured\b|\bvalidat\w*|\bconformit\w*|"
+    r"\b(independent\w*|third[\s-]*party|external\w*|outside)\b[^.]{0,40}\b(assur\w*|review\w*|audit\w*|vouch\w*)|"
+    r"\biso\s*-?\s*\d{4,5}|\bsoc\s*-?\s*(2|ii)\b|\baudit\s+opinion", re.IGNORECASE)
+DURATION_WORDS = re.compile(r"\b(minutes?|mins?|hours?|hrs?)\b", re.IGNORECASE)
+# A conditional line may not widen a rule's scope (independent fact-check F-02, F-07).
+OVERSTATE = re.compile(
+    r"\bappl(y|ies) to (that|this|the|its|each|any|every|all) ([\w-]+ ){0,2}(entity|entities|organi[sz]ations?|arm|"
+    r"subsidiar\w*|bank|banks)\b|\bany (us )?(banking )?(entity|organi[sz]ation) (supervised|regulated)\b|"
+    r"\b(dora|sr 26-2) applies\b", re.IGNORECASE)
+
+
 def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], claim_texts: dict[str, str],
-                caveat_required: bool) -> list[str]:
+                caveat_required: bool, recipient_lines: list[str] | None = None,
+                excluded_names: list[str] | tuple = ()) -> list[str]:
     problems: list[str] = []
     body, sep, sources = text.partition("\n## Sources")
 
@@ -156,6 +172,18 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
             if not content.startswith("Prepared for "):
                 problems.append(f"unexpected text before the first section: {line[:80]!r}")
             continue
+        if section == RECIPIENTS_SECTION and recipient_lines is not None:
+            if line not in recipient_lines:
+                problems.append(f"names a recipient that routing did not return: {line[:80]!r}")
+            continue  # rendered from the audited routed set; titles may contain words like "compliance"
+        if not _is_claim_line(content, claim_texts):
+            fam = FAMILIES.search(CITATION.sub("", content))
+            if fam:
+                problems.append(f"claims or implies compliance, certification, assurance or validation ({fam.group(0)!r}): {line[:80]!r}")
+            if DURATION_WORDS.search(content):
+                problems.append(f"states a duration: {line[:80]!r}")
+        if OVERSTATE.search(CITATION.sub("", content)):
+            problems.append(f"overstates a rule's scope: {line[:80]!r}")
         if section == CONDITIONAL_SECTION:
             if not content.lower().startswith("confirm"):
                 problems.append(f"every line in '{CONDITIONAL_SECTION}' must start with 'Confirm': {line[:80]!r}")
@@ -173,8 +201,11 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
             problems.append(f"product sentence does not restate its cited approved claim: {sentence[:80]!r}")
         if CLAIMS.search(sentence) and not is_claim_text:
             problems.append(f"claims or implies compliance, certification, assurance or validation: {sentence[:80]!r}")
-    if DURATION.search(text):
+    if DURATION.search(body):
         problems.append("states a duration")
+    for name in excluded_names:
+        if name and name in text:
+            problems.append(f"names a contact that routing excluded: {name!r}")
     if DEFENSE.search(text):
         problems.append("mentions CMMC, FedRAMP, CUI or ITAR")
     slop = SLOP.findall(text)

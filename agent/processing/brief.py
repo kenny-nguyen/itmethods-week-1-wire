@@ -53,6 +53,22 @@ class BriefContext:
     claims: list[dict]  # approved product claims for this play
     approver: str
     flags: list[str] = field(default_factory=list)
+    not_routed: list[Contact] = field(default_factory=list)  # excluded by routing; never named in a brief
+
+    def recipient_lines(self) -> list[str]:
+        """The only recipient lines a brief may carry: rendered from the audited routed set (adversarial QA F3)."""
+        out = []
+        for lane, contacts in self.routed.items():
+            who = "; ".join(f"{c.name}, {c.title} [{c.system_id}]" for c in contacts) or "no contact on record"
+            out.append(f"- {lane.capitalize()} lane: {who}")
+        return out
+
+    def gate_kwargs(self) -> dict:
+        """Everything the output gate needs, so every caller checks a brief the same way."""
+        from agent.processing.preflight import CAVEAT
+        return {"allowed_ids": self.allowed_ids(), "allowed_urls": self.allowed_urls(),
+                "claim_texts": self.claim_texts(), "caveat_required": CAVEAT in self.preflight.caveats,
+                "recipient_lines": self.recipient_lines(), "excluded_names": [c.name for c in self.not_routed]}
 
     def sources(self) -> list[tuple[str, str]]:
         """(id, 'title - url' or system record) for every id the brief may cite."""
@@ -136,26 +152,21 @@ class TemplateProvider:
         lines += ["- " + cite(f"Confirm: {c}.", t.facts[0].source, a.system_id) for c in p.caveats if c != CAVEAT]
 
         lines += ["", "## What we know about the account"]
-        if a.runs_forge and any(c["id"] == "P-FORGE" for c in ctx.claims):
-            lines.append("- " + cite("Existing Forge customer.", a.system_id, "P-FORGE"))
+        if a.runs_forge:  # an account fact from the system of record, not a product claim
+            lines.append("- " + cite("Existing Forge customer.", a.system_id))
         if e.agent_adoption in ("production", "planned"):
-            lines.append("- " + cite(f"Agents: {e.agent_adoption}.", e.source))
+            phrase = "in production" if e.agent_adoption == "production" else "planned"
+            lines.append("- " + cite(f"Enrichment records AI agents {phrase} at the account.", e.source))
         if e.risk_committee:
-            lines.append("- " + cite("Risk committee on record.", e.source))
+            lines.append("- " + cite("Enrichment records a board risk committee.", e.source))
 
         lines += ["", "## Where Reign fits"]
-        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims if c["id"] not in ("P-FORGE", "P-BRIEFING")]
+        lines += ["- " + cite(c["text"], c["id"]) for c in ctx.claims]
 
         lines += ["", "## Suggested next step"]
         lines.append("- The account owner offers the audit and risk committee an Executive Assurance Briefing.")
-        brief = next((c for c in ctx.claims if c["id"] == "P-BRIEFING"), None)
-        if brief:
-            lines.append("- " + cite(brief["text"], brief["id"]))
 
-        lines += ["", "## Suggested recipients in the existing relationship"]
-        for lane, contacts in ctx.routed.items():
-            who = "; ".join(f"{c.name}, {c.title} [{c.system_id}]" for c in contacts) or "no contact on record"
-            lines.append(f"- {lane.capitalize()} lane: {who}")
+        lines += ["", "## Suggested recipients in the existing relationship"] + ctx.recipient_lines()
 
         lines += ["", "## Open questions for the account owner"]
         lines += [f"- {q}" for q in ctx.flags] or ["- None from the record."]
