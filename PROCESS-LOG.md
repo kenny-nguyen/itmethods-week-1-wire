@@ -1350,3 +1350,98 @@ The operator's two changes are in the code: agent adoption never excludes, there
 
 </details>
 
+### [D-024] 23:47 · PM · DECISION
+The operator decided every item that was still open. Four readings are confirmed as proposed (R-17 on every segment, unknown industry counts as financial services with a flag, the audited-steps list completed with our own decisions, one audience-trigger-channel per playbook). Six are changed by the operator and recorded as new rows A-038 to A-044.
+
+<details><summary>Structured fields</summary>
+
+**What:** Decided: A-006, A-007, A-017, A-024. New operator rows: A-038 (an audit record is our receipt, never a test for the prospect), A-039 (semiconductor), A-040 (hospitals: watch, don't contact), A-041 (three stub-shaped playbook files plus a motion file; A-030 rejected), A-042 (channel "briefing" is the booked meeting), A-043 (bank: no cold outreach; on a regulatory trigger the brief goes to the named iTmethods account owner), A-044 (the Canadian bank brief structure). Not covered by the message and still proposed: A-012, A-031, A-032, A-033, A-034, A-035; sent to the operator as batch `assumptions-3`.
+
+**Why:** Zero-assumption rule (D-006). A-042 is the operator's close reading of the packet: the CEO writes "on the calendar", and iTmethods' site makes the briefing stage 1 of its funnel, so "briefing" names the meeting and the brief is the document that earns it. A-043 records the reading "the thread = the existing relationship" (the bank already runs Forge) with its reversal trigger: evidence that "the thread" means a specific email thread or a regulator-facing channel.
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:46:06Z (23:46 KST).
+
+**Assumption:** none of the agent's own
+
+**Reversal trigger:** per row
+
+**Links:** D-014, A-038 to A-044, R-007 to R-010
+
+</details>
+
+### [R-007] 23:47 · PM · REVERSAL
+Reverses A-019 and A-020. Chipmakers without a recorded export-control problem, and hospitals, are no longer excluded. They go on a watch list: noticed and logged, never contacted.
+
+<details><summary>Structured fields</summary>
+
+**What:** New positions A-039 and A-040.
+
+**Why:** Operator decision.
+
+**Evidence:** Operator message at 23:46 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-019, A-020, A-039, A-040
+
+</details>
+
+### [R-008] 23:47 · PM · REVERSAL
+Reverses the single-file plays list (A-030, never approved) in favour of three playbook files, each exactly in the stub's shape, plus a motion file that references them. A-017's original reading, one trigger per playbook, is the one that stands.
+
+<details><summary>Structured fields</summary>
+
+**What:** New position A-041. The proposed reversal R-002 is withdrawn.
+
+**Why:** Operator decision.
+
+**Evidence:** Operator message at 23:46 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-017, A-030, R-002, A-041
+
+</details>
+
+### [R-009] 23:47 · PM · REVERSAL
+Reverses A-018 and A-009. "Briefing" is the booked meeting, not the document. For the bank, the agent never contacts the bank: on a regulatory trigger it writes the brief and routes it to the named iTmethods account owner, who decides whether to share it in the existing relationship.
+
+<details><summary>Structured fields</summary>
+
+**What:** New positions A-042 and A-043.
+
+**Why:** Operator decision; a closer reading of the packet than the agent's.
+
+**Evidence:** Operator message at 23:46 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** Per A-043.
+
+**Links:** A-009, A-018, A-042, A-043
+
+</details>
+
+### [R-010] 23:47 · PM · REVERSAL
+Reverses A-028. The Canadian bank brief is structured: what changed, what is certain at home, what depends on the bank's structure (each marked "confirm"), then a next step. It never says a rule applies.
+
+<details><summary>Structured fields</summary>
+
+**What:** New position A-044.
+
+**Why:** Operator decision.
+
+**Evidence:** Operator message at 23:46 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-025, A-028, A-044
+
+</details>
+
