@@ -8,6 +8,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from agent import config
 from agent.feedback import reports, trusted
 from agent.feedback.decide import check_kill_criteria
 from agent.governance.audit import AuditBlocked
@@ -57,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--detail", required=True)
     args = ap.parse_args(argv)
     try:
-        hits = report(args.request, by=args.by, kind=args.kind, detail=args.detail, out_dir=ROOT / "out")
+        hits = report(args.request, by=args.by, kind=args.kind, detail=args.detail, out_dir=config.out_dir())
     except ReportRefused as exc:
         print(f"REPORT REFUSED: {exc}", file=sys.stderr)
         return 2

@@ -99,6 +99,15 @@ class PipelineTests(unittest.TestCase):
             again = run(MOTION, out, provider=TemplateProvider())
             self.assertIn("kill switch", again["playbooks"][BANK]["skipped"])
 
+    def test_scheduled_rerun_does_not_brief_twice(self):  # D-029
+        with tempdir() as d:
+            out = Path(d)
+            first = run(MOTION, out, provider=TemplateProvider())
+            second = run(MOTION, out, provider=TemplateProvider())
+            self.assertEqual(len(first["outputs"]), 2)
+            self.assertEqual(second["outputs"], [])
+            self.assertEqual(second["accounts"]["hs-1002"]["status"], "already_briefed")
+
     def test_manual_kill_switch_skips_the_playbook(self):
         with tempdir() as d:
             out = Path(d)

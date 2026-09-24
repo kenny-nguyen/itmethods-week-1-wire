@@ -16,6 +16,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from agent import config
 from agent.feedback import kill_switch, trusted
 from agent.governance.audit import AuditBlocked
 from agent.governance.error_log import ErrorLog
@@ -66,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--clear", action="store_true")
     args = ap.parse_args(argv)
     try:
-        print(kill(args.playbook_id, by=args.by, reason=args.reason, clear=args.clear, out_dir=ROOT / "out"))
+        print(kill(args.playbook_id, by=args.by, reason=args.reason, clear=args.clear, out_dir=config.out_dir()))
     except KillRefused as exc:
         print(f"REFUSED: {exc}", file=sys.stderr)
         return 2

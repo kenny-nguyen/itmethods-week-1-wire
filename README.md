@@ -75,6 +75,8 @@ python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --r
 
 Only the playbook owner or a listed approver can report, engage or clear, and every one of those actions is audited. While a kill switch is engaged, that playbook is skipped and its approvals are refused. The kill criteria are quality-based (operator decision A-037): any R-17 audit failure, more than one draft in five failing the gate, more than half of decided briefs rejected, one complaint, or one wrong-account report.
 
+Running it for real (configuration, adapters, scheduling, recovery, and what is not production-ready yet): [`docs/production.md`](docs/production.md).
+
 ### 4. Check it
 
 ```
@@ -114,4 +116,6 @@ To connect a real tool, write one class against the matching interface in `agent
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |
 | `tests/` | Unit tests, one file per stage. |
 | `.github/workflows/ci.yml` | CI (continuous integration): runs the tests on every push. |
+| `docs/production.md` | Production guide: configuration, end-to-end run, approval and kill switch, wiring each adapter, scheduling, recovery, known gaps. |
+| `agent/config.py` | Deployment configuration read from the environment. |
 | `docs/research/` | Sourced facts the agent is allowed to use (product claims, regulator pages). |

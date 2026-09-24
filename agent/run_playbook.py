@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agent import AGENT_ID, __version__
+from agent import config
 from agent.feedback import kill_criteria, kill_switch, reports, trusted
 from agent.governance.audit import AuditBlocked, AuditTrail, JsonlAuditSink
 from agent.governance.error_log import ErrorLog
@@ -194,9 +195,26 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
     return summary
 
 
+def _already_briefed(paths: RunPaths, account_id: str, trigger_id: str, playbook_id: str) -> str | None:
+    """A scheduled rerun must not brief the same account on the same trigger twice (log D-029)."""
+    for p in sorted(paths.out.glob("runs/*/approvals/*.json")):
+        try:
+            r = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if (r.get("account", {}).get("id") == account_id and r.get("trigger") == trigger_id
+                and r.get("playbook", {}).get("id") == playbook_id and r.get("status") != "rejected"):
+            return f"{r.get('status')} in run {r.get('run_id')}"
+    return None
+
+
 def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, provider, trail, errors, paths,
                summary, counts) -> None:
     entry = summary["accounts"][acct.id]
+    prior = _already_briefed(paths, acct.system_id, trigger.id, pb["playbook_id"])
+    if prior:  # plain read of our own records: no new touch, nothing to audit
+        entry.update(playbook=pb["playbook_id"], status="already_briefed", reasons=[prior])
+        return
     result = pf.check(trigger, acct, enrichment, pb)
     entry.update(playbook=pb["playbook_id"], preflight=result.status, applicability=result.applicability,
                  preflight_reasons=result.reasons)
@@ -300,7 +318,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     try:
         # Output root is fixed so the audit trail and kill switches cannot be redirected (D-019).
-        s = run(trusted.motion_file(args.motion), ROOT / "out")
+        s = run(trusted.motion_file(args.motion), config.out_dir())
     except (RunRefused, trusted.Untrusted) as exc:
         print(f"RUN REFUSED: {exc}", file=sys.stderr)
         return 2

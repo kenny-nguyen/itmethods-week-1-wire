@@ -23,6 +23,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from agent import config
 from agent.feedback import kill_criteria, kill_switch, reports, trusted
 from agent.governance.audit import AuditBlocked, is_named_human
 from agent.governance.error_log import ErrorLog
@@ -131,7 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--reason", required=True)
     args = ap.parse_args(argv)
     try:
-        r = decide(args.request, approver=args.approver, approve=args.approve, reason=args.reason, out_dir=ROOT / "out")
+        r = decide(args.request, approver=args.approver, approve=args.approve, reason=args.reason, out_dir=config.out_dir())
     except DecisionRefused as exc:
         print(f"DECISION REFUSED: {exc}", file=sys.stderr)
         return 2
