@@ -1,0 +1,12 @@
+{
+  "_fixture": "Fictional enrichment rows standing in for a Clay table. Register rows A-012, A-013. null means the enrichment provider had no data.",
+  "rows": [
+    {"company_id": "hs-1001", "agent_adoption": "production", "risk_committee": true, "export_control_exposure": null, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1001"},
+    {"company_id": "hs-1002", "agent_adoption": "planned", "risk_committee": true, "export_control_exposure": null, "us_fed_regulated_entity": true, "source": "clay:table/first-motion/row/hs-1002"},
+    {"company_id": "hs-1003", "agent_adoption": "production", "risk_committee": true, "export_control_exposure": null, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1003"},
+    {"company_id": "hs-1004", "agent_adoption": "planned", "risk_committee": null, "export_control_exposure": true, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1004"},
+    {"company_id": "hs-1006", "agent_adoption": "production", "risk_committee": null, "export_control_exposure": null, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1006"},
+    {"company_id": "hs-1008", "agent_adoption": null, "risk_committee": null, "export_control_exposure": null, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1008"},
+    {"company_id": "hs-1009", "agent_adoption": "none", "risk_committee": true, "export_control_exposure": null, "us_fed_regulated_entity": null, "source": "clay:table/first-motion/row/hs-1009"}
+  ]
+}

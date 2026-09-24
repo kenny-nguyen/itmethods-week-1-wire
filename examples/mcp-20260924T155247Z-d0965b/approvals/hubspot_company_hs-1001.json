@@ -1,0 +1,35 @@
+{
+  "account": {
+    "id": "hubspot:company/hs-1001",
+    "name": "Northbridge Financial Group (fictional)"
+  },
+  "blockable": true,
+  "brief": "briefs/hubspot_company_hs-1001.md",
+  "channel": "briefing",
+  "drafted_by": "agent via MCP",
+  "note": "Nothing has been sent and the bank has not been contacted. The named account owner decides whether to share this brief in the existing relationship, with python3 -m agent.feedback.decide.",
+  "playbook": {
+    "id": "bank-sr26-2",
+    "version": "0.2.0"
+  },
+  "playbook_sha256": "4d1d7a773321296759e2825d865d6a2429bb6d2bb9904c694be0e1866b9798fa",
+  "request_id": "192e2ea5516b4dc6bc060328cda9519c",
+  "route_to": {
+    "account_owner": "Kenny Nguyen"
+  },
+  "run_id": "mcp-20260924T155247Z-d0965b",
+  "send": false,
+  "sender": "none",
+  "status": "pending",
+  "suggested_recipients_in_existing_relationship": {
+    "engineering": [
+      "zoominfo:contact/zi-2004"
+    ],
+    "risk": [
+      "zoominfo:contact/zi-2001",
+      "zoominfo:contact/zi-2002",
+      "zoominfo:contact/zi-2003"
+    ]
+  },
+  "trigger": "SR-26-2"
+}

@@ -1,0 +1,2 @@
+{"context": {}, "error_type": "Message", "message": "Midtown Health System (fictional) is in segment 'hospital', not this playbook's 'dsib_capital_markets'.", "run_id": "mcp-20260924T155642Z-7c9dc9", "severity": "error", "stage": "tool.screen", "ts": "2026-09-24T15:56:51.633019+00:00"}
+{"context": {}, "error_type": "Message", "message": "sources must be a non-empty list of URLs or system ids.", "run_id": "mcp-20260924T155642Z-7c9dc9", "severity": "error", "stage": "tool.audit", "ts": "2026-09-24T15:56:55.222367+00:00"}

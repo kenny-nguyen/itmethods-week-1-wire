@@ -1,0 +1,1 @@
+{"context": {}, "error_type": "Message", "message": "trigger 'sr-26-2' not found in $REPO/fixtures/regulatory_feed.json", "run_id": "mcp-20260924T155247Z-d0965b", "severity": "error", "stage": "tool.fetch_source", "ts": "2026-09-24T15:52:53.649795+00:00"}

@@ -1,0 +1,11 @@
+// The first Reign motion: one small file that references its playbooks (A-041, operator decision).
+// The motion runs the ICP filter once over the account list, then each playbook whose trigger is
+// implemented. Each playbook keeps its own approval, kill criteria and audit, as the stub has them.
+{
+  "motion_id": "reign-first-motion",
+  "version": "0.2.0",
+  "owner": "Casey Morgan (fictional)",       // A-026 (decided)
+  "principal": "Casey Morgan (fictional)",   // R-17 principal for the motion-level ICP pass
+  "icp": "icp/icp.json",
+  "playbooks": ["bank-sr26-2", "biopharma-fda-pccp", "defense-forge-first"]
+}

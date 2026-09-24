@@ -78,7 +78,7 @@ Not "does it look right" - an active attempt to break the claim. See section 3.
 Every QA finding, accepted or rejected, is recorded in the process log with the decision made about it.
 A finding that is dismissed must be dismissed *in writing, with a reason*. Silently dropped findings are the failure mode this gate exists to prevent.
 
-The detailed stage-by-stage checklist lives in **`QA-AT-EVERY-IPOF-STAGE.md`** in this kit. Read it before your first Output QA.
+The detailed stage-by-stage checklist lives in **`contract/QA-AT-EVERY-IPOF-STAGE.md`** in this kit. Read it before your first Output QA.
 
 ### Independent adversarial QA is ENABLED BY DEFAULT for this assignment
 
@@ -104,7 +104,7 @@ Therefore, for the duration of this assignment: **independent adversarial QA is 
 - **Independence is structural.** QA is a different execution context from the builder, working from a bounded brief. An agent does not QA its own output.
 - **Honest limits.** Anything outside the proof actually executed is labelled *not verified*. Never imply coverage you did not run.
 
-QA procedure: **`QA-AGENT-SOP.md`**. Verdict format: **`templates/qa-verdict.md`**. Every verdict is PASS, FAIL, or CONDITIONAL, with receipts and explicit proof boundaries, and every verdict is logged.
+QA procedure: **`contract/QA-AGENT-SOP.md`**. Verdict format: **`contract/templates/qa-verdict.md`**. Every verdict is PASS, FAIL, or CONDITIONAL, with receipts and explicit proof boundaries, and every verdict is logged.
 
 ---
 
@@ -163,7 +163,7 @@ The assignment is ambiguous on purpose. Ambiguity is expected, and handling it w
 When you hit a requirement that could reasonably be read more than one way, or a fact you need and do not have, do all five of these, in order:
 
 1. **Stop and name it.** Write down the exact ambiguity: the requirement as written, and the readings it admits.
-2. **Record it** in `AMBIGUITY-REGISTER.md` (format: `templates/ambiguity-register.md`) with an ID.
+2. **Record it** in `AMBIGUITY-REGISTER.md` (format: `contract/templates/ambiguity-register.md`) with an ID.
 3. **Decide and state the assumption explicitly.** Pick the reading you will proceed on. Say which one, and why that one - what evidence in the assignment, the repo, or ordinary practice supports it. "Most likely" is a reason. "I assumed" with no reason is not.
 4. **Proceed.** Do not block. Do not stall the window waiting for a clarification that is not coming. A well-reasoned, clearly-labelled assumption that is carried forward is worth far more than an unfinished deliverable.
 5. **Flag it in the deliverable.** The assumption must be visible to the reviewer in the final artifact, not buried in a log. Where the code depends on the assumption, say so at that point in the code or its documentation.
@@ -178,7 +178,7 @@ When you hit a requirement that could reasonably be read more than one way, or a
 
 ## 5. The process log
 
-`PROCESS-LOG.md` at the repository root is **the primary graded artifact**. Template and worked example: `templates/process-log.md`.
+`PROCESS-LOG.md` at the repository root is **the primary graded artifact**. Template and worked example: `contract/templates/process-log.md`.
 
 **Rules:**
 - **Append-only.** Never edit or delete an existing entry. If something turns out to be wrong, append a `REVERSAL` entry that references the original by ID. The record of having changed your mind is evidence, not embarrassment.
@@ -289,13 +289,13 @@ If the substrate makes one of these genuinely impossible, that is not a reason t
 | File | What it is |
 |---|---|
 | `AGENTS.md` | This contract. Read first, follow in full. |
-| `RUNBOOK.md` | The operating sequence for the window: what to do, in what order. |
-| `QA-AT-EVERY-IPOF-STAGE.md` | The stage-by-stage QA checklist behind section 2. |
-| `QA-AGENT-SOP.md` | How the QA role runs a pass. |
-| `templates/intake-worksheet.md` | First-pass structured read of the assignment. Feeds the opening GRAA checkpoint. |
-| `templates/process-log.md` | Template and worked example for `PROCESS-LOG.md`. |
-| `templates/ambiguity-register.md` | Template for `AMBIGUITY-REGISTER.md`. |
-| `templates/qa-verdict.md` | The PASS / FAIL / CONDITIONAL verdict format. |
+| `contract/RUNBOOK.md` | The operating sequence for the window: what to do, in what order. |
+| `contract/QA-AT-EVERY-IPOF-STAGE.md` | The stage-by-stage QA checklist behind section 2. |
+| `contract/QA-AGENT-SOP.md` | How the QA role runs a pass. |
+| `contract/templates/intake-worksheet.md` | First-pass structured read of the assignment. Feeds the opening GRAA checkpoint. |
+| `contract/templates/process-log.md` | Template and worked example for `PROCESS-LOG.md`. |
+| `contract/templates/ambiguity-register.md` | Template for `AMBIGUITY-REGISTER.md`. |
+| `contract/templates/qa-verdict.md` | The PASS / FAIL / CONDITIONAL verdict format. |
 | `.claude/agents/senior-pm.md` | Dispatchable definition for the Senior PM role. |
 | `.claude/agents/qa-engineer.md` | Dispatchable definition for the QA Engineer role. |
 | `.claude/agents/researcher.md` | Dispatchable definition for the Researcher role. |

@@ -1,0 +1,33 @@
+{
+  "account": {
+    "id": "hubspot:company/hs-1002",
+    "name": "Lakeshore Bancorp (fictional)"
+  },
+  "blockable": true,
+  "brief": "briefs/hubspot_company_hs-1002.md",
+  "channel": "briefing",
+  "drafted_by": "agent via MCP",
+  "note": "Nothing has been sent and the bank has not been contacted. The named account owner decides whether to share this brief in the existing relationship, with python3 -m agent.feedback.decide.",
+  "playbook": {
+    "id": "bank-sr26-2",
+    "version": "0.2.0"
+  },
+  "playbook_sha256": "4d1d7a773321296759e2825d865d6a2429bb6d2bb9904c694be0e1866b9798fa",
+  "request_id": "12c208e5ce9740bea0e2674334971eca",
+  "route_to": {
+    "account_owner": "Kenny Nguyen"
+  },
+  "run_id": "mcp-20260924T155247Z-d0965b",
+  "send": false,
+  "sender": "none",
+  "status": "pending",
+  "suggested_recipients_in_existing_relationship": {
+    "engineering": [
+      "zoominfo:contact/zi-2007"
+    ],
+    "risk": [
+      "zoominfo:contact/zi-2006"
+    ]
+  },
+  "trigger": "SR-26-2"
+}

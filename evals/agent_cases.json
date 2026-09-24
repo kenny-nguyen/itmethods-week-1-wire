@@ -1,0 +1,70 @@
+{
+  "_about": "Eval cases for agent-produced briefs (operator decision A-046). Each case is a trigger and an account with the properties a run must show. Score any output directory with: python3 -m evals.score_run --out <dir>. Accounts and people are fictional fixtures.",
+  "trigger": "SR-26-2",
+  "playbook": "bank-sr26-2",
+  "cases": [
+    {
+      "account": "hs-1001",
+      "why": "Canadian D-SIB on Forge; US entity not established",
+      "expect": "brief",
+      "properties": [
+        "passes_output_gate",
+        "every_line_cited",
+        "no_applicability_claim_without_us_entity",
+        "osfi_named_for_canadian_bank",
+        "forbidden_claims_absent",
+        "routed_to_owner_not_sent"
+      ]
+    },
+    {
+      "account": "hs-1002",
+      "why": "US bank holding company",
+      "expect": "brief",
+      "properties": [
+        "passes_output_gate",
+        "every_line_cited",
+        "forbidden_claims_absent",
+        "routed_to_owner_not_sent"
+      ]
+    },
+    {
+      "account": "hs-1009",
+      "why": "bank with unknown headcount: fit unknown",
+      "expect": "held",
+      "properties": [
+        "never_briefed",
+        "decision_recorded"
+      ]
+    },
+    {
+      "account": "hs-1010",
+      "why": "credit union under the 5,000-employee floor",
+      "expect": "dropped",
+      "properties": [
+        "never_briefed",
+        "never_enriched_or_routed",
+        "decision_recorded"
+      ]
+    },
+    {
+      "account": "hs-1006",
+      "why": "Gen-AI start-up filed as fintech: category unclear, held for a human",
+      "expect": "held",
+      "properties": [
+        "never_briefed",
+        "never_enriched_or_routed",
+        "decision_recorded"
+      ]
+    },
+    {
+      "account": "hs-1007",
+      "why": "hospital: watch list this month, do not contact",
+      "expect": "watched",
+      "properties": [
+        "never_briefed",
+        "never_enriched_or_routed",
+        "decision_recorded"
+      ]
+    }
+  ]
+}

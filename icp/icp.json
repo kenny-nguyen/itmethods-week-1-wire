@@ -1,0 +1,131 @@
+{
+  "_about": "The living ICP (ideal customer profile) for the first Reign motion, versioned data. _provenance says for every field whether it came from the packet or was invented, and why. Invented fields were all decided by the operator (register rows named).",
+  "version": "0.3.0",
+  "_provenance": {
+    "min_employees": "packet: CEO notes '5k+ employees'",
+    "unknown_employees": "invented: hold for a human when headcount is unknown, because the motion is precision not volume (A-004, decided)",
+    "agent_adoption": "packet: 'already has agents in production or about to'; invented: a signal only, never a reason to exclude (A-036, decided)",
+    "risk_committee": "packet: unvetted Slack note from Rob; invented: a flag, not a gate (A-021, decided)",
+    "unlisted_segment": "invented: an account whose fit is unclear is held for a human; clearly outside the ICP is dropped with the reason audited (A-031, decided)",
+    "fs_industries": "invented: which industries count as financial services; unknown counts as FS and is flagged 'industry unconfirmed' (A-006, decided)",
+    "exclusion_patterns": "packet: 'Do not include mid-market SaaS', 'Remove [AI startups]' (A-003, decided); invented: the naming-variant patterns, widened after two independent QA passes; applied to the category fields (segment, industry) only, never to free text, and an unclear category is held and flagged for a human (operator decision, A-050)",
+    "segments.dsib_capital_markets": "packet ICP sketch; invented: lanes risk and engineering (A-011, decided)",
+    "segments.biopharma_quality": "packet ICP sketch",
+    "segments.defense_supplier": "packet ICP sketch; invented: lead with Forge (A-023, decided)",
+    "segments.semiconductor": "packet CEO notes; invented: a target only with a recorded US export-control problem, otherwise the watch list (A-039, decided)",
+    "segments.hospital": "packet Slack note 'do not spray hospitals this month'; invented: watch, don't contact (A-040, decided)",
+    "segments.ai_native_saas / ai_startup / mid_market_saas": "packet; removed by operator decision (A-003)",
+    "watch_list": "invented: accounts noticed and logged, never contacted (A-039, A-040, decided)"
+  },
+  "min_employees": 5000,
+  "unknown_employees": "hold",
+  "agent_adoption": {
+    "unknown": "flag",
+    "none": "flag"
+  },
+  "risk_committee": {
+    "unknown_or_false": "flag"
+  },
+  "unlisted_segment": "hold",
+  "fs_industries": [
+    "banking",
+    "financial services",
+    "capital markets",
+    "insurance",
+    "investment management"
+  ],
+  "segments": {
+    "dsib_capital_markets": {
+      "include": true,
+      "fs": true,
+      "lead_product": "reign",
+      "buyer_lanes": [
+        "risk",
+        "engineering"
+      ],
+      "trigger": "SR-26-2"
+    },
+    "biopharma_quality": {
+      "include": true,
+      "fs": false,
+      "lead_product": "reign",
+      "buyer_lanes": [
+        "quality"
+      ],
+      "trigger": "FDA-PCCP-2025"
+    },
+    "defense_supplier": {
+      "include": true,
+      "fs": false,
+      "lead_product": "forge",
+      "buyer_lanes": [
+        "engineering"
+      ],
+      "trigger": "DEFENSE-TBD"
+    },
+    "semiconductor": {
+      "include": true,
+      "fs": false,
+      "lead_product": "forge",
+      "buyer_lanes": [
+        "engineering"
+      ],
+      "requires": {
+        "export_control_exposure": true
+      },
+      "otherwise": "watch"
+    },
+    "hospital": {
+      "include": false,
+      "watch": true,
+      "reason": "Watch, don't contact: noticed and logged, no brief this month (A-040)."
+    },
+    "ai_native_saas": {
+      "include": false,
+      "reason": "AI startups are removed from the ICP (A-003)."
+    },
+    "ai_startup": {
+      "include": false,
+      "reason": "AI startups are removed from the ICP (A-003)."
+    },
+    "mid_market_saas": {
+      "include": false,
+      "reason": "Mid-market SaaS is not in the ICP (A-003)."
+    }
+  },
+  "exclusion_patterns": [
+    {
+      "id": "ai-startup",
+      "regex": "\\b(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)[\\s_-]*(?:native[\\s_-]*|first[\\s_-]*|powered[\\s_-]*|based[\\s_-]*)?(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
+    },
+    {
+      "id": "ai-near-startup",
+      "regex": "\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?)\\b[^.]{0,40}\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b"
+    },
+    {
+      "id": "startup-near-ai",
+      "regex": "\\b(?:start[\\s_-]*ups?|scale[\\s_-]*ups?)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?)\\b"
+    },
+    {
+      "id": "ai-native",
+      "regex": "\\bai[\\s_-]*native\\b"
+    },
+    {
+      "id": "ai-first-company",
+      "regex": "\\bai[\\s_-]*first[\\s_-]*(?:company|startup|saas|vendor|business)\\b"
+    },
+    {
+      "id": "venture-stage-ai",
+      "regex": "\\b(?:series[\\s_-]*[a-d]|seed[\\s_-]*(?:stage|funded)|pre[\\s_-]*seed|early[\\s_-]*stage|venture[\\s_-]*(?:backed|funded)|vc[\\s_-]*backed|yc[\\s_-]*(?:backed|[wsf]\\d{2})|y[\\s_-]*combinator)\\b[^.]{0,40}\\b(?:(?:a\\.?i\\.?|artificial[\\s_-]*intelligence|machine[\\s_-]*learning|ml|deep[\\s_-]*learning|gen[\\s_-]*a\\.?i\\.?|generative[\\s_-]*a\\.?i\\.?|llms?|large[\\s_-]*language[\\s_-]*models?|foundation[\\s_-]*models?|gpt|autonomous[\\s_-]*agents?|agentic(?:[\\s_-]*ai)?)|copilots?|agents?)\\b"
+    },
+    {
+      "id": "mid-market-saas",
+      "regex": "\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b[^.]{0,30}\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b|\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b[^.]{0,40}\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b"
+    }
+  ],
+  "watch_list": {
+    "_about": "Noticed and logged in the audit trail and the run summary; never enriched, routed, briefed or contacted.",
+    "hospitals": "all hospitals this month (A-040)",
+    "chipmakers_without_us_export_control_problem": "semiconductor accounts without a recorded US export-control problem (A-039)"
+  }
+}

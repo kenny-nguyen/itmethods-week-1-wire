@@ -1,0 +1,175 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Run review mcp-20260924T155247Z-d0965b</title><style>
+body{font:15px/1.5 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;margin:0;background:#f6f7f9;color:#1d2330}
+main{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px;border-bottom:1px solid #d9dde5;padding-bottom:4px}
+.meta{color:#5b6475;font-size:13px}.banner{background:#fff4d6;border:1px solid #e8c766;padding:8px 12px;border-radius:6px;margin:12px 0}
+.card{background:#fff;border:1px solid #d9dde5;border-radius:8px;padding:12px 16px;margin:10px 0}
+pre{white-space:pre-wrap;word-wrap:break-word;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:0}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e6e9ef;padding:5px 6px;vertical-align:top}
+.ok{color:#146c2e;font-weight:600}.bad{color:#a1261b;font-weight:600}a{color:#1f56c2}
+</style></head><body><main>
+<h1>Run review</h1><div class=meta>run mcp-20260924T155247Z-d0965b &middot; drafted by agent via MCP &middot; generated from the run's files; those files are the source of truth</div>
+<h2>Briefs (with the risk and engineering framings)</h2>
+<div class=card><div class=meta><a href="briefs/hubspot_company_hs-1001.md">briefs/hubspot_company_hs-1001.md</a></div><pre># Northbridge Financial Group (fictional): SR 26-2 brief for the account owner
+
+Prepared for Kenny Nguyen, the account owner, to decide whether to share it in the existing relationship. Nothing has been sent and the bank has not been contacted.
+
+## What changed
+
+- On April 17, 2026 the Federal Reserve, with the OCC and FDIC, issued SR 26-2, replacing SR 11-7 and SR 21-8 with a risk-based approach to model risk. [src-sr26-2]
+- It expects to be most relevant to Federal Reserve-regulated banking organizations above $30 billion in total assets. [src-sr26-2]
+
+## What is certain for this account
+
+- OSFI Guideline E-23 covers model risk, including AI and machine learning models, and takes effect on May 1, 2027. [src-osfi-e23]
+- E-23 expects an enterprise model inventory that includes vendor models, with monitoring for autonomous decision-making and drift. [src-osfi-e23]
+- OSFI Guideline B-13 sets technology and cyber risk expectations for federally regulated financial institutions. [src-osfi-b13]
+
+## What depends on structure (confirm)
+
+- Confirm: SR 26-2 applicability requires confirmation; confirm whether Northbridge has a Federal Reserve-regulated banking organization. [src-sr26-2]
+- Confirm: whether Northbridge has EU entities of the types DORA covers; that depends on entity type, jurisdiction and facts. [src-dora]
+
+## What we know about the account
+
+- Canadian domestic systemically important bank with about USD 900 billion in total assets. [hubspot:company/hs-1001]
+- Existing Forge customer. [hubspot:company/hs-1001]
+- Agents are in production and a risk committee is on record. [clay:table/first-motion/row/hs-1001]
+
+## Where Reign fits
+
+- Reign Gateway gives applications and agents a governed path to approved models and tools. [P-GATEWAY]
+- Reign prepares the evidence; the people who own the risk decide. [P-EVIDENCE]
+- iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance, so where any of those functions is required, we would work with a firm that holds that mandate. [P-BANKING]
+
+## Suggested next step
+
+- Offer the audit and risk committee an Executive Assurance Briefing on how the production agents would sit in an E-23 model inventory.
+
+## Suggested recipients in the existing relationship
+- Risk lane: Avery Lindqvist (fictional), Chief Audit Executive [zoominfo:contact/zi-2001]; Morgan Achebe (fictional), Chief Risk Officer [zoominfo:contact/zi-2002]; Priya Raman (fictional), Head of Model Risk Management [zoominfo:contact/zi-2003]
+- Engineering lane: Daniel Okafor (fictional), VP, Platform Engineering [zoominfo:contact/zi-2004]
+
+## Open questions for the account owner
+
+- Does Northbridge have a US banking organization regulated by the Federal Reserve? Until that is known, SR 26-2 applicability requires confirmation.
+- Does Northbridge have EU entities of the types DORA covers?
+- Are the production agents in the bank&#x27;s model inventory today, and who owns each one?
+- One contact was not routed because the title matches the do-not-route list for information security.
+
+## Lane framings for the account owner
+
+**Risk (audit, model risk, evidence):** From May 1, 2027, E-23 puts AI and machine learning models, vendor models included, into the enterprise inventory, and Northbridge already has agents in production. The useful question for the Chief Audit Executive and the Head of Model Risk Management is what record exists today for each agent: owner, risk rating, and monitoring for autonomous behaviour and drift. Any SR 26-2 angle waits until a US Federal Reserve-regulated entity is confirmed.
+
+**Engineering (runtime, governed path for agent calls):** The platform team already runs the estate these agents sit on. The question for the VP, Platform Engineering is whether production agents reach models and tools through one governed path that records which agent called what, under which approval, so the risk lane has a record to work from.
+
+## Sources
+
+- [src-sr26-2] Federal Reserve SR 26-2 - https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
+- [src-osfi-e23] OSFI Guideline E-23 - Model Risk Management (2027) - https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027
+- [src-osfi-b13] OSFI Guideline B-13 - Technology and Cyber Risk Management - https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management
+- [src-dora] EIOPA - Digital Operational Resilience Act (DORA) - https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en
+- [P-GATEWAY] iTmethods - https://itmethods.com/gateway
+- [P-EVIDENCE] iTmethods - https://itmethods.com/assurance
+- [P-BANKING] iTmethods - https://itmethods.com/sectors/banking
+- [hubspot:company/hs-1001] HubSpot company record
+- [clay:table/first-motion/row/hs-1001] Clay enrichment row
+- [zoominfo:contact/zi-2001] ZoomInfo contact record
+- [zoominfo:contact/zi-2002] ZoomInfo contact record
+- [zoominfo:contact/zi-2003] ZoomInfo contact record
+- [zoominfo:contact/zi-2004] ZoomInfo contact record
+</pre></div>
+<div class=card><div class=meta><a href="briefs/hubspot_company_hs-1002.md">briefs/hubspot_company_hs-1002.md</a></div><pre># Lakeshore Bancorp (fictional): SR 26-2 brief for the account owner
+
+Prepared for Kenny Nguyen, the account owner, to decide whether to share it in the existing relationship. Nothing has been sent and the bank has not been contacted.
+
+## What changed
+
+- On April 17, 2026 the Federal Reserve, with the OCC and FDIC, issued SR 26-2, replacing SR 11-7 and SR 21-8 with a risk-based approach to model risk. [src-sr26-2]
+- The letter calls for model risk practices tailored to each organization&#x27;s model risk profile and the size and complexity of its operations. [src-sr26-2]
+
+## What is certain for this account
+
+- SR 26-2 says it is expected to be most relevant to Federal Reserve-regulated banking organizations with over $30 billion in total assets. [src-sr26-2]
+- Lakeshore&#x27;s record shows about USD 85 billion in total assets. [hubspot:company/hs-1002]
+
+## What depends on structure (confirm)
+
+- Confirm: whether Lakeshore Bancorp&#x27;s banking organizations are regulated by the Federal Reserve, and their total assets; the letter is expected to be most relevant above $30 billion. [src-sr26-2]
+- Confirm: whether Lakeshore Bancorp has EU entities of the types DORA covers; that depends on entity type, jurisdiction and facts. [src-dora]
+
+## What we know about the account
+
+- US bank holding company with about 12,000 employees. [hubspot:company/hs-1002]
+- The enrichment record marks a Federal Reserve-regulated entity, agents as planned rather than in production, and a risk committee. [clay:table/first-motion/row/hs-1002]
+
+## Where Reign fits
+
+- Reign Gateway gives applications and agents a governed path to approved models and tools. [P-GATEWAY]
+- Reign prepares the evidence; the people who own the risk decide. [P-EVIDENCE]
+- iTmethods does not validate its own work, independently review it or subject it to effective challenge, and does not certify, attest, issue an audit opinion or provide independent assurance, so where any of those functions is required, we would work with a firm that holds that mandate. [P-BANKING]
+
+## Suggested next step
+
+- Offer the audit and risk committee an Executive Assurance Briefing on how planned agents would enter the bank&#x27;s model risk management in light of SR 26-2, before they reach production.
+
+## Suggested recipients in the existing relationship
+- Risk lane: Jordan Whitfield (fictional), Chief Risk Officer [zoominfo:contact/zi-2006]
+- Engineering lane: Casey Nakamura (fictional), Head of AI Engineering [zoominfo:contact/zi-2007]
+
+## Open questions for the account owner
+
+- The Federal Reserve-regulated entity comes from the enrichment row; can the account owner confirm it and name the entity?
+- Does Lakeshore have EU entities of the types DORA covers?
+- Which agent use cases are planned, and would the bank treat them as models in its inventory?
+- No chief audit executive is on record in the routed contacts; is there one in the existing relationship?
+
+## Lane framings for the account owner
+
+**Risk (model risk, audit, evidence):** SR 26-2 replaces SR 11-7 and asks for an approach sized to the bank&#x27;s own model risk profile. With agents still planned, the Chief Risk Officer can decide how agents are classified, inventoried and monitored before the first one ships, rather than retrofitting a record afterwards.
+
+**Engineering (runtime, governed path for agent calls):** The Head of AI Engineering is designing the agent runtime now. The question is whether every agent reaches models and tools through one governed path that records which agent called what, under which approval, so the risk lane has a record from day one.
+
+## Sources
+
+- [src-sr26-2] Federal Reserve SR 26-2 - https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
+- [src-dora] EIOPA - Digital Operational Resilience Act (DORA) - https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en
+- [P-GATEWAY] iTmethods - https://itmethods.com/gateway
+- [P-EVIDENCE] iTmethods - https://itmethods.com/assurance
+- [P-BANKING] iTmethods - https://itmethods.com/sectors/banking
+- [hubspot:company/hs-1002] HubSpot company record
+- [clay:table/first-motion/row/hs-1002] Clay enrichment row
+- [zoominfo:contact/zi-2006] ZoomInfo contact record
+- [zoominfo:contact/zi-2007] ZoomInfo contact record
+</pre></div>
+<h2>Approval requests</h2><table><tr><th>Account</th><th>Status</th><th>Routed to</th><th>Sent</th><th>File</th></tr>
+<tr><td>Northbridge Financial Group (fictional)</td><td>pending</td><td>Kenny Nguyen</td><td>no</td><td><a href="approvals/hubspot_company_hs-1001.json">approvals/hubspot_company_hs-1001.json</a></td></tr>
+<tr><td>Lakeshore Bancorp (fictional)</td><td>pending</td><td>Kenny Nguyen</td><td>no</td><td><a href="approvals/hubspot_company_hs-1002.json">approvals/hubspot_company_hs-1002.json</a></td></tr>
+</table>
+<h2>Eval score</h2><p class=ok>16/16</p><table><tr><th>Account</th><th>Expect</th><th>Failed properties</th></tr>
+<tr><td>hs-1001</td><td>brief</td><td class=ok>none</td></tr>
+<tr><td>hs-1002</td><td>brief</td><td class=ok>none</td></tr>
+<tr><td>hs-1009</td><td>held</td><td class=ok>none</td></tr>
+<tr><td>hs-1010</td><td>dropped</td><td class=ok>none</td></tr>
+<tr><td>hs-1006</td><td>held</td><td class=meta>not exercised this run</td></tr>
+<tr><td>hs-1007</td><td>watched</td><td class=meta>not exercised this run</td></tr>
+</table><p class=meta>Cases: evals/agent_cases.json; scorer: evals/score_run.py</p>
+<h2>Held, dropped, watched or blocked</h2><table><tr><th>Object</th><th>Decision</th><th>Reason</th></tr>
+<tr><td>hubspot:company/hs-1009</td><td>hold</td><td>headcount unknown; the ICP floor is 5,000 employees (A-004)</td></tr>
+<tr><td>hubspot:company/hs-1010</td><td>exclude</td><td>800 employees is under the 5000 floor</td></tr>
+</table><p class=meta>Source: <a href="../../audit.jsonl">../../audit.jsonl</a></p>
+<h2>Audit trail for this run (10 records)</h2><table><tr><th>Action</th><th>Object</th><th>Principal</th><th>Send</th><th>Purpose</th></tr>
+<tr><td>enrich</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Attach enrichment to Northbridge Financial Group (fictional) to test the first Reign motion ICP criteria.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;include&#x27; for Northbridge Financial Group (fictional) in the first Reign motion.</td></tr>
+<tr><td>enrich</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Attach enrichment to Lakeshore Bancorp (fictional) to test the first Reign motion ICP criteria.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;include&#x27; for Lakeshore Bancorp (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1009</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;hold&#x27; for Harbourline Trust (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1010</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;exclude&#x27; for Riverbend Credit Union (fictional) in the first Reign motion.</td></tr>
+<tr><td>route</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Record which Northbridge Financial Group (fictional) contacts the brief suggests to the account owner, by lane.</td></tr>
+<tr><td>route</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Record which Lakeshore Bancorp (fictional) contacts the brief suggests to the account owner, by lane.</td></tr>
+<tr><td>create</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Draft the SR 26-2 brief for Northbridge Financial Group (fictional) and route it to the account owner Kenny Nguyen, who decides before anything is shared.</td></tr>
+<tr><td>create</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Draft the SR 26-2 brief for Lakeshore Bancorp (fictional) and route it to the account owner Kenny Nguyen, who decides before anything is shared.</td></tr>
+</table><p class=meta>Source: <a href="../../audit.jsonl">../../audit.jsonl</a></p>
+<h2>Errors (1)</h2>
+<table><tr><th>Stage</th><th>Message</th></tr><tr><td>tool.fetch_source</td><td>trigger &#x27;sr-26-2&#x27; not found in $REPO/fixtures/regulatory_feed.json</td></tr></table>
+<p class=meta>Source: <a href="../../errors.jsonl">../../errors.jsonl</a></p></main></body></html>

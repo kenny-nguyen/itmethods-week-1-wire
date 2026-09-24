@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "week1-wire": {
+      "command": ".venv/bin/python",
+      "args": ["-m", "agent.mcp_server"],
+      "env": {}
+    }
+  }
+}

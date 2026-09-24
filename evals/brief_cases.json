@@ -1,0 +1,709 @@
+{
+  "_about": "Deterministic evals for the brief output gate. Each case takes a brief that passes, applies one edit, and names the problem the gate must report. The content rules come from docs/research/itmethods-product-facts.md (proposed reading A-029).",
+  "cases": [
+    {
+      "name": "clean brief passes",
+      "edit": null,
+      "expect": null
+    },
+    {
+      "name": "compliance claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign makes the bank compliant with SR 26-2 [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "certification claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign Assurance is certified for model risk work [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "independent assurance claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign provides independent assurance to the audit committee [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "independent validation claim",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign will independently validate your models [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "briefing duration",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- The briefing takes 45 minutes [P-BRIEFING]."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "briefing duration range",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Book a 45-60 min slot."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "CMMC capability",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign supports CMMC Level 2 programmes [P-GATEWAY]."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "FedRAMP mention",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Ask whether FedRAMP matters to them."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "product claim without claim id",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- Reign cuts model validation time in half."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "invented URL",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- See the regulator's summary [src-sr26-2] at https://example.com/sr26-2-summary."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "unknown citation id",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- The bank's CRO spoke about SR 26-2 last week [linkedin:post/123]."
+      },
+      "expect": "unknown source id"
+    },
+    {
+      "name": "filler phrasing",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- In today's rapidly evolving landscape, banks must act [src-sr26-2]."
+      },
+      "expect": "filler"
+    },
+    {
+      "name": "em dash",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- Model risk guidance changed \u2014 again [src-sr26-2]."
+      },
+      "expect": "filler"
+    },
+    {
+      "name": "missing section",
+      "edit": {
+        "remove_section": "## Suggested next step"
+      },
+      "expect": "missing section"
+    },
+    {
+      "name": "over length",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text_repeat": "- Confirm the owner of model inventory for agent workloads before the call.",
+        "times": 30
+      },
+      "expect": "limit is"
+    },
+    {
+      "name": "paraphrase: in line with",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign keeps the bank fully in line with SR 26-2 [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "paraphrase: satisfies expectations",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign satisfies every SR 26-2 expectation [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "paraphrase: handles compliance",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign handles SR 26-2 compliance for you [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "negation bypass",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign makes the bank compliant with no manual work [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "third-party validation",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Models run through the platform are validated by a third party [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "third-party assurance",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The board gets third-party assurance from this work [P-ASSURANCE]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "accreditation",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform is SOC 2 accredited [P-GATEWAY]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "duration in words",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The briefing takes half an hour."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration spelled out",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Plan for about thirty minutes."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration short form",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Book a 45m session."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "FedRAMP spaced",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform supports Fed RAMP High workloads."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "ITAR spelled out",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Fits International Traffic in Arms Regulations programs."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "CMMC dotted",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Ready for C.M.M.C. assessments."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "bare domain",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- See www.evil-example.com/report for more."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "protocol-relative link",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Deck at //attacker.example/p for the approver."
+      },
+      "expect": "not an approved source"
+    },
+    {
+      "name": "markdown image beacon",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- ![](https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm)"
+      },
+      "expect": "HTML or markdown"
+    },
+    {
+      "name": "HTML image",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- <img src=x>"
+      },
+      "expect": "HTML or markdown"
+    },
+    {
+      "name": "uppercase product name",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- REIGN runs the model inventory for the bank."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "wrong claim id",
+      "source": "independent QA or security review",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Reign replaces the bank's model validation team [P-BRIEFING]."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "heading bypass",
+      "source": "independent QA",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "### Reign guarantees SR 26-2 compliance and certifies your models"
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "after-Sources bypass",
+      "source": "independent QA",
+      "edit": {
+        "append_to": "## Sources",
+        "text": "Reign guarantees SR 26-2 compliance and is certified. The briefing is 45 minutes."
+      },
+      "expect": "unexpected text in Sources"
+    },
+    {
+      "name": "claims the rule applies",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What is certain for this account",
+        "text": "- SR 26-2 applies to the bank [src-sr26-2]."
+      },
+      "expect": "says a rule applies outside the conditional section"
+    },
+    {
+      "name": "says in scope",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What changed",
+        "text": "- The bank is in scope for SR 26-2 [src-sr26-2]."
+      },
+      "expect": "says a rule applies outside the conditional section"
+    },
+    {
+      "name": "unmarked structural line",
+      "source": "operator decision A-044: never claim a rule applies",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "- The bank has a US entity supervised by the Federal Reserve [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "applies: governs",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- SR 26-2 governs Lakeshore Bancorp (fictional) [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: must comply",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank must comply with SR 26-2 [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: binds",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- E-23 binds the bank now [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: applicable to",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- SR 26-2 is applicable to the bank [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "applies: regulated under",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank is regulated under SR 26-2 and must follow it [src-sr26-2]."
+      },
+      "expect": "says a rule applies"
+    },
+    {
+      "name": "confirm rule: unbulleted line",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "SR 26-2 governs this bank [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "confirm rule: star bullet",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "* The bank has a US entity [src-sr26-2]."
+      },
+      "expect": "must start with 'Confirm'"
+    },
+    {
+      "name": "uncited fact",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Lakeshore runs 40 AI agents in production today."
+      },
+      "expect": "line has no citation"
+    },
+    {
+      "name": "uncited paragraph",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "Lakeshore was fined by the Federal Reserve last year."
+      },
+      "expect": "line has no citation"
+    },
+    {
+      "name": "claim: examiners sign off",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- Gives your examiners everything they need to sign off [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: pass the exam",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank will pass its next Federal Reserve exam [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: SOC-II",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The platform is SOC-II audited [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "claim: vouched",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- An outside firm has vouched for the controls [src-sr26-2]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "duration: twelve minutes",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- The briefing runs twelve minutes."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration: ninety mins",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Block ninety mins."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "duration: couple of hours",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- It takes a couple of hours."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "defense: controlled-unclassified",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Handles controlled-unclassified data."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "defense: FedRAMP spelled out",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Ready for the Federal Risk and Authorization Management Program."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "defense: NIST 800-171 and DFARS",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Supports NIST SP 800-171 and DFARS 7012 workloads."
+      },
+      "expect": "CMMC"
+    },
+    {
+      "name": "unknown section",
+      "source": "independent QA pass 2",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "## Bonus claims"
+      },
+      "expect": "unexpected section"
+    },
+    {
+      "name": "generic AI governance language",
+      "source": "CEO notes; operator decision (skill rules)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Position Reign as the bank's AI governance answer."
+      },
+      "expect": "filler"
+    },
+    {
+      "name": "F4: compliance-ready",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- This is compliance-ready [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: meets ISO 27001",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service meets ISO 27001 [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: aligned to ISO 27001",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service is aligned to ISO 27001 [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: ISO 27001-ready",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service is ISO 27001-ready [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: conformity assessment",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service has passed a conformity assessment [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: assured by an external reviewer",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service has been assured by an external reviewer [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: independently assured",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The service is independently assured [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F4: one-and-a-half hours",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- The briefing lasts one-and-a-half hours."
+      },
+      "expect": "duration"
+    },
+    {
+      "name": "fact-check: SR 26-2 applies to that entity",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "- Confirm: if the bank has a US arm, SR 26-2 applies to that entity [src-sr26-2]."
+      },
+      "expect": "overstates a rule's scope"
+    },
+    {
+      "name": "fact-check: any Fed-supervised entity",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "- Confirm: any US banking entity supervised by the Federal Reserve is covered [src-sr26-2]."
+      },
+      "expect": "overstates a rule's scope"
+    },
+    {
+      "name": "fact-check: DORA applies to any EU entity",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## What depends on structure (confirm)",
+        "text": "- Confirm: DORA applies to any EU financial entity the bank owns [src-dora]."
+      },
+      "expect": "overstates a rule's scope"
+    },
+    {
+      "name": "fact-check: 'first line' interpretation",
+      "source": "independent adversarial QA (docs/qa/adversarial-report.md) or fact-check (docs/qa/factcheck-report.md)",
+      "edit": {
+        "append_to": "## Where Reign fits",
+        "text": "- iTmethods works as first line on model risk [P-BANKING]."
+      },
+      "expect": "does not restate its cited approved claim"
+    },
+    {
+      "name": "F6: The bank adheres to SR 26-2",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- The bank adheres to SR 26-2 [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It aligns with DORA",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It aligns with DORA [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It is in conformance with applicable requirements",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It is in conformance with applicable requirements [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It follows applicable regulatory standards",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It follows applicable regulatory standards [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It observes the required controls",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It observes the required controls [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    },
+    {
+      "name": "F6: It is suitable for regulatory reliance",
+      "source": "adversarial re-test (docs/qa/adversarial-retest-report.md)",
+      "edit": {
+        "append_to": "## What we know about the account",
+        "text": "- It is suitable for regulatory reliance [hubspot:company/hs-1002]."
+      },
+      "expect": "claims or implies compliance"
+    }
+  ],
+  "caveat_cases": [
+    {
+      "name": "caveat present passes",
+      "remove_caveat": false,
+      "expect": null
+    },
+    {
+      "name": "caveat removed fails",
+      "remove_caveat": true,
+      "expect": "applicability requires confirmation"
+    }
+  ]
+}
