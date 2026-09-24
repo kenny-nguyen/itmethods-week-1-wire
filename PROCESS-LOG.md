@@ -1,29 +1,29 @@
 # Process log
 
-One page, as the packet asks. The full record, written as it happened: [docs/decision-log.md](docs/decision-log.md). Times are KST (Korea Standard Time).
+One page, as the packet asks. Times are KST (Korea Standard Time). The reasoning behind each judgment call: [`AMBIGUITY-REGISTER.md`](AMBIGUITY-REGISTER.md).
 
-## What we tried
+## What I tried
 
-Option 3: a Claude skill driving our own MCP (Model Context Protocol) server, with evals. The skill tells the agent how to read SR 26-2 and reason about one bank; the server's tools enforce R-17, the exclusions, routing and claim limits, so the agent cannot skip them. Rules and tests came before the agent. Claude Code built it; Codex ran independent QA (quality assurance); HubSpot, Clay and ZoomInfo are fixtures ([day-one wiring](docs/day-one-wiring.md)).
+Option 3: a Claude skill driving my own MCP (Model Context Protocol) server, with evals. The skill tells the agent how to read SR 26-2 and reason about one bank; the server's tools enforce R-17, the exclusions, routing and claim limits, so the agent cannot skip them. Rules and tests came before the agent. HubSpot, Clay and ZoomInfo are fixtures ([day-one wiring](docs/day-one-wiring.md)); tools used: [README](README.md#how-it-was-built).
 
 ## What failed
 
-- **Guessed sources.** Two FDA PCCP URLs we guessed returned 404; a researcher found the real guidance (R-012).
-- **Our cross-border lines overstated scope.** The independent fact-check returned FAIL: our brief said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA to any EU financial entity; the sources support neither. Four product claims cited changed pages ([report](docs/qa/factcheck-report.md)).
-- **Four defects our tests missed.** With 92 tests green, an adversarial reviewer on a different model found enrichment running before its R-17 audit record, a "C.I.S.O." title routed to engineering, a brief that could re-add an excluded CISO, and paraphrases like "compliance-ready" passing the claim gate ([report](docs/qa/adversarial-report.md)).
-- **Two usage-limit stops.** The review agent hit its session limit at 00:12; it reset and we reran. A second stop cleared at 00:36 after a plan upgrade.
+- **Guessed sources.** Two FDA PCCP URLs an agent guessed returned 404; a research agent found the real guidance.
+- **My cross-border lines overstated scope.** The independent fact-check returned FAIL: my brief said SR 26-2 applies to any Federal Reserve-supervised US entity and DORA to any EU financial entity; the sources support neither. Four product claims cited changed pages ([report](docs/qa/factcheck-report.md)).
+- **Four defects my tests missed.** With 92 tests green, an adversarial reviewer on a different model found enrichment running before its R-17 audit record, a "C.I.S.O." title routed to engineering, a brief that could re-add an excluded CISO, and paraphrases like "compliance-ready" passing the claim gate ([report](docs/qa/adversarial-report.md)).
+- **Two usage-limit stops.** The validation review agent hit its session limit at 00:12, then reset; a second stop cleared at 00:36 after a plan upgrade.
 - **This log** first ran to about 14,700 words.
 
-## What we learned
+## What I learned
 
 - Cross-border regulation is where a bank brief is judged ([One thing I did not know](docs/one-thing-i-did-not-know.md)).
-- Tests pass on the cases the builder imagined. A reviewer on another model, briefed to break things, found the rest.
-- Building mode drifts. The operator's 00:24 correction: work against the actual goal and requirements.
+- Tests pass on the cases their author imagined. A reviewer on another model, briefed to break things, found the rest.
+- Building mode drifts. My note at 00:24: "act against the actual goal and requirements rather than getting lost in building mode".
 
 ## With another three hours
 
 1. Build the pharma trigger on the verified FDA PCCP guidance, scored by the same evals.
-2. Confirm with the CEO and CRO what Rob intends for defense, and how to classify companies blurring "AI startup" and "uses AI".
+2. Confirm with the CEO and CRO Rob's intent for defense, and how to classify companies blurring "AI startup" and "uses AI".
 3. Wire the real blockable send path and a durable audit sink.
 4. Run and score the direct model-API path with a key.
 5. A drift check that fails when a quoted product claim leaves its page.

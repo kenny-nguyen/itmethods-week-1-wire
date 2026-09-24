@@ -1,14 +1,14 @@
 # One thing I did not know: which rules reach a Canadian bank, and through what
 
-When the window opened, neither the operator nor the agents knew how a US Federal Reserve letter relates to a Canadian bank ("The regulations and the R-17 style audit are new to us", operator journal, 23:14). The trigger in the packet is SR 26-2. The buyer is a Canadian D-SIB (domestic systemically important bank). The obvious brief, "SR 26-2 is out, here is what it means for you", would have been wrong, and wrong in front of the one reader who would notice: the bank's audit and risk function.
+When the window opened, I did not know how a US Federal Reserve letter relates to a Canadian bank. The trigger in the packet is SR 26-2. The buyer is a Canadian D-SIB (domestic systemically important bank). The obvious brief, "SR 26-2 is out, here is what it means for you", would have been wrong, and wrong in front of the one reader who would notice: the bank's audit and risk function.
 
-## What we learned
+## What I learned
 
 Three layers, with a different level of certainty for each.
 
 | Rule | What it is | How it reaches a Canadian D-SIB | Certainty |
 |---|---|---|---|
-| **SR 26-2** | Federal Reserve supervisory letter of April 17, 2026: revised model risk guidance that supersedes SR 11-7 and SR 21-8. The letter says it is "expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve". | Our reading: only through US operations the Federal Reserve regulates. Whether the bank has them, and whether they fall in the scope the letter describes, depends on its structure. | Depends. Marked "Confirm". |
+| **SR 26-2** | Federal Reserve supervisory letter of April 17, 2026: revised model risk guidance that supersedes SR 11-7 and SR 21-8. The letter says it is "expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve". | My reading: only through US operations the Federal Reserve regulates. Whether the bank has them, and whether they fall in the scope the letter describes, depends on its structure. | Depends. Marked "Confirm". |
 | **OSFI E-23** | Model risk management guideline from OSFI (Office of the Superintendent of Financial Institutions), covering AI and machine learning models. Effective May 1, 2027. | Applies to federally regulated financial institutions, which a Canadian D-SIB is. | Certain. |
 | **OSFI B-13** | Technology and cyber risk management guideline. | Same: it sets expectations for all federally regulated financial institutions. The page did not show an effective date, so the brief does not give one. | Certain. |
 | **DORA** | Regulation (EU) 2022/2554, the Digital Operational Resilience Act for the EU financial sector. | EIOPA (European Insurance and Occupational Pensions Authority) says it applies to 20 types of financial entities and to ICT (information and communication technology) third-party service providers. It reaches the bank only if an EU entity of the bank falls into one of those types. | Depends. Marked "Confirm". |
@@ -19,7 +19,7 @@ The practical lesson: for a cross-border bank, the news is the US letter, but th
 
 ## How it became the brief's structure
 
-The brief follows the three layers, in this order (operator decision A-044 in [AMBIGUITY-REGISTER.md](../AMBIGUITY-REGISTER.md)):
+The brief follows the three layers, in this order (decision A-044 in [AMBIGUITY-REGISTER.md](../AMBIGUITY-REGISTER.md)):
 
 1. **What changed** - SR 26-2, in the letter's own scope language.
 2. **What is certain for this account** - OSFI E-23 and B-13.
@@ -27,19 +27,19 @@ The brief follows the three layers, in this order (operator decision A-044 in [A
 
 The skill tells the agent to "never say a rule applies". The output gate refuses applicability wording ("applies", "in scope", "subject to" and similar) anywhere outside the "Confirm" section, and any unmarked line inside it. The account owner gets a brief that is useful without a legal opinion, and its open questions are ones the bank can answer.
 
-## How we got dangerous in three hours
+## How I got dangerous in three hours
 
-- **22:50** Packet opened. SR 26-2 was a name we could not place.
-- **23:03** An independent researcher (a different AI model, working blind) confirmed SR 26-2 is a real Federal Reserve letter dated April 17, 2026, and confirmed OSFI E-23 and B-13 for Canadian banks.
-- **23:17** The builder fetched the SR 26-2 page itself and read its scope sentence, rather than trusting memory or the researcher ([decision log D-003](decision-log.md)).
-- **23:39** The operator judged that cross-border regulation is "probably where they'll look hardest, because it matters for governance", and asked for a deeper pass on SR 26-2 for a Canadian bank.
-- **23:47** The operator set the three-layer structure (A-044). **23:55** It was built into the template, the gate and three new eval cases ([D-028](decision-log.md)).
-- **00:22** The independent fact-check returned FAIL on our own lines. The first draft said that if the bank operates "a US banking entity supervised by the Federal Reserve, SR 26-2 applies to that entity", and that if it has "an EU financial entity, DORA ... applies to that entity". The sources support neither: SR 26-2 describes where it is "expected to be most relevant", and DORA covers listed entity types only ([report](qa/factcheck-report.md), findings F-02 and F-07).
+- **22:50** Packet opened. SR 26-2 was a name I could not place.
+- **23:03** An independent research agent (a different AI model, working blind) confirmed SR 26-2 is a real Federal Reserve letter dated April 17, 2026, and confirmed OSFI E-23 and B-13 for Canadian banks.
+- **23:17** The building agent fetched the SR 26-2 page directly and quoted its scope sentence, so the brief did not rest on memory or on the research agent alone.
+- **23:39** My note at the time: cross-border regulation is "probably where they'll look hardest, because it matters for governance". I asked for a deeper pass on SR 26-2 for a Canadian bank.
+- **23:47** I set the three-layer structure (A-044). **23:55** It was in the template, the gate and three new eval cases.
+- **00:22** The independent fact-check returned FAIL on my own lines. The first draft said that if the bank operates "a US banking entity supervised by the Federal Reserve, SR 26-2 applies to that entity", and that if it has "an EU financial entity, DORA ... applies to that entity". The sources support neither: SR 26-2 describes where it is "expected to be most relevant", and DORA covers listed entity types only ([report](qa/factcheck-report.md), findings F-02 and F-07).
 
 That last step is the real learning. The structure was right, and the conditional was still written too strongly, in exactly the place the structure was meant to protect. The gate allowed "applies" inside the "Confirm" section because a conditional looked safe; that is where the overstatement lived. The fix follows the reviewer's recommendation: the "Confirm" lines keep the regulator's own scope words, and new eval cases fail any brief that says SR 26-2 or DORA applies to an entity.
 
-## What we still do not know
+## What I still do not know
 
-- Whether a Federal Reserve-regulated US arm of a Canadian bank falls inside SR 26-2's expected relevance in practice. The letter says "expected to be most relevant"; how supervisors use that is not on the page we read.
-- The DORA text itself, which we only read through EIOPA's summary.
+- Whether a Federal Reserve-regulated US arm of a Canadian bank falls inside SR 26-2's expected relevance in practice. The letter says "expected to be most relevant"; how supervisors use that is not on the page I read.
+- The DORA text itself, which I only read through EIOPA's summary.
 - The real bank's legal structure. The fixture accounts are fictional on purpose.

@@ -1,6 +1,6 @@
 # Intake Worksheet
 
-First structured read of the assignment, filled from `contract/templates/intake-worksheet.md` before any code was written. It feeds the opening GRAA (Goal, Reality, Analysis, Action) checkpoint `G-001` in `PROCESS-LOG.md` and the rows of `AMBIGUITY-REGISTER.md`.
+First structured read of the assignment, filled from `contract/templates/intake-worksheet.md` before any code was written. It fed the opening GRAA (Goal, Reality, Analysis, Action) checkpoint and the rows of [`AMBIGUITY-REGISTER.md`](../AMBIGUITY-REGISTER.md).
 
 The assignment packet is private and is not copied here. Only the short lines a decision depends on are quoted.
 
@@ -8,11 +8,11 @@ The assignment packet is private and is not copied here. Only the short lines a 
 
 - [x] Read in full from the source files: the assignment brief, CEO (chief executive officer) notes, ICP (ideal customer profile) sketch, the Reign constraint (rule R-17), the Campaign Manager stub, and the window file. Six files, all readable.
 - [x] Every referenced input is present. The brief names four packet items; all four are there.
-- [x] Submission channel and format confirmed: a public GitHub repository containing four things (artifact, one-page process log, one thing learned, what we would not ship).
+- [x] Submission channel and format confirmed: a public GitHub repository containing four things (artifact, one-page process log, one thing learned, what I would not ship).
 
 | # | What is referenced | Where it should be | Status | Register ID |
 |---|---|---|---|---|
-| 1 | Real HubSpot, Clay, ZoomInfo access | Operator accounts | Missing (no access in the window) | A-012 |
+| 1 | Real HubSpot, Clay, ZoomInfo access | My accounts | Missing (no access in the window) | A-012 |
 | 2 | The "Canadian bank on Forge" as a named account | ICP sketch | Not named, on purpose | A-013 |
 | 3 | FDA PCCP (Predetermined Change Control Plan) guidance page | fda.gov | Two guessed URLs returned 404; not yet located | A-014 |
 
@@ -55,7 +55,7 @@ The assignment packet is private and is not copied here. Only the short lines a 
 
 ## 3. Deliverable contract
 
-Four things in a public GitHub repository: a working artifact, a one-page process log with two or three actual prompts or configs, one thing learned, and what we would not ship. Forbidden: a deck, a long strategy memo, a private repo or PDF as the submission. Knockouts include "high-volume slop outbound" and "ignored the Reign constraint".
+Four things in a public GitHub repository: a working artifact, a one-page process log with two or three actual prompts or configs, one thing learned, and what I would not ship. Forbidden: a deck, a long strategy memo, a private repo or PDF as the submission. Knockouts include "high-volume slop outbound" and "ignored the Reign constraint".
 
 ## 4. What is actually being assessed
 
@@ -75,7 +75,7 @@ Four things in a public GitHub repository: a working artifact, a one-page proces
 - **One case:** one fictional FS account, one trigger, one brief.
 - **Layers:** input adapters, ICP filter, applicability preflight, brief generator, audit, approval request.
 - **Not in it:** live connectors, a real send.
-- **Green means:** the pipeline entry point (named `python -m agent.run_playbook` from D-004 on) writes a brief, an approval request marked pending, and audit records for every action, and exits 0; the test suite passes.
+- **Green means:** the pipeline entry point (`python -m agent.run_playbook`) writes a brief, an approval request marked pending, and audit records for every action, and exits 0; the test suite passes.
 
 ## 8. Substrate check
 

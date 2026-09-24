@@ -1,6 +1,6 @@
 # Cut, sequenced, refused
 
-What we cut from the window, what we did first, and what we refused to do, each with the reason. Moved from the README so it stays short. Entry IDs (A-, D-, R-) are in [`AMBIGUITY-REGISTER.md`](../AMBIGUITY-REGISTER.md) and [`decision-log.md`](decision-log.md).
+What I cut from the window, what I did first, and what I refused to do, each with the reason. A- rows are in [`AMBIGUITY-REGISTER.md`](../AMBIGUITY-REGISTER.md).
 
 **Architecture principle.** The artifact is not coupled to banking. The skill and the MCP tools are buyer-agnostic; everything bank-specific lives in data: the bank playbook (`playbooks/bank-sr26-2.jsonc`), the SR 26-2 trigger record and its regulation mapping (OSFI E-23 and B-13, the US-arm and EU-arm conditions) in `fixtures/regulatory_feed.json`. The packet gives the most detail on the bank (the CEO notes, R-17 being specific to financial services, SR 26-2 and DORA), so the bank is the proving ground, not the limit.
 
@@ -20,6 +20,6 @@ What we cut from the window, what we did first, and what we refused to do, each 
 |---|---|
 | The blog | "Do not write a blog. Build the trigger." |
 | Generic CISO sequences | The CEO's explicit kill condition; the CISO is on the do-not-route list and "AI governance" is a gate failure. |
-| A volume cap in place of precision | Operator decision A-037. |
+| A volume cap in place of precision | Precision first; quality-based kill criteria instead (A-037). |
 | Any compliance, certification or independent-assurance claim | iTmethods' own pages make none; the gate refuses them. |
 | Inventing a source or a fact | A missing fact is flagged, never filled; unverified sources cannot be cited. |

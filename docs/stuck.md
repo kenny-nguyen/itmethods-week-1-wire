@@ -1,6 +1,6 @@
 # Stuck, and the next experiment
 
-Where we got stuck in the window, and the experiment we would run next. Moved from the README.
+Where I got stuck in the window, and the experiment I would run next.
 
 | Stuck on | Next experiment |
 |---|---|

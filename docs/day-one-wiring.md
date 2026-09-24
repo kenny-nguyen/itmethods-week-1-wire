@@ -1,6 +1,6 @@
 # Day-one wiring
 
-We had no HubSpot, Clay or ZoomInfo access in the window, so each is a local fixture behind an interface. This is what we would wire on day one. Moved from the README.
+I had no HubSpot, Clay or ZoomInfo access in the window, so each is a local fixture behind an interface. This is what I would wire on day one.
 
 Each tool replaces one fixture class. The pipeline and the MCP tools only talk to these interfaces (`agent/input/base.py`, `agent/governance/audit.py`).
 
