@@ -78,7 +78,7 @@ Tools used in the window: Claude Code, a custom MCP server, Codex, Python unitte
 
 ## About the working contract
 
-The first commit (`Install working contract and kit`) is the method layer of my own agentic operating system, committed before any work so its rules were fixed first: checkpoints, QA (quality assurance) at every stage, an ambiguity register and independent review. The contract is [`AGENTS.md`](AGENTS.md); the rest is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/).
+I use my own agentic operating system; this repository applies its working method (the kit), as I would on any task. The first commit (`Install working contract and kit`) put that method in place before any work, so its rules were fixed first: checkpoints, QA (quality assurance) at every stage, an ambiguity register and independent review. The contract is [`AGENTS.md`](AGENTS.md); the rest is in [`contract/`](contract/) and [`.claude/agents/`](.claude/agents/).
 
 ## Repo map
 
