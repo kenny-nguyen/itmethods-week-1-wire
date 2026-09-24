@@ -8,7 +8,7 @@
     "risk_committee": "packet: unvetted Slack note from Rob; invented: a flag, not a gate (A-021, decided)",
     "unlisted_segment": "invented: an account whose fit is unclear is held for a human; clearly outside the ICP is dropped with the reason audited (A-031, decided)",
     "fs_industries": "invented: which industries count as financial services; unknown counts as FS and is flagged 'industry unconfirmed' (A-006, decided)",
-    "exclusion_patterns": "packet: 'Do not include mid-market SaaS', 'Remove [AI startups]' (A-003, decided); invented: the naming-variant patterns, widened after two independent QA passes (Q-005, Q-007); applied to the category fields (segment, industry) only, never to free text, and an unclear category is held and flagged for a human (operator decision, D-040)",
+    "exclusion_patterns": "packet: 'Do not include mid-market SaaS', 'Remove [AI startups]' (A-003, decided); invented: the naming-variant patterns, widened after two independent QA passes; applied to the category fields (segment, industry) only, never to free text, and an unclear category is held and flagged for a human (operator decision, A-050)",
     "segments.dsib_capital_markets": "packet ICP sketch; invented: lanes risk and engineering (A-011, decided)",
     "segments.biopharma_quality": "packet ICP sketch",
     "segments.defense_supplier": "packet ICP sketch; invented: lead with Forge (A-023, decided)",

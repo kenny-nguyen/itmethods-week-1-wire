@@ -1,8 +1,8 @@
 """Load a playbook by its id from the trusted playbooks directory, never from a path a caller supplies.
 
-Security review finding S-1 (log D-020): the approval step used to load the
+An independent security review found that the approval step used to load the
 playbook named inside the approval request, so whoever could edit the request
-chose the approver list. Now the id is format-checked, the file comes from
+chose the approver list (A-053). Now the id is format-checked, the file comes from
 `playbooks/`, its hash must match the hash recorded when the request was
 created, and it must validate.
 """

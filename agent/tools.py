@@ -73,8 +73,8 @@ class GovernedTools:
         self.counts: dict[str, dict] = {}
 
     # ---- helpers ---------------------------------------------------------------------------
-    def _fail(self, stage: str, message: str, recovery: str) -> None:
-        self.errors.record(f"tool.{stage}", message)
+    def _fail(self, stage: str, message: str, recovery: str, context: dict | None = None) -> None:
+        self.errors.record(f"tool.{stage}", message, context=context)
         raise ToolFailure(message, recovery)
 
     def _playbook(self, playbook_id: str) -> tuple[dict, str]:
@@ -265,7 +265,8 @@ class GovernedTools:
         prior = _already_briefed(self.paths, acct.system_id, trigger.id, playbook_id)
         if prior:
             self._fail("applicability", f"{acct.name} already has a brief for {trigger.id}: {prior}.",
-                       "do not draft again; the account owner decides on the existing request.")
+                       "do not draft again; the account owner decides on the existing request.",
+                       context={"account": acct.id, "outcome": "already_briefed"})
         result = pf.check(trigger, acct, st["enrichment"], pb)
         if result.status != pf.READY:
             self._guard(pb, lambda: self._pb_trail(pb).perform(
@@ -363,7 +364,8 @@ class GovernedTools:
         prior = _already_briefed(self.paths, acct.system_id, trigger.id, playbook_id)
         if prior:
             self._fail("request_approval", f"{acct.name} already has a brief for {trigger.id}: {prior}.",
-                       "do not draft again; the account owner decides on the existing request.")
+                       "do not draft again; the account owner decides on the existing request.",
+                       context={"account": acct.id, "outcome": "already_briefed"})
         bpath, apath = brief_path(self.paths, acct.system_id), approval_path(self.paths, acct.system_id)
         request = {
             "request_id": uuid.uuid4().hex, "run_id": self.run_id, "status": "pending",

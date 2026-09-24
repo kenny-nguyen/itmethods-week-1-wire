@@ -8,7 +8,7 @@
 | WIRE_MODEL | claude-opus-5 | Model id for the Claude Messages API. |
 
 Named principals and approvers are deliberately not environment variables: they live in the
-reviewed playbook files, so nobody can change who approves by changing a shell (log D-018).
+reviewed playbook files, so nobody can change who approves by changing a shell (A-053).
 """
 
 from __future__ import annotations

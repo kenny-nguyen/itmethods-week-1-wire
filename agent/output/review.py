@@ -1,4 +1,4 @@
-"""One-page HTML review view of a run, for the demo (operator decision, log D-036).
+"""One-page HTML review view of a run, for the demo (operator decision, A-061).
 
     python3 -m agent.output.review --run out/runs/<run-id>
 

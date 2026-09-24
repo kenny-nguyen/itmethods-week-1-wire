@@ -209,7 +209,7 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
 
 
 def _already_briefed(paths: RunPaths, account_id: str, trigger_id: str, playbook_id: str) -> str | None:
-    """A scheduled rerun must not brief the same account on the same trigger twice (log D-029)."""
+    """A scheduled rerun must not brief the same account on the same trigger twice (A-055)."""
     for p in sorted(paths.out.glob("runs/*/approvals/*.json")):
         try:
             r = json.loads(p.read_text(encoding="utf-8"))
@@ -297,7 +297,7 @@ def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, p
     }
 
     def commit():
-        # Brief and approval request land together or not at all (QA finding C1-a, Q-005).
+        # Brief and approval request land together or not at all (independent QA).
         write_text(bpath, text)
         try:
             write_json(apath, request)
@@ -330,7 +330,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--motion", default="reign-first-motion", help="a motion in playbooks/motions/")
     args = ap.parse_args(argv)
     try:
-        # Output root is fixed so the audit trail and kill switches cannot be redirected (D-019).
+        # Output root is fixed so the audit trail and kill switches cannot be redirected (security review).
         s = run(trusted.motion_file(args.motion), config.out_dir())
     except (RunRefused, trusted.Untrusted) as exc:
         print(f"RUN REFUSED: {exc}", file=sys.stderr)

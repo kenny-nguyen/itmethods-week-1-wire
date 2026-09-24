@@ -128,7 +128,7 @@
     },
     {
       "name": "paraphrase: in line with",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Reign keeps the bank fully in line with SR 26-2 [P-GATEWAY]."
@@ -137,7 +137,7 @@
     },
     {
       "name": "paraphrase: satisfies expectations",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Reign satisfies every SR 26-2 expectation [P-GATEWAY]."
@@ -146,7 +146,7 @@
     },
     {
       "name": "paraphrase: handles compliance",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Reign handles SR 26-2 compliance for you [P-GATEWAY]."
@@ -155,7 +155,7 @@
     },
     {
       "name": "negation bypass",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Reign makes the bank compliant with no manual work [P-GATEWAY]."
@@ -164,7 +164,7 @@
     },
     {
       "name": "third-party validation",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Models run through the platform are validated by a third party [P-ASSURANCE]."
@@ -173,7 +173,7 @@
     },
     {
       "name": "third-party assurance",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The board gets third-party assurance from this work [P-ASSURANCE]."
@@ -182,7 +182,7 @@
     },
     {
       "name": "accreditation",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The platform is SOC 2 accredited [P-GATEWAY]."
@@ -191,7 +191,7 @@
     },
     {
       "name": "duration in words",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The briefing takes half an hour."
@@ -200,7 +200,7 @@
     },
     {
       "name": "duration spelled out",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Plan for about thirty minutes."
@@ -209,7 +209,7 @@
     },
     {
       "name": "duration short form",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Book a 45m session."
@@ -218,7 +218,7 @@
     },
     {
       "name": "FedRAMP spaced",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The platform supports Fed RAMP High workloads."
@@ -227,7 +227,7 @@
     },
     {
       "name": "ITAR spelled out",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Fits International Traffic in Arms Regulations programs."
@@ -236,7 +236,7 @@
     },
     {
       "name": "CMMC dotted",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Ready for C.M.M.C. assessments."
@@ -245,7 +245,7 @@
     },
     {
       "name": "bare domain",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- See www.evil-example.com/report for more."
@@ -254,7 +254,7 @@
     },
     {
       "name": "protocol-relative link",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Deck at //attacker.example/p for the approver."
@@ -263,7 +263,7 @@
     },
     {
       "name": "markdown image beacon",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- ![](https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm)"
@@ -272,7 +272,7 @@
     },
     {
       "name": "HTML image",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- <img src=x>"
@@ -281,7 +281,7 @@
     },
     {
       "name": "uppercase product name",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- REIGN runs the model inventory for the bank."
@@ -290,7 +290,7 @@
     },
     {
       "name": "wrong claim id",
-      "source": "independent QA Q-005 or security review D-020",
+      "source": "independent QA or security review",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Reign replaces the bank's model validation team [P-BRIEFING]."
@@ -299,7 +299,7 @@
     },
     {
       "name": "heading bypass",
-      "source": "independent QA Q-005",
+      "source": "independent QA",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "### Reign guarantees SR 26-2 compliance and certifies your models"
@@ -308,7 +308,7 @@
     },
     {
       "name": "after-Sources bypass",
-      "source": "independent QA Q-005",
+      "source": "independent QA",
       "edit": {
         "append_to": "## Sources",
         "text": "Reign guarantees SR 26-2 compliance and is certified. The briefing is 45 minutes."
@@ -344,7 +344,7 @@
     },
     {
       "name": "applies: governs",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- SR 26-2 governs Lakeshore Bancorp (fictional) [src-sr26-2]."
@@ -353,7 +353,7 @@
     },
     {
       "name": "applies: must comply",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The bank must comply with SR 26-2 [src-sr26-2]."
@@ -362,7 +362,7 @@
     },
     {
       "name": "applies: binds",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- E-23 binds the bank now [src-sr26-2]."
@@ -371,7 +371,7 @@
     },
     {
       "name": "applies: applicable to",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- SR 26-2 is applicable to the bank [src-sr26-2]."
@@ -380,7 +380,7 @@
     },
     {
       "name": "applies: regulated under",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The bank is regulated under SR 26-2 and must follow it [src-sr26-2]."
@@ -389,7 +389,7 @@
     },
     {
       "name": "confirm rule: unbulleted line",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What depends on structure (confirm)",
         "text": "SR 26-2 governs this bank [src-sr26-2]."
@@ -398,7 +398,7 @@
     },
     {
       "name": "confirm rule: star bullet",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What depends on structure (confirm)",
         "text": "* The bank has a US entity [src-sr26-2]."
@@ -407,7 +407,7 @@
     },
     {
       "name": "uncited fact",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Lakeshore runs 40 AI agents in production today."
@@ -416,7 +416,7 @@
     },
     {
       "name": "uncited paragraph",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "Lakeshore was fined by the Federal Reserve last year."
@@ -425,7 +425,7 @@
     },
     {
       "name": "claim: examiners sign off",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- Gives your examiners everything they need to sign off [src-sr26-2]."
@@ -434,7 +434,7 @@
     },
     {
       "name": "claim: pass the exam",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The bank will pass its next Federal Reserve exam [src-sr26-2]."
@@ -443,7 +443,7 @@
     },
     {
       "name": "claim: SOC-II",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- The platform is SOC-II audited [src-sr26-2]."
@@ -452,7 +452,7 @@
     },
     {
       "name": "claim: vouched",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## What we know about the account",
         "text": "- An outside firm has vouched for the controls [src-sr26-2]."
@@ -461,7 +461,7 @@
     },
     {
       "name": "duration: twelve minutes",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- The briefing runs twelve minutes."
@@ -470,7 +470,7 @@
     },
     {
       "name": "duration: ninety mins",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- Block ninety mins."
@@ -479,7 +479,7 @@
     },
     {
       "name": "duration: couple of hours",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- It takes a couple of hours."
@@ -488,7 +488,7 @@
     },
     {
       "name": "defense: controlled-unclassified",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- Handles controlled-unclassified data."
@@ -497,7 +497,7 @@
     },
     {
       "name": "defense: FedRAMP spelled out",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- Ready for the Federal Risk and Authorization Management Program."
@@ -506,7 +506,7 @@
     },
     {
       "name": "defense: NIST 800-171 and DFARS",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "- Supports NIST SP 800-171 and DFARS 7012 workloads."
@@ -515,7 +515,7 @@
     },
     {
       "name": "unknown section",
-      "source": "independent QA pass 2 (Q-007)",
+      "source": "independent QA pass 2",
       "edit": {
         "append_to": "## Open questions for the account owner",
         "text": "## Bonus claims"

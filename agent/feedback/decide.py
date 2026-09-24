@@ -53,7 +53,7 @@ def created_record(out: Path, request_id: str | None) -> dict | None:
 
 
 def account_owner(system_id: str) -> str | None:
-    """The account owner from the system of record, never from the request file (A-043, D-018)."""
+    """The account owner from the system of record, never from the request file (A-043, A-053)."""
     from agent.input.local import LocalHubSpotAccounts
     for a in LocalHubSpotAccounts(ROOT / "fixtures/hubspot_companies.json").list_accounts():
         if a.system_id == system_id:
@@ -71,7 +71,7 @@ def decide(request_path: str | Path, *, approver: str, approve: bool, reason: st
         errors.record("feedback.decide", msg, context={"request": str(request_path), "approver": approver})
         raise DecisionRefused(msg)
 
-    if (out / "runs") not in request_path.parents:  # D-020, S-2: no decisions against another output root
+    if (out / "runs") not in request_path.parents:  # security review: no decisions against another output root
         refuse(f"request is not under {out / 'runs'}")
     req = json.loads(request_path.read_text(encoding="utf-8"))
     # Bind the request to the audit trail (QA pass 2, C2): the account and playbook come from the audited
@@ -108,7 +108,7 @@ def decide(request_path: str | Path, *, approver: str, approve: bool, reason: st
     try:
         trail.perform(
             action="approve" if approve else "reject", object_id=req["account"]["id"],
-            fs=True,  # never taken from the request file; required audit either way (D-020)
+            fs=True,  # never taken from the request file; required audit either way (security review)
             purpose=(f"Approve the {req['trigger']} brief for {name} to be sent by its owner; no sender is wired."
                      if approve else f"Reject the {req['trigger']} brief for {name} so it is never sent."),
             sources=[req["brief"], f"approval:{req['request_id']}"], send=approve,

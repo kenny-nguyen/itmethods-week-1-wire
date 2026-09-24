@@ -5,7 +5,7 @@ from __future__ import annotations
 import operator
 
 OPS = {">": operator.gt, ">=": operator.ge, "<": operator.lt, "<=": operator.le, "==": operator.eq}
-MIN_RATIO_SAMPLE = 5  # assumption to confirm with sales leadership (D-041)
+MIN_RATIO_SAMPLE = 5  # assumption to confirm with sales leadership (A-049)
 
 
 def ratio(part: int, whole: int) -> float | None:

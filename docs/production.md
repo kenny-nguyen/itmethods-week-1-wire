@@ -12,7 +12,7 @@ Three ways briefs get drafted, and only the first is the agent:
 
 All three pass through the same governed stages and the same output gate.
 
-The batch, approval, report and kill commands on this page were run from a clean clone on 2026-09-25 (process log D-030); the MCP and scoring commands were verified afterwards (D-035). Not run here: a live agent session in Claude Code (that is the demo), and the direct model-API call (no key in the build environment).
+The batch, approval, report and kill commands on this page were run from a clean clone on 2026-09-25; the MCP and scoring commands were verified afterwards. Not run here: a live agent session in Claude Code (that is the demo), and the direct model-API call (no key in the build environment).
 
 ## 1. Requirements and the MCP server
 
@@ -107,7 +107,7 @@ python3 -m agent.feedback.kill --playbook-id bank-sr26-2 --by "Kenny Nguyen" --r
 
 Exit codes for `decide`, `report` and `kill`: `0` done; `2` refused; `report` returns `3` when the report trips a kill criterion and engages the switch. Clearing the switch restarts the complaint and wrong-account counts from that moment, so reports a human has already reviewed do not re-trip it on the next run.
 
-Only the playbook owner or a listed approver can report, engage or clear. The kill criteria (quality-based: audit failures, gate failures, rejections, complaints, wrong-account reports) are checked after every run, decision and report, and after every governed tool call in an agent session (one MCP server session counts as one run), and engage the switch automatically. An audit write failure trips at once. The ratio criteria (gate failures, rejections) count only once there are at least 5 decisions to measure (process log D-041, to confirm with sales leadership). Engaging never waits on the audit store; clearing is refused if its audit record cannot be written.
+Only the playbook owner or a listed approver can report, engage or clear. The kill criteria (quality-based: audit failures, gate failures, rejections, complaints, wrong-account reports) are checked after every run, decision and report, and after every governed tool call in an agent session (one MCP server session counts as one run), and engage the switch automatically. An audit write failure trips at once. The ratio criteria (gate failures, rejections) count only once there are at least 5 decisions to measure (A-049, to confirm with sales leadership). Engaging never waits on the audit store; clearing is refused if its audit record cannot be written.
 
 ## 5. Wire the real stack on day one
 

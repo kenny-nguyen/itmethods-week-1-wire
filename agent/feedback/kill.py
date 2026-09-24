@@ -3,8 +3,8 @@
     python3 -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Drafts read generic."
     python3 -m agent.feedback.kill --playbook-id reign-first-motion --by "Kenny Nguyen" --reason "Reviewed the drafts." --clear
 
-Only the playbook owner or a listed approver may use it (security finding S-3,
-log D-020). Both directions are audited. Engaging writes the switch first and
+Only the playbook owner or a listed approver may use it (independent
+security review). Both directions are audited. Engaging writes the switch first and
 the audit record second, because stopping must not depend on the audit store;
 clearing is refused unless its audit record is written, because restarting is
 the unsafe direction.

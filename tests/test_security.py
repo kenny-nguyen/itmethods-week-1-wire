@@ -1,4 +1,4 @@
-"""Regression tests for the independent security review findings (process log D-020 onwards)."""
+"""Regression tests for the independent security review findings."""
 
 import json
 import shutil

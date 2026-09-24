@@ -32,9 +32,10 @@ def _context(io: dict, pb: dict, account_id: str) -> BriefContext:
     enrichment = io["enrichment"].enrich(account_id)
     result = pf.check(trigger, acct, enrichment, pb)
     lanes = pb["routing"]["lanes"]
-    routed, _ = route(io["contacts"].contacts_for(account_id), lanes, pb["routing"]["do_not_route"], list(lanes))
+    routed, skipped = route(io["contacts"].contacts_for(account_id), lanes, pb["routing"]["do_not_route"], list(lanes))
     claims = [c for c in io["claims"] if c["id"] in pb["claims"]]
-    return BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, [])
+    return BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, [],
+                        not_routed=[c for c, _ in skipped])
 
 
 def _run_order(brief: Path) -> str:
@@ -42,17 +43,26 @@ def _run_order(brief: Path) -> str:
     return brief.parent.parent.name.removeprefix("mcp-")
 
 
-def _briefed_in_earlier_run(out: Path, run_dir: Path, system_id: str) -> bool:
-    for p in out.glob("runs/*/approvals/*.json"):
-        if p.parent.parent.name == run_dir.name:
-            continue
+def _already_briefed_this_run(out: Path, run_dir: Path) -> set[str]:
+    """Accounts this run itself reported as already briefed: the batch summary, or an MCP refusal in the error log."""
+    found = set()
+    try:
+        summary = json.loads((run_dir / "summary.json").read_text())
+        found |= {a for a, e in summary.get("accounts", {}).items() if e.get("status") == "already_briefed"}
+    except (OSError, json.JSONDecodeError):
+        pass
+    try:
+        lines = (out / "errors.jsonl").read_text().splitlines()
+    except OSError:
+        lines = []
+    for line in lines:
         try:
-            r = json.loads(p.read_text())
-        except (OSError, json.JSONDecodeError):
+            e = json.loads(line)
+        except json.JSONDecodeError:
             continue
-        if r.get("account", {}).get("id") == system_id and r.get("status") != "rejected":
-            return True
-    return False
+        if e.get("run_id") == run_dir.name and e.get("context", {}).get("outcome") == "already_briefed":
+            found.add(e["context"].get("account"))
+    return found
 
 
 def score(out: Path, run_dir: Path | None = None) -> dict:
@@ -60,6 +70,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
 
     With `run_dir`, a case whose account has no audit record in that run is labelled "exercised": false and left
     out of the score. Any record counts, so a bank the eval expects a brief for that was held or dropped fails.
+    A case this run itself reported as already briefed is left out too; one it excluded, held or dropped is not.
     """
     spec = json.loads(CASES.read_text(encoding="utf-8"))
     io = _load_inputs(ROOT)
@@ -69,6 +80,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
     if run_dir:
         audit = [r for r in audit if r.get("run_id") == run_dir.name]
     requests = [json.loads(p.read_text()) for p in out.glob(f"runs/{runs}/approvals/*.json")]
+    already = _already_briefed_this_run(out, run_dir) if run_dir else set()
     results, passed, total = [], 0, 0
     for case in spec["cases"]:
         sid = f"hubspot:company/{case['account']}"
@@ -79,8 +91,8 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
             results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                             "exercised": False, "properties": {}})
             continue
-        if run_dir and not briefs and _briefed_in_earlier_run(out, run_dir, sid):
-            # Correctly skipped on a rerun: the account already has a live request from an earlier run.
+        if case["account"] in already:
+            # Correctly skipped on a rerun: this run found a live request for the account from an earlier run.
             results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
                             "exercised": False, "note": "already briefed", "properties": {}})
             continue
@@ -88,8 +100,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
         for prop in case["properties"]:
             if prop == "passes_output_gate":
                 ctx = _context(io, pb, case["account"])
-                probs = check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                                    claim_texts=ctx.claim_texts(), caveat_required=pf.CAVEAT in ctx.preflight.caveats) if text else ["no brief"]
+                probs = check_brief(text, **ctx.gate_kwargs()) if text else ["no brief"]
                 props[prop] = (not probs, probs)
             elif prop == "every_line_cited":
                 bad = [l for l in text.split("## Suggested next step")[0].splitlines()
@@ -97,8 +108,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
                 props[prop] = (bool(text) and not bad, bad)
             elif prop == "no_applicability_claim_without_us_entity":
                 ctx = _context(io, pb, case["account"])
-                asserted = [p for p in check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                                                   claim_texts=ctx.claim_texts(), caveat_required=True)
+                asserted = [p for p in check_brief(text, **{**ctx.gate_kwargs(), "caveat_required": True})
                             if "says a rule applies" in p or "must start with 'Confirm'" in p
                             or "applicability requires confirmation" in p] if text else ["no brief"]
                 props[prop] = (not asserted, asserted or "caveat present; no applicability assertion")
@@ -106,8 +116,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
                 props[prop] = ("E-23" in text and "B-13" in text, "E-23 and B-13 named")
             elif prop == "forbidden_claims_absent":
                 ctx = _context(io, pb, case["account"])
-                probs = [p for p in check_brief(text, allowed_ids=ctx.allowed_ids(), allowed_urls=ctx.allowed_urls(),
-                                                claim_texts=ctx.claim_texts(), caveat_required=False)
+                probs = [p for p in check_brief(text, **{**ctx.gate_kwargs(), "caveat_required": False})
                          if any(k in p for k in ("claims or implies", "duration", "CMMC", "filler"))] if text else ["no brief"]
                 props[prop] = (not probs, probs)
             elif prop == "ciso_never_routed":

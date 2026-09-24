@@ -82,6 +82,17 @@ class F3RecipientsOnlyFromRouting(unittest.TestCase):
             with self.assertRaises(ToolFailure):
                 t.request_approval(BANK, "hs-1001", draft)
 
+    def test_excluded_ciso_named_the_ordinary_way_is_refused(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            self._ready(t)
+            for line in ("- Also loop in Sofia Marchetti.", "- Also loop in the CISO, Sofia Marchetti.",
+                         "- Also loop in SOFIA  MARCHETTI."):
+                draft = offline_draft(t, "hs-1001").replace(
+                    "## Open questions for the account owner\n", f"## Open questions for the account owner\n{line}\n")
+                problems = t.check_claims(BANK, "hs-1001", draft)["problems"]
+                self.assertTrue(any("routing excluded" in p for p in problems), (line, problems))
+
     def test_extra_recipient_line_is_refused(self):
         with tempdir() as d:
             t = GovernedTools(Path(d))

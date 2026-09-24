@@ -16,7 +16,7 @@ PLAYBOOK_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 
 
 def _path(state_dir: Path, playbook_id: str) -> Path:
-    if not isinstance(playbook_id, str) or not PLAYBOOK_ID.match(playbook_id):  # no path traversal (D-020, S-3)
+    if not isinstance(playbook_id, str) or not PLAYBOOK_ID.match(playbook_id):  # no path traversal (security review)
         raise ValueError(f"invalid playbook id {playbook_id!r}")
     return Path(state_dir) / "kill" / f"{playbook_id}.json"
 

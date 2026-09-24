@@ -54,7 +54,7 @@ class Icp:
         """The exclusion pattern the account's category fields (segment and industry) match, if any.
 
         Only the category says what a company is. Free text (name, description) never excludes, so a
-        bank that uses AI or backs AI startups stays in (operator decision, D-040).
+        bank that uses AI or backs AI startups stays in (operator decision, A-050).
         """
         return self._match(" . ".join(filter(None, [account.segment.replace("_", " "), account.industry or ""])))
 
@@ -73,7 +73,7 @@ class Icp:
         if seg is None:
             decision = HOLD if self.raw["unlisted_segment"] == "hold" else EXCLUDE
             described = self._match(" . ".join(filter(None, [account.name, account.description])))
-            flags = [f"description reads like '{described}': a human confirms the company category (D-040)"] if described else []
+            flags = [f"description reads like '{described}': a human confirms the company category (A-050)"] if described else []
             return IcpDecision(decision, fs, [f"segment '{account.segment}' is not in the ICP (A-031)"], flags)
 
         if account.employees is None:

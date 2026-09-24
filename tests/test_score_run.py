@@ -5,7 +5,7 @@ from pathlib import Path
 
 from agent.processing.brief import TemplateProvider
 from agent.run_playbook import run
-from agent.tools import GovernedTools
+from agent.tools import GovernedTools, ToolFailure
 from evals.score_run import score
 from tests.helpers import tempdir
 from tests.test_tools import offline_draft
@@ -107,3 +107,29 @@ class RerunScoring(unittest.TestCase):
             case = next(c for c in r["cases"] if c["account"] == "hs-1001")
             self.assertEqual((case["exercised"], case.get("note")), (False, "already briefed"))
             self.assertEqual(r["passed"], r["total"])
+
+    def test_rerun_that_drops_a_previously_briefed_account_fails(self):
+        with tempdir() as d:
+            out = Path(d)
+            run(MOTION, out, provider=TemplateProvider())  # briefs hs-1002
+            t = GovernedTools(out)
+            t.write_audit_record("bank-sr26-2", "hs-1002", "drop",
+                                 "Drop Lakeshore from this motion because the agent judged the fit wrong.",
+                                 ["hubspot:company/hs-1002"])
+            r = score(out, run_dir=t.paths.run_dir)
+            case = next(c for c in r["cases"] if c["account"] == "hs-1002")
+            self.assertTrue(case["exercised"])
+            self.assertFalse(case["properties"]["passes_output_gate"]["pass"])
+            self.assertLess(r["passed"], r["total"])
+
+    def test_mcp_refusal_as_already_briefed_is_not_a_failure(self):
+        with tempdir() as d:
+            out = Path(d)
+            run(MOTION, out, provider=TemplateProvider())  # briefs hs-1001
+            t = GovernedTools(out)
+            t.screen_account("bank-sr26-2", "hs-1001")
+            with self.assertRaises(ToolFailure):
+                t.check_applicability("bank-sr26-2", "hs-1001")
+            r = score(out, run_dir=t.paths.run_dir)
+            case = next(c for c in r["cases"] if c["account"] == "hs-1001")
+            self.assertEqual((case["exercised"], case.get("note")), (False, "already briefed"))

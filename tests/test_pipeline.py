@@ -66,7 +66,7 @@ class PipelineTests(unittest.TestCase):
             self.assertIsNone(bank.get("kill_switch"))
             for aid in ("hs-1001", "hs-1002"):  # A-044: both banks get the structured brief
                 self.assertEqual(s["accounts"][aid]["status"], "brief_pending_owner_decision")
-            self.assertEqual(s["accounts"]["hs-1006"]["status"], "hold")             # D-040: category unclear, human confirms
+            self.assertEqual(s["accounts"]["hs-1006"]["status"], "hold")             # A-050: category unclear, human confirms
             self.assertEqual(s["accounts"]["hs-1007"]["status"], "watch")            # A-040
             self.assertEqual([w["account"] for w in s["watch_list"]], ["hs-1007"])
             for pid in ("biopharma-fda-pccp", "defense-forge-first"):
@@ -82,7 +82,7 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(enriched, {"hubspot:company/hs-1001", "hubspot:company/hs-1002"},
                              "only in-profile accounts with a live play are enriched")
             creates = [r for r in audit if r["action"] == "create"]
-            self.assertEqual(len(creates), 2)  # one per bank: brief and request land together (Q-005, C1-a)
+            self.assertEqual(len(creates), 2)  # one per bank: brief and request land together (independent QA)
             self.assertTrue(all("approval_request" in r["detail"] for r in creates))
             self.assertEqual(len([r for r in audit if r["action"] == "route"]), 2)  # A-024
             self.assertEqual({r["playbook"]["id"] for r in audit if r["action"] == "create"}, {BANK})
@@ -100,7 +100,7 @@ class PipelineTests(unittest.TestCase):
             again = run(MOTION, out, provider=TemplateProvider())
             self.assertIn("kill switch", again["playbooks"][BANK]["skipped"])
 
-    def test_scheduled_rerun_does_not_brief_twice(self):  # D-029
+    def test_scheduled_rerun_does_not_brief_twice(self):  # A-055
         with tempdir() as d:
             out = Path(d)
             first = run(MOTION, out, provider=TemplateProvider())
@@ -157,7 +157,7 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "preflight_hold")
             self.assertEqual(s["outputs"], [])
 
-    def test_sloppy_drafts_fail_the_gate_but_two_are_not_a_sample(self):  # D-041
+    def test_sloppy_drafts_fail_the_gate_but_two_are_not_a_sample(self):  # A-049
         with tempdir() as d:
             out = Path(d)
             s = run(MOTION, out, provider=SloppyProvider())
@@ -225,7 +225,7 @@ class DecisionTests(unittest.TestCase):
                 decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.", out_dir=out)
             self.assertEqual(json.loads(req.read_text())["status"], "pending")
 
-    def test_rejection_ratio_needs_minimum_sample(self):  # D-041
+    def test_rejection_ratio_needs_minimum_sample(self):  # A-049
         with tempdir() as d:
             out = Path(d)
             req = self._run(out)

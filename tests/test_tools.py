@@ -126,7 +126,7 @@ class GovernedToolTests(unittest.TestCase):
                 t.screen_account(BANK, "hs-1001")
             self.assertIn("kill switch", str(cm.exception))
 
-    def test_gate_refusals_engage_kill_switch_after_minimum_sample(self):  # D-041
+    def test_gate_refusals_engage_kill_switch_after_minimum_sample(self):  # A-049
         with tempdir() as d:
             t = GovernedTools(Path(d))
             t.screen_account(BANK, "hs-1002"); t.check_applicability(BANK, "hs-1002"); t.route_contact(BANK, "hs-1002")

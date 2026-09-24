@@ -1,5 +1,5 @@
 {
-  "_about": "Regulator publications, standing in for a live feed. Unlike the other fixtures these are real documents; every URL was fetched during the window (process log D-003). A trigger whose source is not verified cannot produce a brief.",
+  "_about": "Regulator publications, standing in for a live feed. Unlike the other fixtures these are real documents; every URL was fetched during the window. A trigger whose source is not verified cannot produce a brief.",
   "triggers": [
     {
       "id": "SR-26-2",

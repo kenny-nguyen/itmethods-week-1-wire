@@ -23,13 +23,13 @@ AI_STARTUP_VARIANTS = [
     "startup building AI agents", "start-up shipping LLM copilots", "Series B copilot company",
     "Series B AI platform", "seed-stage AI tooling", "YC-backed agents platform", "copilot startup",
     "AI-first company", "mid-market SaaS", "Mid market SaaS vendor", "SMB SaaS",
-    # Found by independent QA (Q-005), missed by the first pattern set:
+    # Found by independent QA, missed by the first pattern set:
     "Machine learning startup, founded 2023.", "Venture-backed AI company, 40 employees, founded 2024.",
     "Early-stage agentic AI company.", "Generative-AI scale-up selling copilots to banks.",
     "Mid-market B2B SaaS platform for finance teams.", "SaaS for mid-sized companies.",
     "Software-as-a-service vendor for the mid-market.", "Midsize SaaS company.",
     "Artificial intelligence start-up.",
-    # Found by independent QA pass 2 (Q-007):
+    # Found by independent QA pass 2:
     "Fintech startup using large language models.", "YC W24 company building LLM agents.",
     "Venture-funded autonomous agent company.", "Deep-learning startup.", "Seed-funded foundation model lab.",
     "Cloud software vendor for mid-sized manufacturers.", "B2B subscription software for midmarket lenders.",
@@ -38,7 +38,7 @@ AI_STARTUP_VARIANTS = [
     "Backed by a16z, Acme is an AI startup.", "Insurtech AI startup.", "Customer-obsessed GenAI startup.",
 ]
 
-# Descriptions of companies that use AI or deal with AI startups; free text never excludes (D-040).
+# Descriptions of companies that use AI or deal with AI startups; free text never excludes (A-050).
 MUST_NOT_EXCLUDE = [
     "Bank with AI models in production.", "Runs an AI governance programme across capital markets.",
     "Started a model risk programme for AI in 2025.", "Uses generative AI for document review.",
@@ -62,13 +62,13 @@ class IcpTests(unittest.TestCase):
                 d = ICP.evaluate(acct, ENRICHED)
                 self.assertEqual(d.decision, EXCLUDE, f"{text!r} -> {d.decision} {d.reasons}")
 
-    def test_free_text_never_excludes(self):  # D-040: only the category says what a company is
+    def test_free_text_never_excludes(self):  # A-050: only the category says what a company is
         for text in AI_STARTUP_VARIANTS + MUST_NOT_EXCLUDE:
             with self.subTest(text=text):
                 d = ICP.evaluate(replace(BANK, name=f"{text} (fictional)", description=text), ENRICHED)
                 self.assertEqual(d.decision, INCLUDE, f"{text!r} wrongly -> {d.reasons}")
 
-    def test_unclear_category_is_held_and_flagged(self):  # D-040
+    def test_unclear_category_is_held_and_flagged(self):  # A-050
         d = ICP.evaluate(replace(BANK, segment="fintech", industry="Financial Services",
                                  description="Gen-AI start-up building LLM agents for lenders."), ENRICHED)
         self.assertEqual(d.decision, HOLD)

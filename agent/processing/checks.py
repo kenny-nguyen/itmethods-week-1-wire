@@ -4,7 +4,7 @@ A brief that fails any check is not written, and the failure goes to the error
 log. The content rules come from iTmethods' own public pages
 (docs/research/itmethods-product-facts.md; operator decision A-029).
 
-Hardened after independent QA (Q-005) and security review (D-020):
+Hardened after independent QA and security review:
 - every line is checked, including headings and the Sources section, and the
   Sources section may only contain source lines in the generated format;
 - a sentence that mentions Reign, Forge or iTmethods (any case) must restate
@@ -77,6 +77,15 @@ MARKUP = re.compile(r"(<\s*[a-z!/]|!\[|\]\()", re.IGNORECASE)
 BARE_LINK = re.compile(r"(//[a-z0-9-]+\.[a-z0-9.-]+|\bwww\.[a-z0-9-]+|"
                        r"\b(?:[a-z0-9-]+\.)+(?:com|net|org|io|ai|gov|ca|co|dev|app|info|biz|us|uk|eu|xyz|site|example)\b)",
                        re.IGNORECASE)
+
+
+def _words(text: str) -> str:
+    return " ".join(re.findall(r"[a-z0-9]+", text.lower()))
+
+
+def _name_key(name: str) -> str:
+    """Case, punctuation and a trailing "(fictional)" qualifier do not change who a name refers to."""
+    return _words(re.sub(r"\s*\([^)]*\)\s*$", "", name))
 
 
 def _is_claim_line(text: str, claim_texts: dict[str, str]) -> bool:
@@ -203,8 +212,10 @@ def check_brief(text: str, *, allowed_ids: set[str], allowed_urls: set[str], cla
             problems.append(f"claims or implies compliance, certification, assurance or validation: {sentence[:80]!r}")
     if DURATION.search(body):
         problems.append("states a duration")
+    plain_text = f" {_words(text)} "
     for name in excluded_names:
-        if name and name in text:
+        key = _name_key(name)
+        if key and f" {key} " in plain_text:
             problems.append(f"names a contact that routing excluded: {name!r}")
     if DEFENSE.search(text):
         problems.append("mentions CMMC, FedRAMP, CUI or ITAR")
