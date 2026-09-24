@@ -1097,3 +1097,79 @@ Checkpoint after the end-to-end run went green. The foundation does what the goa
 
 </details>
 
+### [D-014] 23:41 · PM · DECISION
+The operator answered the first batch of proposals. Fifteen are decided as proposed, two are changed by the operator, and ten stay open. The register now says "Decided by operator" on each decided row.
+
+<details><summary>Structured fields</summary>
+
+**What:** Decided as proposed: A-001, A-004, A-008, A-011, A-013, A-014, A-015, A-016, A-021, A-022, A-023, A-024 (the list as it stands), A-025 (general case), A-026, A-029. Changed: A-005 becomes A-036 (agent adoption never excludes); A-010 becomes A-037 (no volume cap; quality-based kill criteria only). Still open, not decided here: semiconductor (A-019); hospitals (A-020; the operator's current view is "watch without contacting", not a plain exclusion); unknown industry counted as FS (A-006); audit for every segment (A-007); completeness of the audited steps (A-024); the bank outreach rule (A-009); SR 26-2 versus Canadian rules (A-028); one playbook versus three files and what a play is (A-017, A-030); what "briefing" means as a channel (A-018). Not mentioned, so still proposed: A-012, A-031 to A-035.
+
+**Why:** The zero-assumption rule (D-006). Items for "what we would do next": wire the real audit sink on day one (A-008); confirm Rob's intent on the risk-committee note (A-021); for "Canada federal", find the owner and intent and confirm rather than leave it (A-022, a do-differently note).
+
+**Evidence:** Supervisor inbox message at 2026-09-24T14:40:21Z (23:40 KST) relaying the operator's decisions.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-006, A-036, A-037, R-005, R-006
+
+</details>
+
+### [D-015] 23:41 · PM · DECISION
+The operator's framing for the defense supplier, recorded in the operator's terms: lead with Forge, and bring in Reign as the reason agents can be let near the estate. The operator calls it a natural ascension: one solution creates the next problem, and the second product solves it.
+
+<details><summary>Structured fields</summary>
+
+**What:** A-023 decided with this framing. The defense play stays not implemented in this window.
+
+**Why:** Matches the CEO's last word ("lead with the substrate story and mention assurance as the reason they can let agents near the estate") and gives the next product launch a reusable pattern.
+
+**Evidence:** Operator decision relayed at 23:40 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-023
+
+</details>
+
+### [R-005] 23:41 · PM · REVERSAL
+Reverses A-005. Agent adoption is now a signal only: shown in the brief, flagged when unknown or "none", and never a reason to exclude.
+
+<details><summary>Structured fields</summary>
+
+**What:** Reverses A-005; new position A-036.
+
+**Why:** Operator decision: no part of the assignment says to exclude on a known "none".
+
+**Evidence:** Operator decision relayed at 23:40 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** A-005, A-036
+
+</details>
+
+### [R-006] 23:41 · PM · REVERSAL
+Reverses A-010. There is no volume cap. The CRO's stop button is quality-based only: approver rejections, complaints, wrong-account reports, gate failures and audit failures.
+
+<details><summary>Structured fields</summary>
+
+**What:** Reverses A-010; new position A-037.
+
+**Why:** Operator decision: precision first, without a premature cap; kill criteria are never a count ceiling.
+
+**Evidence:** Operator decision relayed at 23:40 KST.
+
+**Assumption:** Audit failures and gate failures count as quality signals, not volume ceilings: they measure whether the motion can be trusted, not how much it does.
+
+**Reversal trigger:** The operator says audit or gate failures should not stop the motion.
+
+**Links:** A-010, A-037
+
+</details>
+
