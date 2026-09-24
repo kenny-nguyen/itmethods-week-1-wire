@@ -30,6 +30,8 @@ What the contract sets out:
 
 This section is updated as usable pieces land. Requires Python 3.11 or later, run as `python3`; standard library only, nothing to install. Run everything from the repository root.
 
+To see the output without running anything, read `examples/brief-hs-1001.md` (the Canadian bank) and `examples/README.md`.
+
 ### 1. Run the motion
 
 ```
@@ -116,6 +118,7 @@ To connect a real tool, write one class against the matching interface in `agent
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |
 | `tests/` | Unit tests, one file per stage. |
 | `.github/workflows/ci.yml` | CI (continuous integration): runs the tests on every push. |
+| `examples/` | Real output of one run: both bank briefs, their approval requests, the audit records for one bank, the run summary. |
 | `docs/production.md` | Production guide: configuration, end-to-end run, approval and kill switch, wiring each adapter, scheduling, recovery, known gaps. |
 | `agent/config.py` | Deployment configuration read from the environment. |
 | `docs/research/` | Sourced facts the agent is allowed to use (product claims, regulator pages). |
