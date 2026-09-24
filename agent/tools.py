@@ -325,5 +325,14 @@ class GovernedTools:
             commit=commit, detail={"brief": str(bpath), "approval_request": str(apath),
                                    "request_id": request["request_id"], "via": "mcp"}), "request_approval")
         del self.state[(playbook_id, acct.id)]
+        review_path = None
+        try:  # the human review view of this MCP session's run; files stay the source of truth
+            from agent.output import review
+            from evals.score_run import score as score_run
+            self.paths.run_dir.mkdir(parents=True, exist_ok=True)
+            review_path = str(review.write(self.paths.run_dir, out_root=self.paths.out, score=score_run(self.paths.out)))
+        except Exception as exc:
+            self.errors.record("output.review", exc)
         return {"brief": str(bpath), "approval_request": str(apath), "route_to": acct.owner, "sent": False,
+                "review": review_path,
                 "next": f"stop; {acct.owner} decides with python3 -m agent.feedback.decide --request {apath}"}

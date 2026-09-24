@@ -1,10 +1,10 @@
 {
   "account": {
-    "id": "hubspot:company/hs-1001",
-    "name": "Northbridge Financial Group (fictional)"
+    "id": "hubspot:company/hs-1002",
+    "name": "Lakeshore Bancorp (fictional)"
   },
   "blockable": true,
-  "brief": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/briefs/hubspot_company_hs-1001.md",
+  "brief": "briefs/hubspot_company_hs-1002.md",
   "channel": "briefing",
   "note": "Nothing has been sent and the bank has not been contacted. The named account owner decides whether to share this brief in the existing relationship (A-043), with python3 -m agent.feedback.decide. Approvers come from the playbook and HubSpot, never from this file.",
   "playbook": {
@@ -12,22 +12,20 @@
     "version": "0.2.0"
   },
   "playbook_sha256": "b24e3f924bb89ed584905d450aca0327802869e5039298a6f97fa484489c58f7",
-  "request_id": "46e702429be841febf241b36d744bf6e",
+  "request_id": "f6f6471080d4470393ee4655d357ec0e",
   "route_to": {
     "account_owner": "Kenny Nguyen"
   },
-  "run_id": "20260924T145743Z-ad2875",
+  "run_id": "20260924T151407Z-5ea5d4",
   "send": false,
   "sender": "none",
   "status": "pending",
   "suggested_recipients_in_existing_relationship": {
     "engineering": [
-      "zoominfo:contact/zi-2004"
+      "zoominfo:contact/zi-2007"
     ],
     "risk": [
-      "zoominfo:contact/zi-2001",
-      "zoominfo:contact/zi-2002",
-      "zoominfo:contact/zi-2003"
+      "zoominfo:contact/zi-2006"
     ]
   },
   "trigger": "SR-26-2"

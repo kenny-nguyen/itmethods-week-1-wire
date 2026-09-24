@@ -197,6 +197,12 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
                 pass  # the switch is engaged; the failure is in the error log
 
     write_json(paths.run_dir / "summary.json", summary)
+    try:  # the review view is a convenience for humans; the JSON and Markdown files stay the source of truth
+        from agent.output import review
+        from evals.score_run import score as score_run
+        summary["review"] = str(review.write(paths.run_dir, out_root=paths.out, score=score_run(paths.out)))
+    except Exception as exc:  # never hide it, never let it block the run's real outputs
+        errors.record("output.review", exc)
     return summary
 
 
@@ -338,6 +344,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  playbook {pid}: trigger {p['trigger']} {p['trigger_status']}  {extra}")
     for o in s["outputs"]:
         print(f"  brief {o['brief']}\n  approval request {o['approval_request']}")
+    if s.get("review"):
+        print(f"  review view {s['review']}")
     engaged = [pid for pid, p in s["playbooks"].items() if p.get("kill_switch")]
     if engaged:
         print(f"  KILL SWITCH ENGAGED: {', '.join(engaged)}")

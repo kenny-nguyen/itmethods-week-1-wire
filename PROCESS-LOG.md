@@ -1740,3 +1740,41 @@ From a fresh clone at `e48acd7`: the MCP server started exactly as `.mcp.json` s
 
 </details>
 
+### [D-036] 00:14 · BUILDER · DECISION
+Every run now writes a one-page HTML review view for the demo: the briefs, the approval requests and their status, the eval score, every held, dropped or watched account with its reason, the run's audit trail, and its errors. Each section links to the file it came from. The Markdown and JSON files stay the source of truth; the view is generated from them, never hand-written.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/output/review.py` (`python3 -m agent.output.review --run <dir>`); written automatically by `agent.run_playbook` and by the MCP `request_approval` tool at `<out>/runs/<run-id>/review.html`. The example moved to `examples/<run-id>/` with its own `review.html`, audit records, briefs, requests, summary and scores. The run folder layout `runs/<run-id>/` is kept rather than `out/<run-id>/`, so the audit trail and kill switches stay one level up for every run.
+
+**Why:** Operator decision relayed at 00:10 KST: visuals serve the demo recording. Self-contained (inline CSS, no scripts, no external requests) and every record string HTML-escaped, because briefs and CRM text are untrusted.
+
+**Evidence:** `tests/test_review.py`: every `href` resolves to an existing file; no script, link, src, import or url(); an injected `<img onerror>` and `<script>` come out escaped. First run of that test failed on a real dead link: `errors.jsonl` is not written when nothing fails, but the page linked it; now it says "no error log written (nothing failed)". Screenshot of a generated page checked by eye. Tests OK; MCP test OK in the venv; evals 63/63.
+
+**Assumption:** A viewer opens the HTML locally or from a download; GitHub renders `.html` as source.
+
+**Reversal trigger:** The demo needs it hosted.
+
+**Links:** D-034, D-035
+
+</details>
+
+### [D-037] 00:14 · PM · DECISION
+Stuck, then recovered: the first no-mistakes validation run failed at its review step because the pipeline's review agent hit its usage limit. The code was not at fault. The operator reported the limit reset, and validation is being rerun.
+
+<details><summary>Structured fields</summary>
+
+**What:** Run `01M39ZF1GQ1Y5JHK4W045C3ZXD` on head `6e3a063` ended `failed`: "step review failed: agent review: claude exited: exit status 1". The step log shows "You've hit your session limit".
+
+**Why:** Honest record of a stuck point and its recovery. Options sent to the supervisor were: switch the pipeline agent, open the PR directly, or wait for the reset; the reset came first.
+
+**Evidence:** `no-mistakes axi logs --step review --full`; supervisor message at 00:12 KST.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-035
+
+</details>
+

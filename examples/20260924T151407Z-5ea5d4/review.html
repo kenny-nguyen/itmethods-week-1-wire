@@ -1,0 +1,160 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Run review 20260924T151407Z-5ea5d4</title><style>
+body{font:15px/1.5 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;margin:0;background:#f6f7f9;color:#1d2330}
+main{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px;border-bottom:1px solid #d9dde5;padding-bottom:4px}
+.meta{color:#5b6475;font-size:13px}.banner{background:#fff4d6;border:1px solid #e8c766;padding:8px 12px;border-radius:6px;margin:12px 0}
+.card{background:#fff;border:1px solid #d9dde5;border-radius:8px;padding:12px 16px;margin:10px 0}
+pre{white-space:pre-wrap;word-wrap:break-word;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:0}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e6e9ef;padding:5px 6px;vertical-align:top}
+.ok{color:#146c2e;font-weight:600}.bad{color:#a1261b;font-weight:600}a{color:#1f56c2}
+</style></head><body><main>
+<h1>Run review</h1><div class=meta>run 20260924T151407Z-5ea5d4 &middot; drafted by offline-test-mode &middot; generated from the run's files; those files are the source of truth</div>
+<div class=banner><b>OFFLINE TEST MODE.</b> These briefs were drafted by the deterministic CI template, not by the agent.</div>
+<h2>Briefs (with the risk and engineering framings)</h2>
+<div class=card><div class=meta><a href="briefs/hubspot_company_hs-1001.md">briefs/hubspot_company_hs-1001.md</a></div><pre># Northbridge Financial Group (fictional): SR 26-2 brief for the account owner
+
+Prepared for Kenny Nguyen, the account owner, to decide whether to share it in the existing relationship. Nothing has been sent and the bank has not been contacted.
+
+## What changed
+- Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021) [src-sr26-2].
+- The letter says it is expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve [src-sr26-2].
+
+## What is certain for this account
+- OSFI Guideline E-23 (Model Risk Management) covers model risk, including AI and machine learning models, and takes effect on May 1, 2027 [src-osfi-e23].
+- OSFI Guideline B-13 (Technology and Cyber Risk Management) sets expectations for federally regulated financial institutions [src-osfi-b13].
+- Our record shows headquarters in CA [hubspot:company/hs-1001].
+
+## What depends on structure (confirm)
+- Confirm: SR 26-2 applicability requires confirmation [src-sr26-2]. If Northbridge Financial Group (fictional) operates a US banking entity supervised by the Federal Reserve, SR 26-2 applies to that entity [src-sr26-2].
+- Confirm: if Northbridge Financial Group (fictional) has an EU financial entity, DORA (Regulation (EU) 2022/2554 on digital operational resilience for the financial sector) applies to that entity [src-dora].
+
+## What we know about the account
+- Existing Forge customer [hubspot:company/hs-1001] [P-FORGE].
+- Agents: production [clay:table/first-motion/row/hs-1001].
+- Risk committee on record [clay:table/first-motion/row/hs-1001].
+
+## Where Reign fits
+- Reign Gateway is a governed path for agent and application calls to approved models and tools, with identity, policy, spend limits, and records of caller, decision, destination and outcome [P-GATEWAY].
+- Reign Assurance is being designed to prepare evidence; the people who own the risk decide [P-ASSURANCE]. It does not issue an audit opinion or a certification [P-ASSURANCE].
+- iTmethods&#x27; banking page centres on OSFI E-23, SR 26-2 and DORA; iTmethods works as first line and does no independent validation [P-BANKING].
+
+## Suggested next step
+- The account owner offers the audit and risk committee an Executive Assurance Briefing.
+- The Executive Assurance Briefing is the first stage (Briefing, then Runtime Risk and Governance Assessment, Focused Pilot, Platform Rollout) and is aimed at boards, audit and risk committees [P-BRIEFING].
+
+## Suggested recipients in the existing relationship
+- Risk lane: Avery Lindqvist (fictional), Chief Audit Executive [zoominfo:contact/zi-2001]; Morgan Achebe (fictional), Chief Risk Officer [zoominfo:contact/zi-2002]; Priya Raman (fictional), Head of Model Risk Management [zoominfo:contact/zi-2003]
+- Engineering lane: Daniel Okafor (fictional), VP, Platform Engineering [zoominfo:contact/zi-2004]
+
+## Open questions for the account owner
+- Sofia Marchetti (fictional) (Chief Information Security Officer) not routed: title matches do-not-route &#x27;information security&#x27;
+
+## Sources
+- [src-sr26-2] Federal Reserve SR 26-2 - https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
+- [src-osfi-e23] OSFI Guideline E-23 - Model Risk Management (2027) - https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027
+- [src-osfi-b13] OSFI Guideline B-13 - Technology and Cyber Risk Management - https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management
+- [src-dora] EIOPA - Digital Operational Resilience Act (DORA) - https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en
+- [P-FORGE] iTmethods - https://www.itmethods.com/learn/sovereign-ai ; https://www.itmethods.com/forge/agent-infrastructure
+- [P-GATEWAY] iTmethods - https://www.itmethods.com/gateway
+- [P-ASSURANCE] iTmethods - https://www.itmethods.com/assurance
+- [P-BRIEFING] iTmethods - https://www.itmethods.com/reign/assurance
+- [P-BANKING] iTmethods - https://www.itmethods.com/sectors/banking
+- [hubspot:company/hs-1001] HubSpot company record
+- [clay:table/first-motion/row/hs-1001] Clay enrichment row
+- [zoominfo:contact/zi-2001] ZoomInfo contact record
+- [zoominfo:contact/zi-2002] ZoomInfo contact record
+- [zoominfo:contact/zi-2003] ZoomInfo contact record
+- [zoominfo:contact/zi-2004] ZoomInfo contact record
+</pre></div>
+<div class=card><div class=meta><a href="briefs/hubspot_company_hs-1002.md">briefs/hubspot_company_hs-1002.md</a></div><pre># Lakeshore Bancorp (fictional): SR 26-2 brief for the account owner
+
+Prepared for Kenny Nguyen, the account owner, to decide whether to share it in the existing relationship. Nothing has been sent and the bank has not been contacted.
+
+## What changed
+- Issues revised interagency guidance on model risk management that supersedes SR 11-7 (2011) and SR 21-8 (2021) [src-sr26-2].
+- The letter says it is expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve [src-sr26-2].
+
+## What is certain for this account
+- Our record shows headquarters in US [hubspot:company/hs-1002].
+
+## What depends on structure (confirm)
+- Confirm: which Lakeshore Bancorp (fictional) banking entities the Federal Reserve regulates; the letter says it is most relevant above $30 billion in total assets [src-sr26-2].
+- Confirm: if Lakeshore Bancorp (fictional) has an EU financial entity, DORA (Regulation (EU) 2022/2554 on digital operational resilience for the financial sector) applies to that entity [src-dora].
+
+## What we know about the account
+- Agents: planned [clay:table/first-motion/row/hs-1002].
+- Risk committee on record [clay:table/first-motion/row/hs-1002].
+
+## Where Reign fits
+- Reign Gateway is a governed path for agent and application calls to approved models and tools, with identity, policy, spend limits, and records of caller, decision, destination and outcome [P-GATEWAY].
+- Reign Assurance is being designed to prepare evidence; the people who own the risk decide [P-ASSURANCE]. It does not issue an audit opinion or a certification [P-ASSURANCE].
+- iTmethods&#x27; banking page centres on OSFI E-23, SR 26-2 and DORA; iTmethods works as first line and does no independent validation [P-BANKING].
+
+## Suggested next step
+- The account owner offers the audit and risk committee an Executive Assurance Briefing.
+- The Executive Assurance Briefing is the first stage (Briefing, then Runtime Risk and Governance Assessment, Focused Pilot, Platform Rollout) and is aimed at boards, audit and risk committees [P-BRIEFING].
+
+## Suggested recipients in the existing relationship
+- Risk lane: Jordan Whitfield (fictional), Chief Risk Officer [zoominfo:contact/zi-2006]
+- Engineering lane: Casey Nakamura (fictional), Head of AI Engineering [zoominfo:contact/zi-2007]
+
+## Open questions for the account owner
+- None from the record.
+
+## Sources
+- [src-sr26-2] Federal Reserve SR 26-2 - https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
+- [src-dora] EIOPA - Digital Operational Resilience Act (DORA) - https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en
+- [P-GATEWAY] iTmethods - https://www.itmethods.com/gateway
+- [P-ASSURANCE] iTmethods - https://www.itmethods.com/assurance
+- [P-BRIEFING] iTmethods - https://www.itmethods.com/reign/assurance
+- [P-BANKING] iTmethods - https://www.itmethods.com/sectors/banking
+- [hubspot:company/hs-1002] HubSpot company record
+- [clay:table/first-motion/row/hs-1002] Clay enrichment row
+- [zoominfo:contact/zi-2006] ZoomInfo contact record
+- [zoominfo:contact/zi-2007] ZoomInfo contact record
+</pre></div>
+<h2>Approval requests</h2><table><tr><th>Account</th><th>Status</th><th>Routed to</th><th>Sent</th><th>File</th></tr>
+<tr><td>Northbridge Financial Group (fictional)</td><td>pending</td><td>Kenny Nguyen</td><td>no</td><td><a href="approvals/hubspot_company_hs-1001.json">approvals/hubspot_company_hs-1001.json</a></td></tr>
+<tr><td>Lakeshore Bancorp (fictional)</td><td>pending</td><td>Kenny Nguyen</td><td>no</td><td><a href="approvals/hubspot_company_hs-1002.json">approvals/hubspot_company_hs-1002.json</a></td></tr>
+</table>
+<h2>Eval score</h2><p class=ok>22/22</p><table><tr><th>Account</th><th>Expect</th><th>Failed properties</th></tr>
+<tr><td>hs-1001</td><td>brief</td><td class=ok>none</td></tr>
+<tr><td>hs-1002</td><td>brief</td><td class=ok>none</td></tr>
+<tr><td>hs-1009</td><td>held</td><td class=ok>none</td></tr>
+<tr><td>hs-1010</td><td>dropped</td><td class=ok>none</td></tr>
+<tr><td>hs-1006</td><td>dropped</td><td class=ok>none</td></tr>
+<tr><td>hs-1007</td><td>watched</td><td class=ok>none</td></tr>
+</table><p class=meta>Cases: evals/agent_cases.json; scorer: evals/score_run.py</p>
+<h2>Held, dropped, watched or blocked</h2><table><tr><th>Object</th><th>Decision</th><th>Reason</th></tr>
+<tr><td>hubspot:company/hs-1003</td><td>no_live_playbook</td><td>no active playbook with an implemented trigger for &#x27;biopharma_quality&#x27;</td></tr>
+<tr><td>hubspot:company/hs-1004</td><td>no_live_playbook</td><td>no active playbook with an implemented trigger for &#x27;defense_supplier&#x27;</td></tr>
+<tr><td>hubspot:company/hs-1005</td><td>exclude</td><td>matches exclusion pattern &#x27;ai-near-startup&#x27; (AI startups and mid-market SaaS are out, A-003)</td></tr>
+<tr><td>hubspot:company/hs-1006</td><td>exclude</td><td>matches exclusion pattern &#x27;ai-startup&#x27; (AI startups and mid-market SaaS are out, A-003)</td></tr>
+<tr><td>hubspot:company/hs-1007</td><td>watch</td><td>segment &#x27;hospital&#x27; is on the watch list: Watch, don&#x27;t contact: noticed and logged, no brief this month (A-040).</td></tr>
+<tr><td>hubspot:company/hs-1008</td><td>no_live_playbook</td><td>no active playbook with an implemented trigger for &#x27;semiconductor&#x27;</td></tr>
+<tr><td>hubspot:company/hs-1009</td><td>hold</td><td>headcount unknown; the ICP floor is 5,000 employees (A-004)</td></tr>
+<tr><td>hubspot:company/hs-1010</td><td>exclude</td><td>800 employees is under the 5000 floor</td></tr>
+<tr><td>hubspot:company/hs-1011</td><td>exclude</td><td>matches exclusion pattern &#x27;mid-market-saas&#x27; (AI startups and mid-market SaaS are out, A-003)</td></tr>
+</table><p class=meta>Source: <a href="audit.jsonl">audit.jsonl</a></p>
+<h2>Audit trail for this run (17 records)</h2><table><tr><th>Action</th><th>Object</th><th>Principal</th><th>Send</th><th>Purpose</th></tr>
+<tr><td>enrich</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Attach enrichment to Northbridge Financial Group (fictional) to test the first Reign motion ICP criteria.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;include&#x27; for Northbridge Financial Group (fictional) in the first Reign motion.</td></tr>
+<tr><td>enrich</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Attach enrichment to Lakeshore Bancorp (fictional) to test the first Reign motion ICP criteria.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;include&#x27; for Lakeshore Bancorp (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1003</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;no_live_playbook&#x27; for Helix Therapeutics Global (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1004</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;no_live_playbook&#x27; for Ironvale Defense Systems (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1005</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;exclude&#x27; for Promptly Labs (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1006</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;exclude&#x27; for Ledgerlight (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1007</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;watch&#x27; for Midtown Health System (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1008</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;no_live_playbook&#x27; for Crestline Semiconductor (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1009</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;hold&#x27; for Harbourline Trust (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1010</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;exclude&#x27; for Riverbend Credit Union (fictional) in the first Reign motion.</td></tr>
+<tr><td>score</td><td>hubspot:company/hs-1011</td><td>Kenny Nguyen</td><td>False</td><td>Record the ICP decision &#x27;exclude&#x27; for Vantage Cloud Suite (fictional) in the first Reign motion.</td></tr>
+<tr><td>route</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Record which Northbridge Financial Group (fictional) contacts the brief suggests to the account owner, by lane.</td></tr>
+<tr><td>create</td><td>hubspot:company/hs-1001</td><td>Kenny Nguyen</td><td>False</td><td>Draft the SR 26-2 brief for Northbridge Financial Group (fictional) and route it to the account owner Kenny Nguyen, who decides before anything is shared.</td></tr>
+<tr><td>route</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Record which Lakeshore Bancorp (fictional) contacts the brief suggests to the account owner, by lane.</td></tr>
+<tr><td>create</td><td>hubspot:company/hs-1002</td><td>Kenny Nguyen</td><td>False</td><td>Draft the SR 26-2 brief for Lakeshore Bancorp (fictional) and route it to the account owner Kenny Nguyen, who decides before anything is shared.</td></tr>
+</table><p class=meta>Source: <a href="audit.jsonl">audit.jsonl</a></p>
+<h2>Errors (0)</h2>
+<p>None.</p>
+<p class=meta>Source: <a href="errors.jsonl">errors.jsonl</a></p></main></body></html>

@@ -1,5 +1,5 @@
 {
-  "_label": "OFFLINE TEST MODE. These briefs were drafted by the deterministic template used for CI, not by the agent. This is a baseline for the scorer, not an agent result. Scores of real agent runs (Claude Code with the MCP server and the skill) are added separately when that run happens.",
+  "_label": "OFFLINE TEST MODE: template drafts for CI, not the agent. Baseline for the scorer.",
   "out": "$WIRE_OUT_DIR",
   "score": "22/22",
   "passed": 22,

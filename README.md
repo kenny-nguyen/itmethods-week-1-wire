@@ -62,7 +62,7 @@ python3 -m unittest discover -s tests -t . -v
 python3 -m evals.run_evals
 ```
 
-To read output without running anything: `examples/` (offline test mode briefs, labelled as such). Production setup, adapters, scheduling and recovery: [`docs/production.md`](docs/production.md).
+To read output without running anything: `examples/20260924T151407Z-5ea5d4/` (an offline-test-mode run, labelled as such), including its generated `review.html`. Production setup, adapters, scheduling and recovery: [`docs/production.md`](docs/production.md).
 
 ## Cut, sequenced, refused
 
@@ -211,7 +211,8 @@ What the contract sets out:
 | `fixtures/` | Fictional HubSpot, ZoomInfo and Clay records, plus the real regulator publications with fetched URLs. |
 | `tests/` | Unit tests, one file per stage. |
 | `.github/workflows/ci.yml` | CI (continuous integration): offline tests and evals, plus the MCP server test with the pinned package. |
-| `examples/` | Output of one offline-test-mode run (labelled): both bank briefs, approval requests, audit records, run summary, scores. |
+| `examples/` | One offline-test-mode run (labelled): briefs, approval requests, audit records, summary, scores and the generated `review.html`. |
+| `agent/output/review.py` | Generates each run's one-page HTML review view. |
 | `docs/production.md` | Production guide: configuration, end-to-end run, approval and kill switch, wiring each adapter, scheduling, recovery, known gaps. |
 | `agent/config.py` | Deployment configuration read from the environment. |
 | `docs/research/` | Sourced facts the agent is allowed to use (product claims, regulator pages). |

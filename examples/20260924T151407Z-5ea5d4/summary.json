@@ -2,8 +2,8 @@
   "accounts": {
     "hs-1001": {
       "applicability": "requires_confirmation",
-      "approval_request": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/approvals/hubspot_company_hs-1001.json",
-      "brief": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/briefs/hubspot_company_hs-1001.md",
+      "approval_request": "approvals/hubspot_company_hs-1001.json",
+      "brief": "briefs/hubspot_company_hs-1001.md",
       "flags": [],
       "fs": true,
       "name": "Northbridge Financial Group (fictional)",
@@ -20,8 +20,8 @@
     },
     "hs-1002": {
       "applicability": "applies",
-      "approval_request": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/approvals/hubspot_company_hs-1002.json",
-      "brief": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/briefs/hubspot_company_hs-1002.md",
+      "approval_request": "approvals/hubspot_company_hs-1002.json",
+      "brief": "briefs/hubspot_company_hs-1002.md",
       "flags": [],
       "fs": true,
       "name": "Lakeshore Bancorp (fictional)",
@@ -134,13 +134,13 @@
   "outputs": [
     {
       "account": "hs-1001",
-      "approval_request": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/approvals/hubspot_company_hs-1001.json",
-      "brief": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/briefs/hubspot_company_hs-1001.md"
+      "approval_request": "approvals/hubspot_company_hs-1001.json",
+      "brief": "briefs/hubspot_company_hs-1001.md"
     },
     {
       "account": "hs-1002",
-      "approval_request": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/approvals/hubspot_company_hs-1002.json",
-      "brief": "$WIRE_OUT_DIR/runs/20260924T145743Z-ad2875/briefs/hubspot_company_hs-1002.md"
+      "approval_request": "approvals/hubspot_company_hs-1002.json",
+      "brief": "briefs/hubspot_company_hs-1002.md"
     }
   ],
   "playbooks": {
@@ -162,7 +162,7 @@
     },
     "biopharma-fda-pccp": {
       "channel": "briefing",
-      "reason": "One trigger is implemented in this window (bank and SR 26-2, operator decision). The FDA PCCP guidance page has no verified URL yet (A-014), so a brief could not cite it.",
+      "reason": "One trigger is implemented deeply in this window (bank and SR 26-2, operator decision). The FDA PCCP source is verified (R-012); the biopharma brief structure and facts are not built yet.",
       "trigger": "FDA-PCCP-2025",
       "trigger_status": "not_implemented",
       "version": "0.2.0"
@@ -175,8 +175,8 @@
       "version": "0.2.0"
     }
   },
-  "provider": "template",
-  "run_id": "20260924T145743Z-ad2875",
+  "provider": "offline-test-mode",
+  "run_id": "20260924T151407Z-5ea5d4",
   "watch_list": [
     {
       "account": "hs-1007",
