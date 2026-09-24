@@ -1059,3 +1059,22 @@ Two independent reviews were started, each in a separate agent context that did 
 
 </details>
 
+### [D-013] 23:38 · BUILDER · DECISION
+The supervisor's agent-memory helper refused to touch the kit's `CLAUDE.md` and `AGENTS.md`. The kit's own one-line import already does the job, so both files were left exactly as committed, and no project notes were added to the contract.
+
+<details><summary>Structured fields</summary>
+
+**What:** Fallback under contract section 8: skip the helper, keep `CLAUDE.md` (`@AGENTS.md`) and `AGENTS.md` unchanged.
+
+**Why:** One attempt at a misbehaving substrate mechanism is reasonable; a second is a trap. The requirement behind the helper (agents load `AGENTS.md`) is already met, and editing the contract after the fact would blur the point of committing it first. Everything a future session needs to run the code is in the README.
+
+**Evidence:** `fm-ensure-agents-md.sh .` printed "conflict: both AGENTS.md and CLAUDE.md are real files ... reconcile them manually" and changed nothing (`git status` clean).
+
+**Assumption:** none
+
+**Reversal trigger:** The operator wants the helper's canonical two-line pointer in `CLAUDE.md`.
+
+**Links:** -
+
+</details>
+
