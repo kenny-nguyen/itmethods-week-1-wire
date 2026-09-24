@@ -56,10 +56,33 @@ class F1AuditBeforeEnrichment(unittest.TestCase):
         self.assertNotIn(("adapter", "enrich"), events)
 
 
+class RecordingContacts:
+    def __init__(self, inner, events):
+        self.inner, self.events = inner, events
+
+    def contacts_for(self, account_id):
+        self.events.append(("adapter", "contacts"))
+        return self.inner.contacts_for(account_id)
+
+
+class F7AuditBeforeContacts(unittest.TestCase):
+    def test_route_record_precedes_contacts_call(self):
+        events: list = []
+        io = _load_inputs(ROOT)
+        io = {**io, "contacts": RecordingContacts(io["contacts"], events)}
+        with tempdir() as d:
+            t = GovernedTools(Path(d), inputs=io, sink=OrderedSink(events))
+            t.screen_account(BANK, "hs-1001"); t.check_applicability(BANK, "hs-1001")
+            events.clear()
+            t.route_contact(BANK, "hs-1001")
+        self.assertEqual(events[:2], [("audit", "route"), ("adapter", "contacts")])
+
+
 class F2TitleVariants(unittest.TestCase):
     def test_ciso_variants_never_routed(self):
         variants = ["C.I.S.O., VP Engineering", "CISO", "C I S O", "Chief Information-Security Officer",
-                    "chief   information security officer", "CISO/VP Engineering"]
+                    "chief   information security officer", "CISO/VP Engineering",
+                    "\uff23\uff29\uff33\uff2f"]  # full-width CISO (re-test F5)
         cs = [Contact(str(i), "a", f"P{i}", t, "zoominfo") for i, t in enumerate(variants)]
         routed, skipped = route(cs, {"risk": ["risk"], "engineering": ["engineering"]},
                                 ["information security", "ciso"], ["risk", "engineering"])

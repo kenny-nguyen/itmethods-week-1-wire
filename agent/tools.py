@@ -287,20 +287,21 @@ class GovernedTools:
         pb, _ = self._playbook(playbook_id)
         st = self._step(playbook_id, account_id, "applicable")
         acct = st["account"]
-        try:
-            contacts = self.io["contacts"].contacts_for(acct.id)
-        except InputError as exc:
-            self._fail("route", f"contact source failed: {exc}", "check the ZoomInfo adapter and retry.")
         routing = pb.get("routing", {})
         lanes = routing.get("lanes", {})
+        # R-17 order (adversarial re-test F7): the route record is written first, and only then is the contacts
+        # adapter called, inside the commit. The record states the routing rule applied.
+        try:
+            contacts = self._guard(pb, lambda: self._pb_trail(pb).perform(
+                action="route", object_id=acct.system_id, fs=st["decision"].fs,
+                commit=lambda: self.io["contacts"].contacts_for(acct.id),
+                purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
+                sources=[acct.system_id],
+                detail={"lanes_rule": lanes, "do_not_route": routing.get("do_not_route", []), "via": "mcp"}),
+                "route")
+        except InputError as exc:
+            self._fail("route", f"contact source failed: {exc}", "check the ZoomInfo adapter and retry.")
         routed, skipped = route(contacts, lanes, routing.get("do_not_route", []), list(lanes))
-        self._guard(pb, lambda: self._pb_trail(pb).perform(
-            action="route", object_id=acct.system_id, fs=st["decision"].fs, commit=lambda: None,
-            purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
-            sources=[c.system_id for c in contacts] or [acct.system_id],
-            detail={"lanes": {l: [c.system_id for c in cs] for l, cs in routed.items()},
-                    "not_routed": [{"contact": c.system_id, "why": why} for c, why in skipped], "via": "mcp"}),
-            "route")
         st.update(stage="routed", routed=routed, not_routed=[c for c, _ in skipped],
                   flags=list(st["decision"].flags) + [f"A contact was not routed: {why}." for c, why in skipped])
         return {"lanes": {l: [{"id": c.system_id, "name": c.name, "title": c.title} for c in cs]

@@ -245,25 +245,24 @@ def _brief_one(acct, enrichment, decision, pb, sha, trigger, io, claims_by_id, p
         entry["status"] = f"preflight_{result.status}"
         return
 
-    try:
-        contacts = io["contacts"].contacts_for(acct.id)
-    except InputError as exc:
-        errors.record("input.contacts", exc, context={"account": acct.id})
-        entry["status"] = "input_error"
-        return
     routing = pb.get("routing", {})
     lanes = routing.get("lanes", {})
-    routed, skipped = route(contacts, lanes, routing.get("do_not_route", []), list(lanes))
+    # R-17 order (adversarial re-test F7): the route record first, then the contacts adapter inside the commit.
     try:  # routing into lanes is our decision about people at the account (A-024)
-        trail.perform(action="route", object_id=acct.system_id, fs=decision.fs, commit=lambda: None,
-                      purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
-                      sources=[c.system_id for c in contacts] or [acct.system_id],
-                      detail={"lanes": {l: [c.system_id for c in cs] for l, cs in routed.items()},
-                              "not_routed": [{"contact": c.system_id, "why": why} for c, why in skipped]})
+        contacts = trail.perform(
+            action="route", object_id=acct.system_id, fs=decision.fs,
+            commit=lambda: io["contacts"].contacts_for(acct.id),
+            purpose=f"Record which {acct.name} contacts the brief suggests to the account owner, by lane.",
+            sources=[acct.system_id], detail={"lanes_rule": lanes, "do_not_route": routing.get("do_not_route", [])})
     except AuditBlocked as exc:
         counts["audit_blocked"] += 1
         entry.update(status="audit_blocked", reasons=[str(exc)])
         return
+    except InputError as exc:
+        errors.record("input.contacts", exc, context={"account": acct.id})
+        entry["status"] = "input_error"
+        return
+    routed, skipped = route(contacts, lanes, routing.get("do_not_route", []), list(lanes))
     flags = list(decision.flags) + [f"A contact was not routed: {why}." for c, why in skipped]
     claims = [claims_by_id[cid] for cid in pb.get("claims", [])]
     ctx = BriefContext(trigger, result, acct, enrichment, routed, claims, acct.owner, flags,
