@@ -1662,3 +1662,22 @@ The MCP server is in. It exposes eight governed tools to any MCP client, and eve
 
 </details>
 
+### [D-033] 00:05 · BUILDER · DECISION
+The skill is written: it tells the agent to read the trigger sources itself, reason about the specific account, decide write, hold or drop, draft both lane framings, and self-check before requesting approval. The CEO's "no generic 'AI governance' sequence" is now a gate rule, not just an instruction. A literal em dash that crept back into the gate's own source is replaced by its escape.
+
+<details><summary>Structured fields</summary>
+
+**What:** `skills/regulatory-trigger-brief/SKILL.md`, linked at `.claude/skills/regulatory-trigger-brief` so Claude Code finds it in this repository. Gate: "AI governance" banned; optional owner-only section "## Lane framings for the account owner". New eval case.
+
+**Why:** Operator decision A-046: the skill is the agent's instructions; the tools enforce. Putting the CEO's warning into the gate means a model that ignores the skill still cannot ship the phrase.
+
+**Evidence:** `python3 -m evals.run_evals`: "63/63". First attempt at the gate edit did not apply (the replaced text did not match because the D-017 rewrite had re-introduced a literal em dash); caught by the new eval case missing (62/63). Tests OK (MCP test skipped without the package; it passes in `.venv`).
+
+**Assumption:** Claude Code discovers project skills under `.claude/skills/`; the operator's layout puts the source under `skills/`, hence the link.
+
+**Reversal trigger:** The skill does not load in the demo session (then copy instead of link).
+
+**Links:** A-046, D-032
+
+</details>
+

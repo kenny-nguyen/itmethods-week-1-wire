@@ -521,6 +521,15 @@
         "text": "## Bonus claims"
       },
       "expect": "unexpected section"
+    },
+    {
+      "name": "generic AI governance language",
+      "source": "CEO notes; operator decision (skill rules)",
+      "edit": {
+        "append_to": "## Open questions for the account owner",
+        "text": "- Position Reign as the bank's AI governance answer."
+      },
+      "expect": "filler"
     }
   ],
   "caveat_cases": [

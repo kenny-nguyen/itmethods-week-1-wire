@@ -71,7 +71,7 @@ DEFENSE = re.compile(r"(\bc\.?\s?m\.?\s?m\.?\s?c\b|cybersecurity\s+maturity\s+mo
                      r"federal\s+risk\s+and\s+authori[sz]ation|\bcui\b|controlled[\s-]+unclassified|\bitar\b|"
                      r"international\s+traffic\s+in\s+arms|\bnist\s*(sp\s*)?800[\s-]*171\b|\bdfars\b)", re.IGNORECASE)
 SLOP = re.compile(r"(in today's|rapidly evolving|game[- ]changer|\bunlock\w*|\bleverag\w*|seamless\w*|"
-                  r"cutting[- ]edge|revolutioni\w+|synerg\w+|\bdelve\w*|hope this finds you|—)", re.IGNORECASE)
+                  r"cutting[- ]edge|revolutioni\w+|synerg\w+|\bdelve\w*|hope this finds you|\bai\s+governance\b|\u2014)", re.IGNORECASE)
 # Links and markup that are not approved sources.
 MARKUP = re.compile(r"(<\s*[a-z!/]|!\[|\]\()", re.IGNORECASE)
 BARE_LINK = re.compile(r"(//[a-z0-9-]+\.[a-z0-9.-]+|\bwww\.[a-z0-9-]+|"
