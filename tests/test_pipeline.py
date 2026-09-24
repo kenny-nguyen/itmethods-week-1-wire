@@ -4,8 +4,9 @@ import json
 import unittest
 from pathlib import Path
 
-from agent.feedback import kill_switch
-from agent.feedback.decide import DecisionRefused, decide
+from agent.feedback import kill_switch, trusted
+from agent.feedback.decide import DecisionRefused, check_kill_criteria, decide
+from agent.governance.error_log import ErrorLog
 from agent.governance.audit import validate_record
 from agent.input import playbook as pbmod
 from agent.processing.brief import ProviderError, TemplateProvider
@@ -65,7 +66,7 @@ class PipelineTests(unittest.TestCase):
             self.assertIsNone(bank.get("kill_switch"))
             for aid in ("hs-1001", "hs-1002"):  # A-044: both banks get the structured brief
                 self.assertEqual(s["accounts"][aid]["status"], "brief_pending_owner_decision")
-            self.assertEqual(s["accounts"]["hs-1006"]["status"], "exclude")          # AI start-up filed as fintech
+            self.assertEqual(s["accounts"]["hs-1006"]["status"], "hold")             # D-040: category unclear, human confirms
             self.assertEqual(s["accounts"]["hs-1007"]["status"], "watch")            # A-040
             self.assertEqual([w["account"] for w in s["watch_list"]], ["hs-1007"])
             for pid in ("biopharma-fda-pccp", "defense-forge-first"):
@@ -156,13 +157,14 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "preflight_hold")
             self.assertEqual(s["outputs"], [])
 
-    def test_sloppy_drafts_fail_the_gate_and_trip_the_kill_switch(self):
+    def test_sloppy_drafts_fail_the_gate_but_two_are_not_a_sample(self):  # D-041
         with tempdir() as d:
             out = Path(d)
             s = run(MOTION, out, provider=SloppyProvider())
             self.assertEqual(s["accounts"]["hs-1002"]["status"], "gate_failed")
-            self.assertEqual(s["playbooks"][BANK]["metrics"]["drafted"], 0)
-            self.assertIn("gate-failures", s["playbooks"][BANK]["kill_switch"]["reason"])
+            metrics = s["playbooks"][BANK]["metrics"]
+            self.assertEqual((metrics["drafted"], metrics["gate_failed"], metrics["gate_failed_ratio"]), (0, 2, None))
+            self.assertIsNone(s["playbooks"][BANK].get("kill_switch"))
 
     def test_provider_outage_fails_the_account(self):
         with tempdir() as d:
@@ -223,11 +225,18 @@ class DecisionTests(unittest.TestCase):
                 decide(req, approver="Kenny Nguyen", approve=True, reason="Sources and routing checked.", out_dir=out)
             self.assertEqual(json.loads(req.read_text())["status"], "pending")
 
-    def test_rejection_trips_rejected_ratio_kill_criterion(self):
+    def test_rejection_ratio_needs_minimum_sample(self):  # D-041
         with tempdir() as d:
             out = Path(d)
             req = self._run(out)
             decide(req, approver="Kenny Nguyen", approve=False, reason="Reads too generic for a CAE.", out_dir=out)
+            self.assertIsNone(kill_switch.engaged(out / "state", BANK))  # one decision is not a sample
+            pb = trusted.load_trusted(BANK)
+            trail = trusted.trail_for(pb, out, "test", ErrorLog(out / "errors.jsonl", "test"))
+            for i, status in enumerate(["rejected", "rejected", "approved_ready_to_send", "rejected"]):
+                (req.parent / f"extra-{i}.json").write_text(json.dumps({"status": status}))
+            hits = check_kill_criteria(pb, out, req.parent, trail, by="Kenny Nguyen")
+            self.assertEqual([h["id"] for h in hits], ["approver-rejections"])  # 4 of 5 rejected
             self.assertIsNotNone(kill_switch.engaged(out / "state", BANK))
 
     def test_audit_failure_blocks_approval(self):

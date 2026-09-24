@@ -8,8 +8,7 @@
     "risk_committee": "packet: unvetted Slack note from Rob; invented: a flag, not a gate (A-021, decided)",
     "unlisted_segment": "invented: an account whose fit is unclear is held for a human; clearly outside the ICP is dropped with the reason audited (A-031, decided)",
     "fs_industries": "invented: which industries count as financial services; unknown counts as FS and is flagged 'industry unconfirmed' (A-006, decided)",
-    "exclusion_patterns": "packet: 'Do not include mid-market SaaS', 'Remove [AI startups]' (A-003, decided); invented: the naming-variant patterns, widened after two independent QA passes (Q-005, Q-007)",
-    "object_context_regex": "invented: a match is ignored when the startups are the account's investees, partners or customers, not the account (D-016)",
+    "exclusion_patterns": "packet: 'Do not include mid-market SaaS', 'Remove [AI startups]' (A-003, decided); invented: the naming-variant patterns, widened after two independent QA passes (Q-005, Q-007); applied to the category fields (segment, industry) only, never to free text, and an unclear category is held and flagged for a human (operator decision, D-040)",
     "segments.dsib_capital_markets": "packet ICP sketch; invented: lanes risk and engineering (A-011, decided)",
     "segments.biopharma_quality": "packet ICP sketch",
     "segments.defense_supplier": "packet ICP sketch; invented: lead with Forge (A-023, decided)",
@@ -124,7 +123,6 @@
       "regex": "\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b[^.]{0,30}\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b|\\b(?:saas|software[\\s_-]*as[\\s_-]*a[\\s_-]*service|cloud[\\s_-]*software|subscription[\\s_-]*software|b2b[\\s_-]*software)\\b[^.]{0,40}\\b(?:mid[\\s_-]*(?:market|size|sized)|smb|small[\\s_-]*(?:and|&)[\\s_-]*mid[\\s_-]*sized?)\\b"
     }
   ],
-  "object_context_regex": "\\b(?:invest(?:s|ed|ing|ments?)?\\s+in|partner(?:s|ed|ing|ships?)?\\s+with|backs|funds|finances|serves|serving|advises|(?:sells?|selling|lends?|lending|provides?|providing|offers?|offering)\\b[^.]{0,30}\\bto|portfolio\\s+(?:of|includes?|companies)|(?:clients?|customers?)\\s+(?:include|including|are|such\\s+as)|(?:accelerator|incubator)\\s+for)\\b[^.]{0,30}$",
   "watch_list": {
     "_about": "Noticed and logged in the audit trail and the run summary; never enriched, routed, briefed or contacted.",
     "hospitals": "all hospitals this month (A-040)",

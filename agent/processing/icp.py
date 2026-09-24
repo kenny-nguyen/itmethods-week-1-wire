@@ -32,13 +32,12 @@ class IcpDecision:
 class Icp:
     raw: dict
     patterns: list[tuple[str, re.Pattern]]
-    object_context: re.Pattern
 
     @classmethod
     def load(cls, path: str | Path) -> "Icp":
         raw = json.loads(Path(path).read_text(encoding="utf-8"))
         patterns = [(p["id"], re.compile(p["regex"], re.IGNORECASE)) for p in raw["exclusion_patterns"]]
-        return cls(raw, patterns, re.compile(raw["object_context_regex"], re.IGNORECASE))
+        return cls(raw, patterns)
 
     def is_fs(self, account: Account) -> bool:
         seg = self.raw["segments"].get(account.segment, {})
@@ -48,22 +47,16 @@ class Icp:
             return True
         return account.industry.strip().lower() in self.raw["fs_industries"]
 
-    def matched_exclusion(self, account: Account) -> str | None:
-        """First exclusion pattern that describes the account itself.
+    def _match(self, text: str) -> str | None:
+        return next((pid for pid, pattern in self.patterns if pattern.search(text)), None)
 
-        A match is ignored when the startups are someone the account deals with
-        ("invests in AI startups", "partners with fintech startups"): the
-        `object_context` pattern, which needs a relational phrase rather than an
-        adjective such as "well-funded", is checked on the words just before the match.
+    def matched_exclusion(self, account: Account) -> str | None:
+        """The exclusion pattern the account's category fields (segment and industry) match, if any.
+
+        Only the category says what a company is. Free text (name, description) never excludes, so a
+        bank that uses AI or backs AI startups stays in (operator decision, D-040).
         """
-        text = " . ".join(filter(None, [account.name, account.description, account.segment.replace("_", " "),
-                                        account.industry or ""]))
-        for pid, pattern in self.patterns:
-            for m in pattern.finditer(text):
-                before = text[max(0, m.start() - 40):m.start()]
-                if not self.object_context.search(before):
-                    return pid
-        return None
+        return self._match(" . ".join(filter(None, [account.segment.replace("_", " "), account.industry or ""])))
 
     def prescreen(self, account: Account) -> IcpDecision | None:
         """Decide what can be decided without enrichment, so excluded companies are never enriched."""
@@ -72,14 +65,16 @@ class Icp:
 
         hit = self.matched_exclusion(account)
         if hit:
-            return IcpDecision(EXCLUDE, fs, [f"matches exclusion pattern '{hit}' (AI startups and mid-market SaaS are out, A-003)"])
+            return IcpDecision(EXCLUDE, fs, [f"category matches exclusion pattern '{hit}' (AI startups and mid-market SaaS are out, A-003)"])
         if seg is not None and seg.get("watch"):
             return IcpDecision(WATCH, fs, [f"segment '{account.segment}' is on the watch list: {seg.get('reason', '')}".strip()])
         if seg is not None and not seg.get("include", False):
             return IcpDecision(EXCLUDE, fs, [f"segment '{account.segment}' is excluded: {seg.get('reason', '')}".strip()])
         if seg is None:
             decision = HOLD if self.raw["unlisted_segment"] == "hold" else EXCLUDE
-            return IcpDecision(decision, fs, [f"segment '{account.segment}' is not in the ICP (A-031)"])
+            described = self._match(" . ".join(filter(None, [account.name, account.description])))
+            flags = [f"description reads like '{described}': a human confirms the company category (D-040)"] if described else []
+            return IcpDecision(decision, fs, [f"segment '{account.segment}' is not in the ICP (A-031)"], flags)
 
         if account.employees is None:
             if self.raw["unknown_employees"] == "hold":

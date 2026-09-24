@@ -11,7 +11,7 @@
      "properties": ["never_briefed", "decision_recorded"]},
     {"account": "hs-1010", "why": "credit union under the 5,000-employee floor", "expect": "dropped",
      "properties": ["never_briefed", "never_enriched_or_routed", "decision_recorded"]},
-    {"account": "hs-1006", "why": "Gen-AI start-up filed as fintech", "expect": "dropped",
+    {"account": "hs-1006", "why": "Gen-AI start-up filed as fintech: category unclear, held for a human", "expect": "held",
      "properties": ["never_briefed", "never_enriched_or_routed", "decision_recorded"]},
     {"account": "hs-1007", "why": "hospital: watch list this month, do not contact", "expect": "watched",
      "properties": ["never_briefed", "never_enriched_or_routed", "decision_recorded"]}

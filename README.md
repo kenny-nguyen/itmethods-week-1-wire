@@ -133,7 +133,7 @@ To read output without running anything: `examples/20260924T151407Z-5ea5d4/` (an
 | "Do not outbound to the bank until a briefing is on the calendar" vs "we should already be in the thread" on a trigger | No cold outreach; on a trigger the brief goes to the account owner, who shares it in the existing relationship. | The bank already runs Forge, so "the thread" is the existing relationship. | A-043 |
 | Risk and engineering "will not sit in the same meeting" | One brief, two lanes by title, never ask. | "Route them without asking." | A-011 |
 | Defense: "Forge-first... I think. Check with Rob. Actually lead with the substrate story" | Lead with Forge; Reign is why agents can be let near the estate. | The last word in the notes; not implemented this window. | A-023 |
-| ICP sketch lists "AI-native SaaS startups"; notes say remove them | Excluded under any naming variant. | Operator-approved; patterns hardened by two QA passes. | A-003 |
+| ICP sketch lists "AI-native SaaS startups"; notes say remove them | Excluded when the company's category (segment or industry) names an AI startup or mid-market SaaS, under any naming variant. Free text such as a description never excludes; an unclear category is held for a human. | Operator decision: be clear on what we exclude and why, and never drop a bank because it uses or backs AI. | A-003, D-040 |
 | Pharma "asked about FDA PCCP... build the trigger" vs one deep trigger | Encoded as a playbook, trigger not implemented yet. | One trigger done well beats three done thinly. | A-027, A-041 |
 | Website says "banks, hospitals, and defense"; Slack says do not spray hospitals this month | Watch, don't contact. | Explicit instruction; spray is a knockout. | A-040 |
 
@@ -166,6 +166,7 @@ Each tool replaces one fixture class. The pipeline and the MCP tools only talk t
 | No live agent run in this session | Run the skill in Claude Code with the server attached (the demo) and commit the scored result to `examples/`. |
 | No HubSpot, Clay or ZoomInfo access | Wire the adapters in the day-one table; the fixtures already exercise every interface. |
 | EUR-Lex and fda.gov block automated reads from this environment | Fetch the regulation texts through a browser or the researcher and store verified text snapshots next to the feed. |
+| Companies that blur the line between a bank or insurer and an AI startup (the category field is the only thing that excludes; an unclear category is held) | Gain clarity with sales leadership on how those companies are categorised, then update the classification rule in `icp/icp.json` (D-040). |
 | The approver is a typed name | Bind approvals to an authenticated identity (single sign-on or the HubSpot user) before any send path is wired. |
 
 ## About the working contract (the first commit)

@@ -42,8 +42,19 @@ def _run_order(brief: Path) -> str:
     return brief.parent.parent.name.removeprefix("mcp-")
 
 
+def _exercised(case: dict, recs: list[dict]) -> bool:
+    """Did this run act on the case's account? A brief case needs more than screening: a hold, route or create
+    (an account already briefed in an earlier run is screened again but not exercised)."""
+    if case["expect"] == "brief":
+        return any(r["action"] in ("hold", "route", "create") for r in recs)
+    return bool(recs)
+
+
 def score(out: Path, run_dir: Path | None = None) -> dict:
-    """Score every run under `out`, or only the run in `run_dir` (what that run's review view shows)."""
+    """Score every run under `out`, or only the run in `run_dir` (what that run's review view shows).
+
+    With `run_dir`, a case the run did not exercise is labelled "exercised": false and left out of the score.
+    """
     spec = json.loads(CASES.read_text(encoding="utf-8"))
     io = _load_inputs(ROOT)
     pb = load(ROOT / "playbooks" / f"{spec['playbook']}.jsonc")
@@ -58,6 +69,10 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
         briefs = sorted(out.glob(f"runs/{runs}/briefs/hubspot_company_{case['account']}.md"), key=_run_order)
         text = briefs[-1].read_text() if briefs else ""
         recs = [r for r in audit if r.get("object") == sid]
+        if run_dir and not _exercised(case, recs):
+            results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
+                            "exercised": False, "properties": {}})
+            continue
         props = {}
         for prop in case["properties"]:
             if prop == "passes_output_gate":
@@ -103,7 +118,7 @@ def score(out: Path, run_dir: Path | None = None) -> dict:
                 props[prop] = (bool(decided), decided)
             total += 1
             passed += bool(props[prop][0])
-        results.append({"account": case["account"], "why": case["why"], "expect": case["expect"],
+        results.append({"account": case["account"], "why": case["why"], "expect": case["expect"], "exercised": True,
                         "properties": {k: {"pass": bool(v[0]), "evidence": v[1]} for k, v in props.items()}})
     return {"out": str(out), "run": run_dir.name if run_dir else None, "score": f"{passed}/{total}", "passed": passed,
             "total": total, "cases": results}
@@ -116,6 +131,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     result = score(Path(args.out) if args.out else config.out_dir())
     for c in result["cases"]:
+        if not c["exercised"]:
+            print(f"SKIP  {c['account']}  {c['why']}  not exercised in this run")
+            continue
         fails = [k for k, v in c["properties"].items() if not v["pass"]]
         print(f"{'PASS' if not fails else 'FAIL'}  {c['account']}  {c['why']}" + (f"  failed: {fails}" if fails else ""))
     print(f"score {result['score']}")

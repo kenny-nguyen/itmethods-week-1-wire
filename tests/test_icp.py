@@ -33,21 +33,19 @@ AI_STARTUP_VARIANTS = [
     "Fintech startup using large language models.", "YC W24 company building LLM agents.",
     "Venture-funded autonomous agent company.", "Deep-learning startup.", "Seed-funded foundation model lab.",
     "Cloud software vendor for mid-sized manufacturers.", "B2B subscription software for midmarket lenders.",
-    # Adjectives about the account itself used to read as "the startups are someone else" (review F2):
+    # Adjectives about the company itself (review F2):
     "Well-funded AI startup building copilots for banks.", "VC-funded AI startup.",
     "Backed by a16z, Acme is an AI startup.", "Insurtech AI startup.", "Customer-obsessed GenAI startup.",
 ]
 
+# Descriptions of companies that use AI or deal with AI startups; free text never excludes (D-040).
 MUST_NOT_EXCLUDE = [
     "Bank with AI models in production.", "Runs an AI governance programme across capital markets.",
     "Started a model risk programme for AI in 2025.", "Uses generative AI for document review.",
-    "Global biopharma with AI-enabled device software.", "Agents on the estate under export control.",
-    # Wrongly excluded by the first pattern set, found by independent QA (Q-005):
     "US bank holding company; its venture arm invests in AI startups.",
-    "Insurer selling startup business policies through 20,000 agents.",
     "Bank that partners with fintech startups and is piloting AI agents in lending.",
-    "Large bank deploying generative AI across operations.",
-    "Bank whose clients include AI startups.", "Bank lending to AI startups across Canada.",
+    "Large bank with a venture arm backing AI startups.", "Large bank funding AI startups across Canada.",
+    "Large bank financing AI startups.", "Large insurer insuring AI startups.", "Bank with a fund for AI startups.",
 ]
 
 
@@ -57,22 +55,26 @@ class IcpTests(unittest.TestCase):
         self.assertEqual(d.decision, INCLUDE, d.reasons)
         self.assertTrue(d.fs)
 
-    def test_ai_startup_variants_excluded_even_under_other_segments(self):
+    def test_ai_startup_category_variants_excluded(self):
         for text in AI_STARTUP_VARIANTS:
             with self.subTest(text=text):
-                acct = replace(BANK, segment="fintech", industry="Software", description=text)
+                acct = replace(BANK, segment="fintech", industry=text, description="Lending software.")
                 d = ICP.evaluate(acct, ENRICHED)
                 self.assertEqual(d.decision, EXCLUDE, f"{text!r} -> {d.decision} {d.reasons}")
 
-    def test_variants_in_company_name_also_excluded(self):
-        acct = replace(BANK, name="Acme AI Startup Inc (fictional)", description="Lending software.")
-        self.assertEqual(ICP.evaluate(acct, ENRICHED).decision, EXCLUDE)
-
-    def test_bare_ai_mentions_do_not_exclude(self):
-        for text in MUST_NOT_EXCLUDE:
+    def test_free_text_never_excludes(self):  # D-040: only the category says what a company is
+        for text in AI_STARTUP_VARIANTS + MUST_NOT_EXCLUDE:
             with self.subTest(text=text):
-                d = ICP.evaluate(replace(BANK, description=text), ENRICHED)
+                d = ICP.evaluate(replace(BANK, name=f"{text} (fictional)", description=text), ENRICHED)
                 self.assertEqual(d.decision, INCLUDE, f"{text!r} wrongly -> {d.reasons}")
+
+    def test_unclear_category_is_held_and_flagged(self):  # D-040
+        d = ICP.evaluate(replace(BANK, segment="fintech", industry="Financial Services",
+                                 description="Gen-AI start-up building LLM agents for lenders."), ENRICHED)
+        self.assertEqual(d.decision, HOLD)
+        self.assertTrue(any("a human confirms the company category" in f for f in d.flags), d.flags)
+        d = ICP.evaluate(replace(BANK, segment="fintech", industry="Financial Services", description="Lender."), ENRICHED)
+        self.assertEqual((d.decision, d.flags), (HOLD, []))
 
     def test_excluded_segment_labels(self):
         for seg in ("ai_native_saas", "ai_startup", "mid_market_saas"):
@@ -116,8 +118,8 @@ class IcpTests(unittest.TestCase):
         got = {aid: ICP.evaluate(a, clay.enrich(aid)).decision for aid, a in accounts.items()}
         self.assertEqual(got, {
             "hs-1001": INCLUDE, "hs-1002": INCLUDE, "hs-1003": INCLUDE, "hs-1004": INCLUDE,
-            "hs-1005": EXCLUDE, "hs-1006": EXCLUDE, "hs-1007": WATCH, "hs-1008": WATCH,
-            "hs-1009": HOLD, "hs-1010": EXCLUDE, "hs-1011": EXCLUDE,
+            "hs-1005": EXCLUDE, "hs-1006": HOLD, "hs-1007": WATCH, "hs-1008": WATCH,
+            "hs-1009": HOLD, "hs-1010": EXCLUDE, "hs-1011": HOLD,
         })
 
 

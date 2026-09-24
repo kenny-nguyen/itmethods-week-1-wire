@@ -133,7 +133,7 @@ def check_kill_criteria(pb: dict, out: Path, approvals_dir: Path | None, trail, 
             continue
         if status in ("approved_ready_to_send", "rejected"):
             decided.append(status)
-    metrics = {"rejected_ratio": decided.count("rejected") / len(decided) if decided else 0.0,
+    metrics = {"rejected_ratio": kill_criteria.ratio(decided.count("rejected"), len(decided)),
                **reports.metrics(out / "state", pb["playbook_id"])}
     hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
     if hits and not kill_switch.engaged(out / "state", pb["playbook_id"]):

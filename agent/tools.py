@@ -36,7 +36,7 @@ from pathlib import Path
 
 from agent import AGENT_ID, __version__, config
 from agent.feedback import kill_criteria, kill_switch, reports, trusted
-from agent.governance.audit import AuditBlocked, AuditTrail, JsonlAuditSink
+from agent.governance.audit import AuditBlocked, AuditTrail, JsonlAuditSink, purpose_problems
 from agent.governance.error_log import ErrorLog
 from agent.input import playbook as pbmod
 from agent.input.base import InputError
@@ -135,7 +135,7 @@ class GovernedTools:
         pid = pb["playbook_id"]
         counts = {k: v for k, v in self._counts(pid).items() if k != "since"}
         attempted = counts["drafted"] + counts["gate_failed"]
-        metrics = {**counts, "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
+        metrics = {**counts, "gate_failed_ratio": kill_criteria.ratio(counts["gate_failed"], attempted),
                    **reports.metrics(self.paths.state, pid)}
         hits = kill_criteria.tripped(pb["kill_criteria"], metrics)
         if not hits or kill_switch.engaged(self.paths.state, pid):
@@ -150,14 +150,22 @@ class GovernedTools:
         except AuditBlocked:
             pass  # the switch is engaged; the failure is in the error log
 
+    def _recovery(self, pb: dict, retry: str) -> str:
+        """The retry advice, unless the kill switch is now engaged: then the only next step is the owner's."""
+        killed = kill_switch.engaged(self.paths.state, pb["playbook_id"])
+        if not killed:
+            return retry
+        return (f"stop; the {pb['playbook_id']} playbook is now stopped by its kill switch ({killed['reason']}). "
+                "Only the playbook owner or an approver can clear it, with python3 -m agent.feedback.kill --clear.")
+
     def _guard(self, pb: dict, fn, stage: str):
         try:
             result = fn()
         except AuditBlocked as exc:
             self._count(pb, "audit_blocked")
             self._check_kill(pb)
-            self._fail(stage, str(exc), "the audit record could not be written, so nothing happened. Fix the audit "
-                                        "store (see errors.jsonl), then retry. Do not work around it.")
+            self._fail(stage, str(exc), "the audit record could not be written, so nothing happened. " + self._recovery(
+                pb, "Fix the audit store (see errors.jsonl), then retry. Do not work around it."))
         self._check_kill(pb)
         return result
 
@@ -323,6 +331,12 @@ class GovernedTools:
         if decision not in AGENT_DECISIONS:
             self._fail("audit", f"decision {decision!r} is not one an agent may record.",
                        f"use one of {sorted(AGENT_DECISIONS)}; drafting goes through request_approval.")
+        problems = purpose_problems(purpose)
+        if not sources or not all(isinstance(x, str) and x.strip() for x in sources):
+            problems.append("sources must be a non-empty list of URLs or system ids")
+        if problems:
+            self._fail("audit", "; ".join(problems) + ".",
+                       "write one specific purpose sentence and cite the sources for this hold or drop, then call again.")
         acct = self._account(account_id)
         rec = self._guard(pb, lambda: self._pb_trail(pb).perform(
             action=AGENT_DECISIONS[decision], object_id=acct.system_id, fs=self.io["icp"].is_fs(acct),
@@ -345,8 +359,8 @@ class GovernedTools:
                                context={"account": acct.id, "problems": problems})
             self._count(pb, "gate_failed")
             self._check_kill(pb)
-            raise ToolFailure("the brief failed the output gate: " + "; ".join(problems),
-                              "fix each problem (check_claims lists them) and call request_approval again.")
+            raise ToolFailure("the brief failed the output gate: " + "; ".join(problems), self._recovery(
+                pb, "fix each problem (check_claims lists them) and call request_approval again."))
         prior = _already_briefed(self.paths, acct.system_id, trigger.id, playbook_id)
         if prior:
             self._fail("request_approval", f"{acct.name} already has a brief for {trigger.id}: {prior}.",

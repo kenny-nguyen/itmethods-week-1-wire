@@ -87,8 +87,9 @@ def render(run_dir: Path, *, audit_path: Path, errors_path: Path, score: dict | 
                    "<tr><th>Account</th><th>Expect</th><th>Failed properties</th></tr>")
         for c in score["cases"]:
             fails = [k for k, v in c["properties"].items() if not v["pass"]]
-            out.append(f"<tr><td>{escape(c['account'])}</td><td>{escape(c['expect'])}</td>"
-                       f"<td class={'bad' if fails else 'ok'}>{escape(', '.join(fails) or 'none')}</td></tr>")
+            cell = ("<td class=meta>not exercised in this run</td>" if not c["exercised"] else
+                    f"<td class={'bad' if fails else 'ok'}>{escape(', '.join(fails) or 'none')}</td>")
+            out.append(f"<tr><td>{escape(c['account'])}</td><td>{escape(c['expect'])}</td>{cell}</tr>")
         out.append("</table><p class=meta>Cases: evals/agent_cases.json; scorer: evals/score_run.py</p>")
 
     out.append("<h2>Held, dropped, watched or blocked</h2><table><tr><th>Object</th><th>Decision</th><th>Reason</th></tr>")

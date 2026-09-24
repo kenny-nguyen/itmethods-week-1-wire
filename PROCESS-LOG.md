@@ -1816,3 +1816,79 @@ Per the operator, the MCP agent path is the real agent, so the playbook's qualit
 **Links:** D-038, A-037
 
 </details>
+
+### [R-013] 00:31 · BUILDER · REVERSAL
+Reverses the description-reading part of D-016 and D-038 (F2): free-text descriptions no longer exclude an account. Only the company's category fields (segment and industry) can exclude it as an AI startup or mid-market SaaS.
+
+<details><summary>Structured fields</summary>
+
+**What:** `object_context_regex` is removed from `icp/icp.json` and `agent/processing/icp.py`. The AI-startup and mid-market SaaS naming-variant patterns now match only the segment label and the industry. An account whose segment is not in the ICP is held for a human, as before (A-031), and gets a flag when its description reads like an AI startup, so the human knows to confirm the category. Fixture effect: hs-1006 (a Gen-AI start-up filed as fintech) and hs-1011 (mid-market SaaS filed as enterprise software) are held, not dropped. Neither is enriched or contacted.
+
+**Why:** Operator decision. Two rounds of regex tuning on descriptions showed that each fix opened the opposite hole. Round 1 let "Well-funded AI startup" through. Round 2 dropped "Large bank funding AI startups". The operator's principle: the point is not enterprise grade; it is being very clear on what we do and why, and what we do not do and why. So a company is excluded because its category says what it is. Using AI or backing AI startups never excludes it.
+
+**Evidence:** `tests/test_icp.py` `test_ai_startup_category_variants_excluded`, `test_free_text_never_excludes`, `test_unclear_category_is_held_and_flagged`, `test_fixture_outcomes`.
+
+**Assumption:** The HubSpot segment and industry fields are kept accurate enough to be the exclusion source.
+
+**Reversal trigger:** Sales leadership finds AI startups filed under an in-ICP segment such as `dsib_capital_markets`. The next step in the README covers this: gain clarity on those companies and update the classification rule.
+
+**Links:** D-016, D-038, A-003, A-031
+
+</details>
+
+### [D-040] 00:31 · PM · DECISION
+The operator's rule for AI-startup exclusion: category decides, free text never excludes, and an unclear category is held and flagged for a human.
+
+<details><summary>Structured fields</summary>
+
+**What:** This is the policy that R-013 implements. It is recorded on its own so the code comments and the README can cite it.
+
+**Why:** The goal is to be clear about what we do and why, and what we do not do and why, rather than to build enterprise-grade classification.
+
+**Evidence:** Operator instruction during the no-mistakes review, round 2.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** R-013
+
+</details>
+
+### [D-041] 00:31 · BUILDER · ASSUMPTION
+Ratio kill criteria (`gate-failures`, `approver-rejections`) count only after a minimum sample of 5 decisions. The hard safety criterion (an audit write failure) still trips at once. This refines D-039.
+
+<details><summary>Structured fields</summary>
+
+**What:** `agent/feedback/kill_criteria.py` `ratio()` returns "not measured" below 5 attempts or decisions. The batch runner, `decide` and the MCP tools all use it. When a tool call has just engaged the kill switch, its failure text now says the playbook is stopped and only the owner or an approver can clear it; it no longer says to retry. An agent's own bad input to `write_audit_record` (a generic purpose or no sources) is refused before the audit trail, so it never counts as an audit write failure.
+
+**Why:** Operator decision. Under D-039 one refused draft (ratio 1/1) stopped the playbook, which is noise and not a quality signal. The retry advice also contradicted the kill switch.
+
+**Evidence:** `tests/test_tools.py` `test_gate_refusals_engage_kill_switch_after_minimum_sample`, `test_audit_failure_engages_kill_switch`, `test_agent_input_errors_do_not_count_as_audit_failures`; `tests/test_pipeline.py` `test_rejection_ratio_needs_minimum_sample`.
+
+**Assumption:** 5 is the minimum sample. To confirm with sales leadership.
+
+**Reversal trigger:** Sales leadership sets a different sample size, or wants the first refusal to stop the play.
+
+**Links:** D-039, A-037
+
+</details>
+
+### [D-042] 00:31 · BUILDER · DECISION
+A run's review view now scores only the eval cases that run exercised. Cases it did not touch are labelled "not exercised in this run" and left out of the score, instead of showing as failures.
+
+<details><summary>Structured fields</summary>
+
+**What:** In `evals/score_run.py`, a brief case counts as exercised only when the run holds, routes or creates for the account. An account already briefed in an earlier run is screened again but is not exercised. Other cases count when the run has any audit record for the account. Scoring a whole output root (the command-line default) is unchanged.
+
+**Why:** Operator decision on R2-3. After D-038 a scheduled rerun or a one-account MCP session showed failures that were not the agent's fault.
+
+**Evidence:** `tests/test_score_run.py` `test_run_scope_scores_only_that_run`, `test_mcp_session_scores_only_the_accounts_it_touched`.
+
+**Assumption:** none
+
+**Reversal trigger:** n/a
+
+**Links:** D-038
+
+</details>

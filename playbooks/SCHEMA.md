@@ -49,7 +49,7 @@ Every field below says where it came from (the stub, an operator decision, or a 
 
 The stub: "how CRO stops a motion that goes sloppy". Operator decision A-037: quality-based only, never a count ceiling, and no volume cap (a `limits` block is rejected). Each entry has `id`, `metric`, `op`, `threshold` and `why`. Metrics are computed after every run, approval decision and feedback report; if any criterion trips, that playbook's kill switch engages until its owner or an approver clears it.
 
-Metrics: `audit_blocked`, `gate_failed_ratio`, `rejected_ratio` (over decided requests), `complaints`, `wrong_account_reports` (from `python3 -m agent.feedback.report`).
+Metrics: `audit_blocked`, `gate_failed_ratio`, `rejected_ratio` (over decided requests; both ratios are not measured, and cannot trip, until there are 5 attempts or decisions, D-041), `complaints`, `wrong_account_reports` (from `python3 -m agent.feedback.report`).
 
 ## `audit`
 

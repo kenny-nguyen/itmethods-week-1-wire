@@ -181,7 +181,7 @@ def run(motion_path: str | Path, out_dir: str | Path, *, playbooks_dir: Path | N
         # ---- FEEDBACK: quality kill criteria (A-037) --------------------------------------------
         attempted = counts["drafted"] + counts["gate_failed"]
         metrics = {**counts, "audit_blocked": counts["audit_blocked"] + motion_blocked,
-                   "gate_failed_ratio": counts["gate_failed"] / attempted if attempted else 0.0,
+                   "gate_failed_ratio": kill_criteria.ratio(counts["gate_failed"], attempted),
                    **reports.metrics(paths.state, pid)}
         rec["metrics"] = metrics
         hits = kill_criteria.tripped(pb["kill_criteria"], metrics)

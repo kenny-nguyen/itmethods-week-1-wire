@@ -53,8 +53,21 @@ class ScoreRunTests(unittest.TestCase):
             runs = Path(d) / "runs"
             r1 = score(Path(d), run_dir=runs / first["run_id"])
             self.assertEqual(r1["passed"], r1["total"])
-            case = next(c for c in score(Path(d), run_dir=runs / second["run_id"])["cases"] if c["account"] == "hs-1001")
-            self.assertFalse(case["properties"]["passes_output_gate"]["pass"])
+            r2 = score(Path(d), run_dir=runs / second["run_id"])
+            skipped = {c["account"] for c in r2["cases"] if not c["exercised"]}
+            self.assertEqual(skipped, {"hs-1001", "hs-1002"})  # already briefed in the first run
+            self.assertEqual(r2["passed"], r2["total"])
+            self.assertGreater(r2["total"], 0)
+
+    def test_mcp_session_scores_only_the_accounts_it_touched(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            t.screen_account("bank-sr26-2", "hs-1001"); t.check_applicability("bank-sr26-2", "hs-1001")
+            t.route_contact("bank-sr26-2", "hs-1001")
+            t.request_approval("bank-sr26-2", "hs-1001", offline_draft(t, "hs-1001"))
+            r = score(Path(d), run_dir=t.paths.run_dir)
+            self.assertEqual([c["account"] for c in r["cases"] if c["exercised"]], ["hs-1001"])
+            self.assertEqual((r["passed"], r["total"]), (7, 7))
 
     def test_latest_brief_is_by_run_time_not_directory_name(self):
         with tempdir() as d:

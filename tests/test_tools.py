@@ -116,23 +116,41 @@ class GovernedToolTests(unittest.TestCase):
 
         with tempdir() as d:
             t = GovernedTools(Path(d), sink=FailingSink())
-            with self.assertRaises(ToolFailure):
+            with self.assertRaises(ToolFailure) as cm:
                 t.screen_account(BANK, "hs-1002")
+            self.assertIn("stopped by its kill switch", str(cm.exception))
+            self.assertNotIn("then retry", str(cm.exception))
             killed = kill_switch.engaged(Path(d) / "state", BANK)
             self.assertIn("audit-write-failure", killed["reason"])
             with self.assertRaises(ToolFailure) as cm:
                 t.screen_account(BANK, "hs-1001")
             self.assertIn("kill switch", str(cm.exception))
 
-    def test_gate_refusal_engages_kill_switch(self):
+    def test_gate_refusals_engage_kill_switch_after_minimum_sample(self):  # D-041
         with tempdir() as d:
             t = GovernedTools(Path(d))
             t.screen_account(BANK, "hs-1002"); t.check_applicability(BANK, "hs-1002"); t.route_contact(BANK, "hs-1002")
             bad = offline_draft(t, "hs-1002").replace("## What changed\n", "## What changed\n- SR 26-2 applies to the bank [src-sr26-2].\n")
-            with self.assertRaises(ToolFailure):
+            for _ in range(4):
+                with self.assertRaises(ToolFailure) as cm:
+                    t.request_approval(BANK, "hs-1002", bad)
+                self.assertIn("call request_approval again", str(cm.exception))
+                self.assertIsNone(kill_switch.engaged(Path(d) / "state", BANK))
+            with self.assertRaises(ToolFailure) as cm:
                 t.request_approval(BANK, "hs-1002", bad)
+            self.assertIn("stopped by its kill switch", str(cm.exception))
+            self.assertNotIn("call request_approval again", str(cm.exception))
             self.assertIn("gate-failures", kill_switch.engaged(Path(d) / "state", BANK)["reason"])
             self.assertIn("block", [r["action"] for r in jsonl(Path(d) / "audit.jsonl")])
+
+    def test_agent_input_errors_do_not_count_as_audit_failures(self):
+        with tempdir() as d:
+            t = GovernedTools(Path(d))
+            for purpose, sources in (("engagement", ["hubspot:company/hs-1002"]),
+                                     ("Hold the Lakeshore brief until the owner confirms the entity list.", [])):
+                with self.assertRaises(ToolFailure):
+                    t.write_audit_record(BANK, "hs-1002", "hold", purpose, sources)
+            self.assertIsNone(kill_switch.engaged(Path(d) / "state", BANK))
 
     def test_clean_session_leaves_kill_switch_off(self):
         with tempdir() as d:
