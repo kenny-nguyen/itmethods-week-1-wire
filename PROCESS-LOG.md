@@ -595,3 +595,136 @@ The operator approved a repository layout. The kit's supporting files move under
 
 </details>
 
+### [D-005] 23:28 · RESEARCH · DECISION
+The supervising agent relayed a researcher's report of public iTmethods product facts and four hard content rules. The source pages were re-fetched and the key negative claims spot-checked before anything was written down.
+
+<details><summary>Structured fields</summary>
+
+**What:** Record the product facts in `docs/research/itmethods-product-facts.md` as the only product statements a brief may make.
+
+**Why:** A brief about Reign that overclaims (compliance, certification, a briefing length, defense capability) is worse than no brief. Fetching the pages again instead of trusting the relayed summary is the Input QA gate.
+
+**Evidence:** Eight itmethods.com URLs returned HTTP 200 at 23:22 KST. Page text quoted in the research file: the assurance page says iTmethods "does not issue an audit opinion or a certification"; the defense page says "We hold no FedRAMP authorization".
+
+**Assumption:** Public site text is the approved claim set for this exercise.
+
+**Reversal trigger:** A marketing-approved claims list that differs from the site.
+
+**Links:** A-029
+
+</details>
+
+### [A-027] 23:28 · PM · AMBIGUITY
+The operator chose the bank and SR 26-2 as the one trigger implemented deeply. The other two first-motion buyers stay in the same playbook, marked "not implemented yet", because "pick one" in the packet is about the artifact type, not about serving one persona.
+
+<details><summary>Structured fields</summary>
+
+**What:** Does "pick one, go deep, do not spray" limit the artifact to one buyer persona? Options: (a) one persona only; (b) one artifact type and one deep trigger, with the playbook covering all three buyers.
+
+**Why:** The packet's "pick one" sits above a list of three artifact types, and it asks for a tool that turns "a regulatory trigger" (singular) into a brief. The CEO asks for "one playbook we can reuse". Encoding the other buyers as data costs little and shows the engine is not bank-specific.
+
+**Evidence:** Operator decision received 23:25 KST; register row A-027.
+
+**Assumption:** (b). SR 26-2 for the bank implemented; FDA PCCP (biopharma quality) and the defense supplier encoded with triggers marked not implemented and why.
+
+**Reversal trigger:** The reviewer reads "go deep" as one persona only.
+
+**Links:** A-002, A-030
+
+</details>
+
+### [R-001] 23:28 · PM · REVERSAL
+Reverses A-025. When SR 26-2 applicability to a Canadian bank is not established, the agent now writes the brief and says plainly that applicability requires confirmation, instead of holding the account.
+
+<details><summary>Structured fields</summary>
+
+**What:** Reverses A-025. New position in A-028: brief with the caveat "applicability requires confirmation", OSFI E-23 and B-13 as the Canadian context.
+
+**Why:** A-025's reversal trigger fired exactly as written ("Operator prefers a caveated brief"). SR 26-2 reaches a Canadian D-SIB only through a US Federal Reserve-regulated entity, so the brief cannot assert it applies, but the Canadian guidelines certainly do.
+
+**Evidence:** Operator decision received 23:25 KST. SR 26-2 page text: "expected to be most relevant to banking organizations with over $30 billion in total assets regulated by the Federal Reserve" (fetched 23:17 KST).
+
+**Assumption:** A caveated brief is safe to route to a named approver because it never states that the rule applies.
+
+**Reversal trigger:** Legal review says any SR 26-2 mention to a non-US bank is inappropriate.
+
+**Links:** A-025, A-028, D-003
+
+</details>
+
+### [A-028] 23:28 · PM · AMBIGUITY
+For a Canadian bank the brief says SR 26-2 "applicability requires confirmation" unless a US Federal Reserve-regulated entity is on record, and it leads with OSFI E-23 and B-13.
+
+<details><summary>Structured fields</summary>
+
+**What:** What does the brief say about SR 26-2 for a Canadian D-SIB (domestic systemically important bank)? Options: (a) hold (A-025); (b) brief with the caveat and the Canadian context.
+
+**Why:** Operator decision, and a forwardable brief is the CEO's exception to "no outbound before a briefing".
+
+**Evidence:** Register row A-028.
+
+**Assumption:** (b)
+
+**Reversal trigger:** A confirmed US entity list for the account removes the caveat.
+
+**Links:** R-001
+
+</details>
+
+### [A-029] 23:29 · PM · AMBIGUITY
+Briefs may only say what iTmethods' own pages say about its products, and a deterministic gate rejects compliance, certification, assurance and validation claims, any briefing length, and any hint of CMMC, FedRAMP or CUI capability.
+
+<details><summary>Structured fields</summary>
+
+**What:** What may a brief say about iTmethods and its products? Options: (a) whatever the model writes; (b) a sourced claims list plus deterministic forbidden-claim checks.
+
+**Why:** Models paraphrase toward confident claims. A word-list gate is dumb, but it is deterministic, testable and cannot be talked out of its rules.
+
+**Evidence:** `docs/research/itmethods-product-facts.md`; operator content rules received 23:25 KST.
+
+**Assumption:** (b). CMMC = Cybersecurity Maturity Model Certification; FedRAMP = Federal Risk and Authorization Management Program; CUI = Controlled Unclassified Information.
+
+**Reversal trigger:** An approved-claims list from marketing.
+
+**Links:** D-005
+
+</details>
+
+### [R-002] 23:29 · PM · REVERSAL
+Reverses A-017. One playbook now holds a list of plays, one per buyer, and each play keeps exactly one trigger.
+
+<details><summary>Structured fields</summary>
+
+**What:** Reverses A-017 ("one trigger per playbook"). New position in A-030: `plays[]`, each keeping the stub's `audience`, `trigger` and `channel` shapes; approval, kill criteria and audit shared.
+
+**Why:** A-017's reversal trigger was about Campaign Manager owners; what actually arrived was the operator's decision that the first-motion playbook covers three buyers. The reason behind A-017 (every audit record tied to one trigger) survives, because each play has one trigger.
+
+**Evidence:** Operator decision received 23:25 KST.
+
+**Assumption:** A shared governance block across plays is acceptable to Campaign Manager.
+
+**Reversal trigger:** Campaign Manager requires one trigger per playbook file.
+
+**Links:** A-017, A-030
+
+</details>
+
+### [A-030] 23:29 · PM · AMBIGUITY
+The first-motion playbook is one file with a list of plays: the bank play implemented, the biopharma and defense plays encoded but marked not implemented.
+
+<details><summary>Structured fields</summary>
+
+**What:** How does one playbook cover three buyers given the stub's single `audience` / `trigger` / `channel`? Options: (a) three playbooks; (b) one playbook with `plays[]`.
+
+**Why:** "One playbook we can reuse" (CEO notes) and the operator's decision.
+
+**Evidence:** Register row A-030.
+
+**Assumption:** (b)
+
+**Reversal trigger:** Campaign Manager requires one trigger per playbook file.
+
+**Links:** R-002
+
+</details>
+

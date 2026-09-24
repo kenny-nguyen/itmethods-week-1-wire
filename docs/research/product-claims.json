@@ -1,0 +1,12 @@
+{
+  "_about": "The only statements a brief may make about iTmethods products. Source: public itmethods.com pages re-fetched 2026-09-24 23:22 KST. See itmethods-product-facts.md. Register row A-029.",
+  "claims": [
+    {"id": "P-FORGE", "text": "Forge is iTmethods' managed runtime and infrastructure substrate for DevOps, AI workloads and agent runtimes: \"Forge runs; Reign governs\".", "urls": ["https://www.itmethods.com/learn/sovereign-ai", "https://www.itmethods.com/forge/agent-infrastructure"]},
+    {"id": "P-SOLD-SEPARATELY", "text": "Reign products are sold independently, not as a bundle.", "urls": ["https://www.itmethods.com/ops"]},
+    {"id": "P-STATUS", "text": "Reign Ops and Reign Gateway are available; Reign Factory is in beta; Reign Assurance is in co-design.", "urls": ["https://www.itmethods.com", "https://www.itmethods.com/assurance"]},
+    {"id": "P-GATEWAY", "text": "Reign Gateway is a governed path for agent and application calls to approved models and tools, with identity, policy, spend limits, and records of caller, decision, destination and outcome.", "urls": ["https://www.itmethods.com/gateway"]},
+    {"id": "P-ASSURANCE", "text": "Reign Assurance is being designed to prepare evidence; the people who own the risk decide. It does not issue an audit opinion or a certification.", "urls": ["https://www.itmethods.com/assurance"]},
+    {"id": "P-BRIEFING", "text": "The Executive Assurance Briefing is the first stage (Briefing, then Runtime Risk and Governance Assessment, Focused Pilot, Platform Rollout) and is aimed at boards, audit and risk committees.", "urls": ["https://www.itmethods.com/reign/assurance"]},
+    {"id": "P-BANKING", "text": "For banks, iTmethods works as first line on OSFI E-23, SR 26-2 and DORA readiness; it does no independent validation.", "urls": ["https://www.itmethods.com/sectors/banking"]}
+  ]
+}

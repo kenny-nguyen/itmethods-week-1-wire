@@ -8,7 +8,7 @@ The assignment packet itself is private and is not in this repository. Where a d
 
 ## About the working contract (the first commit)
 
-The first commit in this history (`Install working contract and kit`) contains no product code. The supporting kit files were later moved under `contract/` so the repository root holds only what a reviewer reads first; `AGENTS.md` stays at the root because agents load it from there. It is an operating contract for the AI agents that do the work in this repository, committed before the timer-driven work began so that the rules were fixed before any decision was made. A reviewer can check any later commit against rules that could not have been written to fit it.
+The first commit in this history (`Install working contract and kit`) contains no product code. It is an operating contract for the AI agents that do the work in this repository, committed before the timer-driven work began so that the rules were fixed before any decision was made. A reviewer can check any later commit against rules that could not have been written to fit it. The supporting kit files were later moved under `contract/` (process log D-004) so the repository root holds what a reviewer reads first; `AGENTS.md` stays at the root because agents load it from there.
 
 What the contract sets out:
 
@@ -41,3 +41,4 @@ This section is updated as usable pieces land.
 | `PROCESS-LOG.md` | Append-only decision log, written during the window. |
 | `AMBIGUITY-REGISTER.md` | Every ambiguity, the reading taken, and what would flip it. |
 | `INTAKE-WORKSHEET.md` | First structured read of the assignment. |
+| `docs/research/` | Sourced facts the agent is allowed to use (product claims, regulator pages). |

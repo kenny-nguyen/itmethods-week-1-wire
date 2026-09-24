@@ -1,6 +1,6 @@
 # iTmethods product facts (public sources)
 
-The only product statements a generated brief may make. They are loaded from `data/claims.json`, which carries the same statements with their source URLs. A brief that states anything about iTmethods outside this list, or breaks one of the content rules below, fails the output gate (`wire/processing/checks.py`).
+The only product statements a generated brief may make. They are loaded from `docs/research/product-claims.json`, which carries the same statements with their source URLs. A brief that states anything about iTmethods outside this list, or breaks one of the content rules below, fails the output gate (`agent/processing/checks.py`).
 
 Source: a researcher report relayed by the supervising agent at 23:20 KST, summarised below. The URLs were re-fetched at 23:22 KST and all returned HTTP 200; the banking, defense and assurance claims were spot-checked against page text (quotes below).
 
